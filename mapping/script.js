@@ -53,7 +53,6 @@ window.addEventListener('click', (event) => {
     }
 });
 
-
 // Logika prilikom izbora Provider Marketa
 providerMarketSelect.addEventListener('change', function() {
     const selectedMarketName = this.value;
@@ -73,8 +72,7 @@ providerMarketSelect.addEventListener('change', function() {
     mappingCounter = 0;
 });
 
-
-// IZMENJENO: Prima listu provider specifiera i generiše selekt umesto tekstualnog polja
+// Specifier iz providera (dropdown) levo, Hermes desno
 function createSpecifierRowHtml(providerSpecifiers = []) {
     const hermesSpecifiers = ["goalnr", "hcp", "total", "from", "to"];
     const hermesOptionsHtml = hermesSpecifiers.map(spec => `<option value="${spec}">${spec}</option>`).join('');
@@ -107,7 +105,7 @@ function createSpecifierRowHtml(providerSpecifiers = []) {
     `;
 }
 
-// NOVO: Funkcija za Fixed Specifiers (levo tekstualno polje, desno dropdown)
+// Fixed Specifier levo, Hermes desno
 function createFixedSpecifierRowHtml() {
     const hermesSpecifiers = ["goalnr", "hcp", "total", "from", "to"];
     const hermesOptionsHtml = hermesSpecifiers.map(spec => `<option value="${spec}">${spec}</option>`).join('');
@@ -130,7 +128,7 @@ function createFixedSpecifierRowHtml() {
     `;
 }
 
-// Provider select (levo), Hermes select (desno)
+// Provider levo, Hermes desno
 function createExtSpecifierRowHtml() {
     const extSpecifiers = ["match_status", "score_info", "set_number", "score"];
     const optionsHtml = extSpecifiers.map(ext => `<option value="${ext}">${ext}</option>`).join('');
@@ -208,6 +206,7 @@ addMappingBtn.addEventListener('click', function() {
     newSection.classList.add('mapping-card');
     newSection.style.backgroundColor = "white"; 
     
+    // IZMENA: Grupisanje Specifiera u zajednički blok
     newSection.innerHTML = `
         <div class="mapping-card-header">
             <h4>Mapping #${currentMappingId}</h4>
@@ -235,29 +234,33 @@ addMappingBtn.addEventListener('click', function() {
 
         <div class="mapping-details-wrapper" style="display: none;">
             
-            <div class="specifier-mapping-section" style="margin-top: 20px; padding-top: 15px; border-top: 1px dashed #ccc;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                    <h5 style="margin: 0; color: #555; font-size: 15px;">Specifiers mapping</h5>
-                    <button type="button" class="btn-secondary btn-add-specifier">Add Specifier</button>
+            <div class="specifiers-group-section" style="margin-top: 20px; padding-top: 15px; border-top: 1px dashed #ccc;">
+                <h4 style="margin: 0 0 15px 0; color: #2c3e50; font-size: 16px;">Specifiers Mapping Group</h4>
+                
+                <div class="specifier-mapping-section" style="background: #fcfcfc; border: 1px solid #eaeaea; padding: 15px; border-radius: 6px; margin-bottom: 15px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <h5 style="margin: 0; color: #555; font-size: 14px;">Mapped from Provider</h5>
+                        <button type="button" class="btn-secondary btn-add-specifier">Add Specifier</button>
+                    </div>
+                    <div class="specifiers-list">
+                        <div class="specifier-row">${createSpecifierRowHtml(currentProviderSpecifiers)}</div>
+                    </div>
                 </div>
-                <div class="specifiers-list">
-                    <div class="specifier-row">${createSpecifierRowHtml(currentProviderSpecifiers)}</div>
-                </div>
-            </div>
 
-            <div class="fixed-specifier-mapping-section" style="margin-top: 20px; padding-top: 15px; border-top: 1px dashed #ccc;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                    <h5 style="margin: 0; color: #555; font-size: 15px;">Fixed specifiers mapping</h5>
-                    <button type="button" class="btn-secondary btn-add-fixed-specifier">Add Fixed Specifier</button>
-                </div>
-                <div class="fixed-specifiers-list">
-                    <div class="specifier-row">${createFixedSpecifierRowHtml()}</div>
+                <div class="fixed-specifier-mapping-section" style="background: #fcfcfc; border: 1px solid #eaeaea; padding: 15px; border-radius: 6px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <h5 style="margin: 0; color: #555; font-size: 14px;">Fixed Values</h5>
+                        <button type="button" class="btn-secondary btn-add-fixed-specifier">Add Fixed Specifier</button>
+                    </div>
+                    <div class="fixed-specifiers-list">
+                        <div class="specifier-row">${createFixedSpecifierRowHtml()}</div>
+                    </div>
                 </div>
             </div>
 
             <div class="ext-specifier-mapping-section" style="margin-top: 20px; padding-top: 15px; border-top: 1px dashed #ccc;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                    <h5 style="margin: 0; color: #555; font-size: 15px;">Extended specifiers mapping</h5>
+                    <h4 style="margin: 0; color: #2c3e50; font-size: 16px;">Extended specifiers mapping</h4>
                     <button type="button" class="btn-secondary btn-add-ext-specifier">Add Ext. Specifier</button>
                 </div>
                 <div class="ext-specifiers-list"></div>
@@ -265,7 +268,7 @@ addMappingBtn.addEventListener('click', function() {
             
             <div class="outcome-mapping-section" style="display: ${sectionDisplayStyle}; margin-top: 20px; padding-top: 15px; border-top: 1px dashed #ccc;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                    <h5 style="margin: 0; color: #555; font-size: 15px;">Outcome mapping</h5>
+                    <h4 style="margin: 0; color: #2c3e50; font-size: 16px;">Outcome mapping</h4>
                     <button type="button" class="btn-secondary btn-add-outcome">Add Outcome</button>
                 </div>
                 <div class="outcomes-list">
@@ -287,7 +290,6 @@ addMappingBtn.addEventListener('click', function() {
     const addSpecifierBtn = newSection.querySelector('.btn-add-specifier');
     const specifiersList = newSection.querySelector('.specifiers-list');
     
-    // Elementi za Fixed Specifiers
     const addFixedSpecifierBtn = newSection.querySelector('.btn-add-fixed-specifier');
     const fixedSpecifiersList = newSection.querySelector('.fixed-specifiers-list');
 
@@ -298,7 +300,7 @@ addMappingBtn.addEventListener('click', function() {
     const outcomesList = newSection.querySelector('.outcomes-list');
     const saveSingleMappingBtn = newSection.querySelector('.btn-save-single-mapping');
 
-    // Kada se izabere Hermes Market, upiši njegov tip i prikaži ostatak forme
+    // Kada se izabere Hermes Market
     selectMarket.addEventListener('change', function() {
         if(this.value) {
             marketTypeDisplay.value = hermesMarketTypes[this.value] || "Unknown";
@@ -308,7 +310,6 @@ addMappingBtn.addEventListener('click', function() {
 
     // --- LOGIKA ZA DODAVANJE REDOVA ---
     
-    // 1. Specifiers
     addSpecifierBtn.addEventListener('click', () => {
         const newRow = document.createElement('div');
         newRow.classList.add('specifier-row');
@@ -324,10 +325,9 @@ addMappingBtn.addEventListener('click', function() {
         });
     }
 
-    // 2. NOVO: Fixed Specifiers
     addFixedSpecifierBtn.addEventListener('click', () => {
         const newRow = document.createElement('div');
-        newRow.classList.add('specifier-row'); // Koristimo istu CSS klasu za raspored
+        newRow.classList.add('specifier-row');
         newRow.innerHTML = createFixedSpecifierRowHtml();
         newRow.querySelector('.btn-remove-fixed-specifier').addEventListener('click', () => newRow.remove());
         fixedSpecifiersList.appendChild(newRow);
@@ -340,7 +340,6 @@ addMappingBtn.addEventListener('click', function() {
         });
     }
 
-    // 3. Extended Specifiers
     addExtSpecifierBtn.addEventListener('click', () => {
         const newRow = document.createElement('div');
         newRow.classList.add('ext-specifier-row');
@@ -349,7 +348,6 @@ addMappingBtn.addEventListener('click', function() {
         extSpecifiersList.appendChild(newRow);
     });
 
-    // 4. Outcomes
     addOutcomeBtn.addEventListener('click', () => {
         const newRow = document.createElement('div');
         newRow.classList.add('outcome-row');
@@ -365,7 +363,6 @@ addMappingBtn.addEventListener('click', function() {
         });
     }
 
-    // --- LOGIKA ZA ČUVANJE (SAVE) ---
     saveSingleMappingBtn.addEventListener('click', () => {
         const selectedMarket = selectMarket.value;
         alert(`Mapping #${currentMappingId} for Hermes Market "${selectedMarket}" has been saved!`);
@@ -380,24 +377,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const urlMarket = urlParams.get('market');
     const urlSport = urlParams.get('sport');
 
-    // 1. Prikazujemo sport ako je prosleđen
     if (urlSport) {
         const sportDisplay = document.getElementById('displaySport');
         if (sportDisplay) sportDisplay.textContent = urlSport;
     }
 
-    // 2. Selektujemo market ako je prosleđen
     if (urlMarket) {
-        // Provera da li taj market postoji u našim mock podacima. Ako ne, kreiramo ga da JS ne bi pukao.
         if (!providerMarketsData[urlMarket]) {
             providerMarketsData[urlMarket] = { 
                 type: "Regular", 
                 specifiers: [], 
-                outcomes: ["Home", "Away"] // Generički ishodi za nepoznate markete
+                outcomes: ["Home", "Away"]
             };
         }
 
-        // Provera da li opcija postoji u HTML dropdown-u. Ako ne, dodajemo je.
         const optionExists = Array.from(providerMarketSelect.options).some(opt => opt.value === urlMarket);
         if (!optionExists) {
             const newOption = document.createElement('option');
@@ -406,7 +399,6 @@ document.addEventListener('DOMContentLoaded', () => {
             providerMarketSelect.appendChild(newOption);
         }
 
-        // Postavljamo vrednost dropdown-a i trigerujemo 'change' event da otključamo dugmiće
         providerMarketSelect.value = urlMarket;
         providerMarketSelect.dispatchEvent(new Event('change'));
     }
