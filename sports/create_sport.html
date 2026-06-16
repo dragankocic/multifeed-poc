@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Hermes Sport</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+    <div id="sidebar-container" data-root=".." data-active="sports-management"></div>
+    <script src="../sidebar.js"></script>
+
+    <div class="main-content">
+        <header class="main-header" style="background-color: #17a2b8;">
+            <h1 id="pageMainTitle">Create Hermes Sport</h1>
+        </header>
+
+        <main class="split-layout">
+            <div class="form-side">
+                
+                <div style="margin-bottom: 20px;">
+                    <a href="hermes_sports.html" class="btn-secondary" style="text-decoration: none; display: inline-block;">&larr; Back to list</a>
+                </div>
+
+                <div class="info-section">
+                    <h2 id="pageSubTitle">Define a new Sport</h2>
+                </div>
+
+                <section class="section-card">
+                    <h3 class="section-title">Sport Details</h3>
+                    <div class="form-column">
+                        
+                        <div class="form-group">
+                            <label for="sportName">Sport Name</label>
+                            <input type="text" id="sportName" placeholder="e.g. Volleyball">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="sportAbbr">Abbreviation</label>
+                            <input type="text" id="sportAbbr" placeholder="e.g. VLB" maxlength="3" style="text-transform: uppercase;">
+                        </div>
+
+                    </div>
+                </section>
+
+                <div class="actions-bar">
+                    <button id="saveSportBtn" class="btn-primary">Save sport</button>
+                </div>
+            </div>
+
+            <aside class="info-side">
+                <div class="sticky-info">
+                    <h3 class="side-title">Guidelines</h3>
+                    <div class="info-block">
+                        <h4>Sport Name</h4>
+                        <p>Zvanični naziv sporta u Hermes sistemu. Ovaj naziv će se prikazivati u dropdown listama prilikom kreiranja marketa i mapiranja.</p>
+                    </div>
+                    <div class="info-block">
+                        <h4>Abbreviation</h4>
+                        <p>Skraćenica od tačno tri slova (npr. SOC, BKB, TEN). Koristi se u bazama i API odgovorima radi uštede prostora.</p>
+                    </div>
+                </div>
+            </aside>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Provera URL parametara za Edit mod
+            const urlParams = new URLSearchParams(window.location.search);
+            const isEdit = urlParams.get('edit') === 'true';
+            const editName = urlParams.get('name');
+            const editAbbr = urlParams.get('abbr');
+
+            // Ako je Edit mod, popuni polja i promeni naslove
+            if (isEdit) {
+                document.getElementById('pageMainTitle').textContent = 'Edit Hermes Sport';
+                document.getElementById('pageSubTitle').textContent = 'Update existing Sport';
+                document.getElementById('saveSportBtn').textContent = 'Update sport';
+                document.title = 'Edit Hermes Sport';
+
+                if (editName) document.getElementById('sportName').value = editName;
+                if (editAbbr) document.getElementById('sportAbbr').value = editAbbr;
+            }
+
+            // Logika za čuvanje
+            document.getElementById('saveSportBtn').addEventListener('click', () => {
+                const name = document.getElementById('sportName').value;
+                const abbr = document.getElementById('sportAbbr').value;
+                
+                if(!name || !abbr) {
+                    alert("Please fill in both fields.");
+                    return;
+                }
+
+                const actionText = isEdit ? "updated" : "created";
+                alert(`Hermes Sport "${name}" (${abbr.toUpperCase()}) successfully ${actionText}!`);
+                window.location.href = 'hermes_sports.html';
+            });
+        });
+    </script>
+</body>
+</html>

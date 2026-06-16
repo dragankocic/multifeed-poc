@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multifeed Messages</title>
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="stylesheet" href="messages_style.css">
+</head>
+<body>
+
+    <div id="sidebar-container" data-root="../.." data-active="multifeed-messages"></div>
+
+    <div class="main-content">
+        <header class="main-header">
+            <h1>Multifeed System Messages</h1>
+        </header>
+
+        <main class="dashboard-container">
+            
+            <div class="top-bar" style="flex-direction: column; align-items: stretch; gap: 20px;">
+                
+                <div class="switch-container">
+                    <span>Group by event</span>
+                    <label class="switch">
+                        <input type="checkbox" id="groupByEventToggle">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="filters" style="flex-wrap: wrap; gap: 15px;">
+                    
+                    <div class="filter-group">
+                        <label for="providerSelect">Provider</label>
+                        <select id="providerSelect" style="padding: 10px; border-radius: 4px; border: 1px solid #ccc; min-width: 150px;">
+                            <option value="ExeFeed" selected>ExeFeed</option>
+                            <option value="SportRadar">SportRadar</option>
+                            <option value="Bet Genius">Bet Genius</option>
+                            <option value="IMG Arena">IMG Arena</option>
+                            <option value="Bet Construct">Bet Construct</option>
+                            <option value="LSports">LSports</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="feedSelect">Feed</label>
+                        <select id="feedSelect" style="padding: 10px; border-radius: 4px; border: 1px solid #ccc; min-width: 150px;">
+                            </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label>Received between</label>
+                        <div class="date-range-container">
+                            <input type="datetime-local" id="dateFrom" style="padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                            <span>-</span>
+                            <input type="datetime-local" id="dateTo" style="padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                        </div>
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="sportSelect">Sport</label>
+                        <select id="sportSelect" style="padding: 10px; border-radius: 4px; border: 1px solid #ccc;">
+                            <option value="all" selected>All</option>
+                            <option value="Soccer">Soccer</option>
+                            <option value="Basketball">Basketball</option>
+                            <option value="Tennis">Tennis</option>
+                            <option value="Motorsport">Motorsport</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="statusSelect">Status</label>
+                        <select id="statusSelect" style="padding: 10px; border-radius: 4px; border: 1px solid #ccc;">
+                            <option value="all" selected>All Statuses</option>
+                            <option value="Not started">Not started</option>
+                            <option value="Live">Live</option>
+                            <option value="Ended">Ended</option>
+                            <option value="Closed">Closed</option>
+                            <option value="Cancelled">Cancelled</option>
+                            <option value="Delayed">Delayed</option>
+                            <option value="Interrupted">Interrupted</option>
+                            <option value="Suspended">Suspended</option>
+                            <option value="Postponed">Postponed</option>
+                            <option value="Abandoned">Abandoned</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="searchInput">Search</label>
+                        <input type="text" id="searchInput" placeholder="Search ID or description..." style="padding: 10px 15px; border: 1px solid #ccc; border-radius: 4px; font-size: 15px; min-width: 200px; background-color: #fdfdfd;">
+                    </div>
+                </div>
+            </div>
+
+            <section class="markets-section">
+                <table class="markets-table">
+                    <thead id="tableHeader">
+                        </thead>
+                    <tbody id="messagesTableBody">
+                        </tbody>
+                </table>
+                
+                <div class="pagination-container">
+                    <div class="rows-per-page">
+                        <label style="font-size: 14px; color: #555; margin-right: 10px;">Rows per page:</label>
+                        <select id="rowsPerPage" style="padding: 5px 10px; border-radius: 4px; border: 1px solid #ccc;">
+                            <option value="5">5</option>
+                            <option value="10" selected>10</option>
+                            <option value="20">20</option>
+                            <option value="50">50</option>
+                        </select>
+                    </div>
+                    
+                    <div class="pagination-controls">
+                        <span id="pageInfo" style="font-size: 14px; color: #555;">Page 1 of 1</span>
+                        <button class="page-btn" id="prevPageBtn">Previous</button>
+                        <button class="page-btn" id="nextPageBtn">Next</button>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script src="../../sidebar.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const tableHeader = document.getElementById("tableHeader");
+            const tableBody = document.getElementById("messagesTableBody");
+            
+            const providerSelect = document.getElementById("providerSelect");
+            const feedSelect = document.getElementById("feedSelect");
+            const sportSelect = document.getElementById("sportSelect");
+            const statusSelect = document.getElementById("statusSelect");
+            const searchInput = document.getElementById("searchInput");
+            const groupByEventToggle = document.getElementById("groupByEventToggle");
+            
+            // Paginacija elementi
+            const rowsPerPageSelect = document.getElementById("rowsPerPage");
+            const prevPageBtn = document.getElementById("prevPageBtn");
+            const nextPageBtn = document.getElementById("nextPageBtn");
+            const pageInfo = document.getElementById("pageInfo");
+
+            // Baza feed-ova za dinamičko punjenje
+            const providerFeedsDatabase = {
+                "ExeFeed": ["Exe-Live", "Exe-Prematch"],
+                "SportRadar": ["SR-LiveOdds", "SR-MTS", "SR-PreMatch", "SR-Resulting"],
+                "Bet Genius": ["BG-GeniusOdds"],
+                "IMG Arena": ["IMG-TennisLive", "IMG-GolfTrack", "IMG-PreOdds"],
+                "Bet Construct": ["BC-MainLive", "BC-PrematchData", "BC-Scouting", "BC-Virtuals", "BC-CryptoFeed"],
+                "LSports": ["LS-STM", "LS-PreMatch"]
+            };
+
+            // Mock podaci - INDIVIDUALNE PORUKE
+            const allMessages = [
+                { eventId: "EV-001", provId: "sr:match:11", provider: "SportRadar", feed: "SR-LiveOdds", time: "2026-06-09 12:30:05", sport: "Soccer", status: "Live", desc: "Real Madrid - Barcelona", type: "Match Update" },
+                { eventId: "EV-002", provId: "sr:match:22", provider: "ExeFeed", feed: "Exe-Live", time: "2026-06-09 12:28:10", sport: "Basketball", status: "Live", desc: "New York Knicks - San Antonio Spurs", type: "Period Update" },
+                { eventId: "EV-001", provId: "sr:match:11", provider: "SportRadar", feed: "SR-LiveOdds", time: "2026-06-09 12:25:00", sport: "Soccer", status: "Live", desc: "Real Madrid - Barcelona", type: "Incident" },
+                { eventId: "EV-003", provId: "sr:match:33", provider: "Bet Genius", feed: "BG-GeniusOdds", time: "2026-06-09 11:00:00", sport: "Tennis", status: "Ended", desc: "Novak Djokovic - Carlos Alcaraz", type: "Status Update" },
+                { eventId: "EV-004", provId: "sr:match:44", provider: "SportRadar", feed: "SR-PreMatch", time: "2026-06-10 15:00:00", sport: "Soccer", status: "Not started", desc: "Manchester City - Arsenal", type: "Market Update" },
+                { eventId: "EV-005", provId: "sr:match:55", provider: "ExeFeed", feed: "Exe-Prematch", time: "2026-06-09 10:15:00", sport: "Soccer", status: "Cancelled", desc: "Bayern Munich - BVB", type: "Status Update" },
+                { eventId: "EV-001", provId: "sr:match:11", provider: "SportRadar", feed: "SR-LiveOdds", time: "2026-06-09 12:10:00", sport: "Soccer", status: "Live", desc: "Real Madrid - Barcelona", type: "Status Update" },
+                { eventId: "EV-006", provId: "sr:match:66", provider: "Bet Construct", feed: "BC-MainLive", time: "2026-06-09 12:31:00", sport: "Basketball", status: "Suspended", desc: "LA Lakers - Boston Celtics", type: "Status Update" },
+                { eventId: "EV-007", provId: "sr:match:77", provider: "LSports", feed: "LS-STM", time: "2026-06-09 09:00:00", sport: "Tennis", status: "Closed", desc: "Rafael Nadal - Andy Murray", type: "Market Update" },
+                { eventId: "EV-002", provId: "sr:match:22", provider: "ExeFeed", feed: "Exe-Live", time: "2026-06-09 12:20:00", sport: "Basketball", status: "Live", desc: "New York Knicks - San Antonio Spurs", type: "Incident" },
+                { eventId: "EV-008", provId: "sr:race:1", provider: "IMG Arena", feed: "IMG-PreOdds", time: "2026-06-09 14:00:00", sport: "Motorsport", status: "Delayed", desc: "Monaco GP", type: "Status Update" },
+                { eventId: "EV-001", provId: "sr:match:11", provider: "SportRadar", feed: "SR-PreMatch", time: "2026-06-09 11:55:00", sport: "Soccer", status: "Not started", desc: "Real Madrid - Barcelona", type: "Pre-match Update" }
+            ];
+
+            // Mock podaci - JEDINSTVENI DOGAĐAJI
+            const allEvents = [
+                { eventId: "EV-001", provId: "sr:match:11", provider: "SportRadar", feed: "SR-LiveOdds", startTime: "2026-06-09 12:10:00", sport: "Soccer", desc: "Real Madrid - Barcelona", status: "Live" },
+                { eventId: "EV-002", provId: "sr:match:22", provider: "ExeFeed", feed: "Exe-Live", startTime: "2026-06-09 11:45:00", sport: "Basketball", desc: "New York Knicks - San Antonio Spurs", status: "Live" },
+                { eventId: "EV-003", provId: "sr:match:33", provider: "Bet Genius", feed: "BG-GeniusOdds", startTime: "2026-06-09 09:00:00", sport: "Tennis", desc: "Novak Djokovic - Carlos Alcaraz", status: "Ended" },
+                { eventId: "EV-004", provId: "sr:match:44", provider: "SportRadar", feed: "SR-PreMatch", startTime: "2026-06-10 20:45:00", sport: "Soccer", desc: "Manchester City - Arsenal", status: "Not started" },
+                { eventId: "EV-008", provId: "sr:race:1", provider: "IMG Arena", feed: "IMG-PreOdds", startTime: "2026-06-14 15:00:00", sport: "Motorsport", desc: "Monaco GP", status: "Delayed" },
+                { eventId: "EV-009", provId: "sr:match:99", provider: "LSports", feed: "LS-PreMatch", startTime: "2026-06-11 18:00:00", sport: "Soccer", desc: "AC Milan - Inter", status: "Not started" },
+                { eventId: "EV-010", provId: "sr:match:101", provider: "ExeFeed", feed: "Exe-Prematch", startTime: "2026-06-11 18:00:00", sport: "Soccer", desc: "Bayern Munich - BVB", status: "Not started" }
+            ];
+
+            let currentPage = 1;
+            let rowsPerPage = parseInt(rowsPerPageSelect.value);
+            let filteredData = [];
+
+            const statusColors = {
+                "Live": { bg: "#d4edda", col: "#155724", border: "#c3e6cb" },
+                "Not started": { bg: "#e2e3e5", col: "#383d41", border: "#d6d8db" },
+                "Ended": { bg: "#cce5ff", col: "#004085", border: "#b8daff" },
+                "Closed": { bg: "#d1ecf1", col: "#0c5460", border: "#bee5eb" },
+                "Cancelled": { bg: "#f8d7da", col: "#721c24", border: "#f5c6cb" },
+                "Delayed": { bg: "#fff3cd", col: "#856404", border: "#ffeeba" },
+                "Suspended": { bg: "#fff3cd", col: "#856404", border: "#ffeeba" },
+                "Interrupted": { bg: "#fff3cd", col: "#856404", border: "#ffeeba" },
+                "Postponed": { bg: "#f8d7da", col: "#721c24", border: "#f5c6cb" },
+                "Abandoned": { bg: "#f8d7da", col: "#721c24", border: "#f5c6cb" }
+            };
+
+            // IZMENJENO: Punjenje feed dropdowna, prvo opcija je automatski izabrana
+            function updateFeedDropdown() {
+                const selectedProvider = providerSelect.value;
+                feedSelect.innerHTML = ''; // Potpuno brisanje starog sadržaja
+                
+                if (selectedProvider && providerFeedsDatabase[selectedProvider]) {
+                    providerFeedsDatabase[selectedProvider].forEach((feedName, index) => {
+                        const option = document.createElement('option');
+                        option.value = feedName;
+                        option.textContent = feedName;
+                        if(index === 0) option.selected = true; // Selektuj prvi feed
+                        feedSelect.appendChild(option);
+                    });
+                }
+            }
+
+            function filterAndRender() {
+                const providerVal = providerSelect.value;
+                const feedVal = feedSelect.value;
+                const sportVal = sportSelect.value;
+                const statusVal = statusSelect.value;
+                const searchVal = searchInput.value.toLowerCase();
+                const isGrouped = groupByEventToggle.checked;
+
+                if (isGrouped) {
+                    tableHeader.innerHTML = `
+                        <tr>
+                            <th>Event ID</th>
+                            <th>Provider event ID</th>
+                            <th>Start time</th>
+                            <th>Sport</th>
+                            <th>Description</th>
+                            <th>Status</th>
+                            <th style="text-align: right;">Action</th>
+                        </tr>
+                    `;
+                } else {
+                    tableHeader.innerHTML = `
+                        <tr>
+                            <th>Event ID</th>
+                            <th>Prov. Event ID</th>
+                            <th>Timestamp</th>
+                            <th>Sport</th>
+                            <th>Status</th>
+                            <th>Description</th>
+                            <th>Message Type</th>
+                            <th style="text-align: right;">Action</th>
+                        </tr>
+                    `;
+                }
+
+                const dataSource = isGrouped ? allEvents : allMessages;
+
+                // IZMENJENO: Striktno proveravanje providera i feed-a bez 'all'
+                filteredData = dataSource.filter(item => {
+                    const matchesProvider = item.provider === providerVal;
+                    const matchesFeed = item.feed === feedVal;
+                    const matchesSport = sportVal === 'all' || item.sport === sportVal;
+                    const matchesStatus = statusVal === 'all' || item.status === statusVal;
+                    const matchesSearch = item.eventId.toLowerCase().includes(searchVal) || 
+                                          item.desc.toLowerCase().includes(searchVal) || 
+                                          item.provId.toLowerCase().includes(searchVal);
+                    
+                    return matchesProvider && matchesFeed && matchesSport && matchesStatus && matchesSearch;
+                });
+
+                if (isGrouped) {
+                    filteredData.sort((a, b) => b.startTime.localeCompare(a.startTime)); 
+                } else {
+                    filteredData.sort((a, b) => b.time.localeCompare(a.time));
+                }
+
+                const totalPages = Math.ceil(filteredData.length / rowsPerPage) || 1;
+                if (currentPage > totalPages) currentPage = totalPages;
+                
+                pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
+                prevPageBtn.disabled = currentPage === 1;
+                nextPageBtn.disabled = currentPage === totalPages;
+
+                const startIndex = (currentPage - 1) * rowsPerPage;
+                const paginatedItems = filteredData.slice(startIndex, startIndex + rowsPerPage);
+
+                tableBody.innerHTML = "";
+                
+                if (paginatedItems.length === 0) {
+                    const cols = isGrouped ? 7 : 8;
+                    tableBody.innerHTML = `<tr><td colspan="${cols}" style="text-align: center; padding: 20px; color: #888;">No data found matching criteria.</td></tr>`;
+                    return;
+                }
+
+                paginatedItems.forEach(item => {
+                    const row = document.createElement("tr");
+                    const colors = statusColors[item.status] || { bg: "#eee", col: "#333", border: "#ccc" };
+                    
+                    if (isGrouped) {
+                        row.innerHTML = `
+                            <td style="font-weight: 600; color: #007bff;">${item.eventId}</td>
+                            <td style="color: #6c757d; font-size: 13px;">${item.provId}</td>
+                            <td style="font-family: monospace; font-size: 13px;">${item.startTime}</td>
+                            <td>${item.sport}</td>
+                            <td style="font-weight: 500; color: #2c3e50;">${item.desc}</td>
+                            <td><span class="status-badge" style="background-color: ${colors.bg}; color: ${colors.col}; border: 1px solid ${colors.border};">${item.status}</span></td>
+                            <td style="text-align: right;">
+                                <button class="btn-action" style="background-color: #17a2b8; border: none;">View Event</button>
+                            </td>
+                        `;
+                    } else {
+                        row.innerHTML = `
+                            <td style="font-weight: 600; color: #007bff;">${item.eventId}</td>
+                            <td style="color: #6c757d; font-size: 13px;">${item.provId}</td>
+                            <td style="font-family: monospace; font-size: 13px;">${item.time}</td>
+                            <td>${item.sport}</td>
+                            <td><span class="status-badge" style="background-color: ${colors.bg}; color: ${colors.col}; border: 1px solid ${colors.border};">${item.status}</span></td>
+                            <td>${item.desc}</td>
+                            <td style="font-size: 13px; color: #555;">${item.type}</td>
+                            <td style="text-align: right;">
+                                <button class="btn-action" style="background-color: #17a2b8; border: none;">View Msg</button>
+                            </td>
+                        `;
+                    }
+                    tableBody.appendChild(row);
+                });
+            }
+
+            // Slušači događaja
+            providerSelect.addEventListener('change', () => { 
+                updateFeedDropdown(); 
+                currentPage = 1; 
+                filterAndRender(); 
+            });
+            feedSelect.addEventListener('change', () => { currentPage = 1; filterAndRender(); });
+            sportSelect.addEventListener('change', () => { currentPage = 1; filterAndRender(); });
+            statusSelect.addEventListener('change', () => { currentPage = 1; filterAndRender(); });
+            searchInput.addEventListener('input', () => { currentPage = 1; filterAndRender(); });
+            
+            groupByEventToggle.addEventListener('change', () => { 
+                currentPage = 1; 
+                filterAndRender(); 
+            });
+            
+            rowsPerPageSelect.addEventListener('change', (e) => {
+                rowsPerPage = parseInt(e.target.value);
+                currentPage = 1;
+                filterAndRender();
+            });
+
+            prevPageBtn.addEventListener('click', () => {
+                if (currentPage > 1) { currentPage--; filterAndRender(); }
+            });
+
+            nextPageBtn.addEventListener('click', () => {
+                const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+                if (currentPage < totalPages) { currentPage++; filterAndRender(); }
+            });
+
+            // Inicijalno postavljanje
+            updateFeedDropdown();
+            filterAndRender();
+        });
+    </script>
+</body>
+</html>

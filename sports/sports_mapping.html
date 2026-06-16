@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sports Mappings Dashboard</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+    <div id="sidebar-container" data-root=".." data-active="sports-mapping"></div>
+    <script src="../sidebar.js"></script>
+
+    <div class="main-content">
+        <header class="main-header">
+            <h1>Sports Mappings Dashboard</h1>
+        </header>
+
+        <main class="dashboard-container">
+            
+            <div class="top-bar">
+                <div class="filters">
+                    <div class="filter-group">
+                        <label for="providerSelect">Provider</label>
+                        <select id="providerSelect">
+                            <option value="all">All Providers</option>
+                            <option value="ExeFeed" selected>ExeFeed</option>
+                            <option value="SportRadar">SportRadar</option>
+                            <option value="SportGenius">SportGenius</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="statusSelect">Mapping status</label>
+                        <select id="statusSelect">
+                            <option value="all" selected>All</option>
+                            <option value="mapped">Mapped</option>
+                            <option value="unmapped">Unmapped</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="searchInput">Search</label>
+                        <input type="text" id="searchInput" placeholder="Search sport..." style="padding: 10px 15px; border: 1px solid #ccc; border-radius: 4px; font-size: 15px; min-width: 200px; background-color: #fdfdfd;">
+                    </div>
+                </div>
+            </div>
+
+            <section class="markets-section" style="overflow-x: auto;">
+                <table class="markets-table" style="min-width: 1000px;">
+                    <thead>
+                        <tr>
+                            <th>Provider</th>
+                            <th>Prov. Sport ID</th>
+                            <th>Prov. Sport Name</th>
+                            <th>Hermes Sport ID</th>
+                            <th>Hermes Sport Name</th>
+                            <th>Hermes Abbr.</th>
+                            <th>Status</th>
+                            <th style="text-align: right;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sportsTableBody">
+                        </tbody>
+                </table>
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const tableBody = document.getElementById("sportsTableBody");
+            const providerSelect = document.getElementById("providerSelect");
+            const statusSelect = document.getElementById("statusSelect");
+            const searchInput = document.getElementById("searchInput");
+
+            // Mock podaci za provider sportove
+            const providerSports = [
+                { provider: "ExeFeed", provId: "-", provName: "Soccer", hermesId: "S-001", hermesName: "Soccer", hermesAbbr: "SOC", status: "Mapped" },
+                { provider: "SportRadar", provId: "sr:sport:1", provName: "Football", hermesId: "S-001", hermesName: "Soccer", hermesAbbr: "SOC", status: "Mapped" },
+                { provider: "ExeFeed", provId: "-", provName: "Basketball", hermesId: "S-002", hermesName: "Basketball", hermesAbbr: "BKB", status: "Mapped" },
+                { provider: "SportGenius", provId: "sg-10", provName: "Ice Hockey", hermesId: "-", hermesName: "-", hermesAbbr: "-", status: "Unmapped" },
+                { provider: "ExeFeed", provId: "-", provName: "Tennis", hermesId: "-", hermesName: "-", hermesAbbr: "-", status: "Unmapped" }
+            ];
+
+            function renderSports() {
+                tableBody.innerHTML = ""; 
+
+                const providerVal = providerSelect.value;
+                const statusVal = statusSelect.value;
+                const searchVal = searchInput.value.toLowerCase();
+
+                // Logika za filtriranje
+                const filteredSports = providerSports.filter(sport => {
+                    const matchesProvider = providerVal === 'all' || sport.provider === providerVal;
+                    const matchesStatus = statusVal === 'all' || sport.status.toLowerCase() === statusVal;
+                    
+                    // Pretraga po nazivu Provider sporta ili Hermes sporta
+                    const matchesSearch = sport.provName.toLowerCase().includes(searchVal) || 
+                                          sport.hermesName.toLowerCase().includes(searchVal);
+
+                    return matchesProvider && matchesStatus && matchesSearch;
+                });
+
+                // Ako filteri ne vrate nijedan podatak
+                if (filteredSports.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: #888; font-style: italic; padding: 20px;">No sports found matching the filters.</td></tr>';
+                    return;
+                }
+
+                filteredSports.forEach(sport => {
+                    const row = document.createElement("tr");
+
+                    const badgeStyle = sport.status === "Mapped"
+                        ? "background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb;"
+                        : "background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba;";
+
+                    // Menjamo tekst i boju dugmeta u zavisnosti od statusa mapiranja
+                    const actionButton = sport.status === "Mapped"
+                        ? `<a href="map_sport.html?provider=${sport.provider}&provName=${sport.provName}" class="btn-action" style="background-color: #17a2b8; text-decoration: none; display: inline-block;">Edit</a>`
+                        : `<a href="map_sport.html?provider=${sport.provider}&provName=${sport.provName}" class="btn-action" style="text-decoration: none; display: inline-block;">Map</a>`;
+
+                    row.innerHTML = `
+                        <td style="font-weight: 500;">${sport.provider}</td>
+                        <td style="color: #6c757d;">${sport.provId}</td>
+                        <td class="market-name" style="color: #007bff;">${sport.provName}</td>
+                        <td style="color: #6c757d;">${sport.hermesId}</td>
+                        <td style="font-weight: 500;">${sport.hermesName}</td>
+                        <td style="color: #555;">${sport.hermesAbbr}</td>
+                        <td>
+                            <span class="status-badge" style="${badgeStyle}">${sport.status}</span>
+                        </td>
+                        <td style="text-align: right;">
+                            ${actionButton}
+                        </td>
+                    `;
+
+                    tableBody.appendChild(row);
+                });
+            }
+
+            // Slušači za filtere
+            providerSelect.addEventListener('change', renderSports);
+            statusSelect.addEventListener('change', renderSports);
+            searchInput.addEventListener('input', renderSports);
+
+            // Prvo renderovanje tabele
+            renderSports();
+        });
+    </script>
+</body>
+</html>

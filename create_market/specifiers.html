@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Specifiers</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header class="main-header">
+        <h1>Manage Specifiers</h1>
+    </header>
+
+    <main class="split-layout">
+        <div class="form-side">
+            <div style="margin-bottom: 20px;">
+                <a href="create_market.html" class="btn-secondary" style="text-decoration: none; display: inline-block;">&larr; Back to Create Market</a>
+            </div>
+
+            <section class="section-card">
+                <h3 class="section-title" id="formTitle">Add New Specifier</h3>
+                <div class="form-group">
+                    <label for="specifierName">Name (Naziv)</label>
+                    <input type="text" id="specifierName" placeholder="Enter specifier name">
+                </div>
+                <div class="actions-bar" style="text-align: left; margin-bottom: 0; margin-top: 20px;">
+                    <button id="saveBtn" class="btn-primary">Save</button>
+                    <button id="cancelBtn" class="btn-secondary" style="display: none; margin-left: 10px;">Cancel</button>
+                </div>
+            </section>
+        </div>
+
+        <aside class="info-side" style="flex: 2;">
+            <section class="section-card">
+                <h3 class="section-title">Specifiers List</h3>
+                <div id="listContainer" style="display: flex; flex-direction: column; gap: 10px;">
+                    </div>
+            </section>
+        </aside>
+    </main>
+
+    <script>
+        // Logika za CRUD operacije (povezano sa localStorage)
+        const STORAGE_KEY = 'poc_specifiers';
+        let specifiers = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [
+            { id: 1, name: "total" },
+            { id: 2, name: "goalnr" },
+            { id: 3, name: "hcp" }
+        ];
+        let editId = null;
+
+        const nameInput = document.getElementById('specifierName');
+        const saveBtn = document.getElementById('saveBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const formTitle = document.getElementById('formTitle');
+        const listContainer = document.getElementById('listContainer');
+
+        function saveToStorage() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(specifiers));
+        }
+
+        function renderList() {
+            listContainer.innerHTML = '';
+            if (specifiers.length === 0) {
+                listContainer.innerHTML = '<p style="color: #777; font-size: 14px;">No specifiers found.</p>';
+                return;
+            }
+
+            specifiers.forEach(spec => {
+                const row = document.createElement('div');
+                row.style.cssText = 'display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; background: #fdfdfd; border: 1px solid #eee; border-radius: 4px;';
+                
+                row.innerHTML = `
+                    <div>
+                        <span style="color: #999; font-size: 12px; margin-right: 10px;">ID: ${spec.id}</span>
+                        <strong style="font-size: 14px; color: #333;">${spec.name}</strong>
+                    </div>
+                    <div>
+                        <button class="btn-secondary edit-btn" style="padding: 4px 10px; font-size: 12px; margin-right: 5px; background: #ffc107; color: #000;" data-id="${spec.id}">Edit</button>
+                        <button class="btn-secondary delete-btn" style="padding: 4px 10px; font-size: 12px; background: #dc3545;" data-id="${spec.id}">Delete</button>
+                    </div>
+                `;
+                listContainer.appendChild(row);
+            });
+
+            // Attach listeners
+            document.querySelectorAll('.edit-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => editSpecifier(parseInt(e.target.dataset.id)));
+            });
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => deleteSpecifier(parseInt(e.target.dataset.id)));
+            });
+        }
+
+        function editSpecifier(id) {
+            const spec = specifiers.find(s => s.id === id);
+            if(spec) {
+                editId = id;
+                nameInput.value = spec.name;
+                formTitle.textContent = 'Edit Specifier';
+                saveBtn.textContent = 'Update';
+                cancelBtn.style.display = 'inline-block';
+            }
+        }
+
+        function deleteSpecifier(id) {
+            if(confirm('Are you sure you want to delete this specifier?')) {
+                specifiers = specifiers.filter(s => s.id !== id);
+                saveToStorage();
+                renderList();
+                if(editId === id) resetForm();
+            }
+        }
+
+        function resetForm() {
+            editId = null;
+            nameInput.value = '';
+            formTitle.textContent = 'Add New Specifier';
+            saveBtn.textContent = 'Save';
+            cancelBtn.style.display = 'none';
+        }
+
+        saveBtn.addEventListener('click', () => {
+            const val = nameInput.value.trim();
+            if(!val) return alert('Name is required');
+
+            if (editId !== null) {
+                const spec = specifiers.find(s => s.id === editId);
+                spec.name = val;
+            } else {
+                const newId = specifiers.length ? Math.max(...specifiers.map(s => s.id)) + 1 : 1;
+                specifiers.push({ id: newId, name: val });
+            }
+            
+            saveToStorage();
+            renderList();
+            resetForm();
+        });
+
+        cancelBtn.addEventListener('click', resetForm);
+
+        // Initial render
+        renderList();
+    </script>
+</body>
+</html>

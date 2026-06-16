@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hermes Market Overview</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="sidebar-container" data-root="." data-active="markets-management"></div>
+    <script src="sidebar.js"></script>
+
+    <div class="main-content">
+        <header class="main-header" style="background-color: #17a2b8; color: white;">
+            <h1>Hermes Market Overview</h1>
+        </header>
+
+        <main class="dashboard-container" style="max-width: 900px;">
+            
+            <div style="margin-bottom: 20px;">
+                <a href="hermes_markets.html" class="btn-secondary" style="text-decoration: none; display: inline-block;">&larr; Back to Hermes Markets</a>
+            </div>
+
+            <section class="top-bar" style="display: block; background-color: white; padding: 25px; border-radius: 8px; border: 1px solid #e0e0e0;">
+                <h2 style="margin-bottom: 15px; color: #2c3e50; font-size: 24px;">
+                    Hermes Market: <span id="displayMarketName" style="color: #17a2b8;"></span>
+                </h2>
+                <div style="display: flex; gap: 30px; border-top: 1px dashed #ccc; padding-top: 15px;">
+                    <p style="font-size: 16px; color: #555;">Market ID: <strong id="displayMarketId" style="color: #333;"></strong></p>
+                    <p style="font-size: 16px; color: #555;">Sport: <strong id="displaySport" style="color: #333;"></strong></p>
+                    <p style="font-size: 16px; color: #555;">Type: <strong id="displayType" style="color: #333;"></strong></p>
+                </div>
+            </section>
+
+            <section class="markets-section" style="margin-top: 25px; padding: 25px; background: white; border-radius: 8px; border: 1px solid #e0e0e0;">
+                <h3 style="margin-bottom: 20px; color: #333; font-size: 18px; border-bottom: 1px solid #eee; padding-bottom: 10px;">Mapped Provider Markets</h3>
+                <p style="margin-bottom: 15px; font-size: 14px; color: #666;">Ovo je lista provider marketa koji su izmapirani na ovaj Hermes market.</p>
+                
+                <table class="markets-table" style="margin-bottom: 25px;">
+                    <thead>
+                        <tr>
+                            <th>Provider Market Name</th>
+                            <th>Provider</th>
+                            <th style="text-align: right;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="providerMarketsList">
+                        </tbody>
+                </table>
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const marketId = urlParams.get('id') || '-';
+            const marketName = urlParams.get('market') || 'Unknown Hermes Market';
+            const sportName = urlParams.get('sport') || 'Unknown Sport';
+            const typeName = urlParams.get('type') || 'Unknown Type';
+
+            document.getElementById('displayMarketId').textContent = marketId;
+            document.getElementById('displayMarketName').textContent = marketName;
+            document.getElementById('displaySport').textContent = sportName;
+            document.getElementById('displayType').textContent = typeName;
+
+            const reverseMappings = {
+                "1X2": [
+                    { providerName: "1X2", provider: "Exefeed" },
+                    { providerName: "3-way", provider: "Betradar" }
+                ],
+                "Anytime goalscorer": [
+                    { providerName: "ANY_GOAL_SCORER", provider: "Exefeed" }
+                ]
+            };
+
+            const mappedList = reverseMappings[marketName] || [];
+            const listContainer = document.getElementById('providerMarketsList');
+
+            if (mappedList.length === 0) {
+                listContainer.innerHTML = '<tr><td colspan="3" style="text-align: center; color: #888; font-style: italic;">No provider markets mapped to this Hermes market yet.</td></tr>';
+            } else {
+                mappedList.forEach(prov => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td style="font-weight: 500; color: #2c3e50;">${prov.providerName}</td>
+                        <td><span style="background: #e9ecef; padding: 4px 10px; border-radius: 4px; font-size: 13px; border: 1px solid #ccc;">${prov.provider}</span></td>
+                        <td style="text-align: right;">
+                            <a href="view_market.html?market=${encodeURIComponent(prov.providerName)}&sport=${encodeURIComponent(sportName)}" class="btn-action" style="background-color: #007bff; text-decoration: none; display: inline-block;">View Provider Market</a>
+                        </td>
+                    `;
+                    listContainer.appendChild(tr);
+                });
+            }
+        });
+    </script>
+</body>
+</html>

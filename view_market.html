@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Market Mappings</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="sidebar-container" data-root="." data-active="markets-management"></div>
+    <script src="sidebar.js"></script>
+
+    <div class="main-content">
+        <header class="main-header">
+            <h1>Market Mappings Overview</h1>
+        </header>
+
+        <main class="dashboard-container" style="max-width: 900px;">
+            
+            <div style="margin-bottom: 20px;">
+                <a href="index.html" class="btn-secondary" style="text-decoration: none; display: inline-block;">&larr; Back to Dashboard</a>
+            </div>
+
+            <section class="top-bar" style="display: block; background-color: white; padding: 25px; border-radius: 8px; border: 1px solid #e0e0e0;">
+                <h2 style="margin-bottom: 15px; color: #2c3e50; font-size: 24px;">
+                    Provider Market: <span id="displayMarketName" style="color: #007bff;"></span>
+                </h2>
+                <div style="display: flex; gap: 30px; border-top: 1px dashed #ccc; padding-top: 15px;">
+                    <p style="font-size: 16px; color: #555;">Market ID: <strong id="displayMarketId" style="color: #333;"></strong></p>
+                    <p style="font-size: 16px; color: #555;">Sport: <strong id="displaySport" style="color: #333;"></strong></p>
+                </div>
+            </section>
+
+            <section class="markets-section" style="margin-top: 25px; padding: 25px; background: white; border-radius: 8px; border: 1px solid #e0e0e0;">
+                <h3 style="margin-bottom: 20px; color: #333; font-size: 18px; border-bottom: 1px solid #eee; padding-bottom: 10px;">Mapped Hermes Markets</h3>
+                
+                <table class="markets-table" style="margin-bottom: 25px;">
+                    <thead>
+                        <tr>
+                            <th>Hermes Market Name</th>
+                            <th style="text-align: right;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="mappedMarketsList">
+                        </tbody>
+                </table>
+
+                <div style="text-align: left;">
+                    <a href="#" id="addMappingBtn" class="btn-primary" style="text-decoration: none; display: inline-block;">Add new mapping</a>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const marketId = urlParams.get('id') || '-';
+            const marketName = urlParams.get('market') || 'Unknown Market';
+            const sportName = urlParams.get('sport') || 'Unknown Sport';
+
+            document.getElementById('displayMarketId').textContent = marketId;
+            document.getElementById('displayMarketName').textContent = marketName;
+            document.getElementById('displaySport').textContent = sportName;
+
+            const addMappingBtn = document.getElementById('addMappingBtn');
+            addMappingBtn.href = `mapping/mapping.html?market=${encodeURIComponent(marketName)}`;
+
+            const mockMappings = {
+                "1X2": ["1X2", "Asian Handicap"],
+                "TOTAL_GOALS": ["Total Goals", "Total Goals flat"],
+                "ANY_GOAL_SCORER": ["Anytime goalscorer"]
+            };
+
+            const mappedList = mockMappings[marketName] || [];
+            const listContainer = document.getElementById('mappedMarketsList');
+
+            if (mappedList.length === 0) {
+                listContainer.innerHTML = '<tr><td colspan="2" style="text-align: center; color: #888; font-style: italic;">No mappings found for this market.</td></tr>';
+            } else {
+                mappedList.forEach(hermesMarket => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td style="font-weight: 500; color: #2c3e50;">${hermesMarket}</td>
+                        <td style="text-align: right;">
+                            <a href="view_hermes_market.html?market=${encodeURIComponent(hermesMarket)}&sport=${encodeURIComponent(sportName)}" class="btn-secondary" style="text-decoration: none; display: inline-block; margin-right: 8px;">View Market</a>
+                            <a href="mapping/mapping.html?market=${encodeURIComponent(marketName)}&edit=${encodeURIComponent(hermesMarket)}" class="btn-action" style="background-color: #17a2b8; text-decoration: none; display: inline-block; margin-right: 8px;">Edit Mapping</a>
+                            <button class="btn-remove-mapping" style="background-color: #dc3545; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 600;">Remove</button>
+                        </td>
+                    `;
+                    listContainer.appendChild(tr);
+                });
+
+                document.querySelectorAll('.btn-remove-mapping').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        if (confirm('Are you sure you want to remove this mapping?')) {
+                            const row = this.closest('tr');
+                            row.remove();
+                            if (listContainer.children.length === 0) {
+                                listContainer.innerHTML = '<tr><td colspan="2" style="text-align: center; color: #888; font-style: italic;">No mappings found for this market.</td></tr>';
+                            }
+                        }
+                    });
+                });
+            }
+        });
+    </script>
+</body>
+</html>

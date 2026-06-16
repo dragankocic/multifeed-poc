@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Provider Markets Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- SIDEBAR KONTEJNER -->
+    <div id="sidebar-container" data-root="." data-active="markets-mapping"></div>
+    <script src="sidebar.js"></script>
+
+    <!-- GLAVNI SADRŽAJ -->
+    <div class="main-content">
+        <header class="main-header">
+            <h1>Provider Markets Dashboard</h1>
+        </header>
+
+        <main class="dashboard-container">
+            
+            <div class="top-bar">
+                <div class="filters">
+                    
+                    <!-- Filter za Provajdera -->
+                    <div class="filter-group">
+                        <label for="providerSelect">Provider</label>
+                        <select id="providerSelect">
+                            <option value="all" selected>All Providers</option>
+                            <option value="ExeFeed">ExeFeed</option>
+                            <option value="SportRadar">SportRadar</option>
+                            <option value="Bet Genius">Bet Genius</option>
+                            <option value="IMG Arena">IMG Arena</option>
+                            <option value="Bet Construct">Bet Construct</option>
+                            <option value="LSports">LSports</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Filter za Sport (Vraćeno All) -->
+                    <div class="filter-group">
+                        <label for="sportSelect">Sport</label>
+                        <select id="sportSelect">
+                            <option value="all" selected>All</option>
+                            <option value="Soccer">Soccer</option>
+                            <option value="Basketball">Basketball</option>
+                            <option value="Tennis">Tennis</option>
+                        </select>
+                    </div>
+
+                    <!-- Filter za Pretragu -->
+                    <div class="filter-group">
+                        <label for="searchInput">Search</label>
+                        <input type="text" id="searchInput" placeholder="Search by name or ID..." style="padding: 10px 15px; border: 1px solid #ccc; border-radius: 4px; font-size: 15px; min-width: 200px; background-color: #fdfdfd;">
+                    </div>
+
+                    <!-- Filter za Status mapiranja (Dodato Partially mapped) -->
+                    <div class="filter-group">
+                        <label for="statusSelect">Mapping status</label>
+                        <select id="statusSelect">
+                            <option value="all" selected>All</option>
+                            <option value="mapped">Mapped</option>
+                            <option value="partially mapped">Partially mapped</option>
+                            <option value="unmapped">Unmapped</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <a href="create_market/create_market.html" class="btn-primary" style="text-decoration: none; display: inline-block;">Add Market</a>
+                </div>
+            </div>
+
+            <!-- TABELA (Uklonjena Feed kolona) -->
+            <section class="markets-section">
+                <table class="markets-table">
+                    <thead>
+                        <tr>
+                            <th>Market ID</th>
+                            <th>Provider Market Name</th>
+                            <th>Provider</th>
+                            <th>Sport</th>
+                            <th>Status</th>
+                            <th style="text-align: right;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="marketsTableBody">
+                        <!-- Dinamički se puni preko script.js -->
+                    </tbody>
+                </table>
+            </section>
+
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

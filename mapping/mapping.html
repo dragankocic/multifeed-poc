@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Provider Markets POC</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+    <div id="sidebar-container" data-root=".." data-active="markets-mapping"></div>
+    <script src="../sidebar.js"></script>
+
+    <div class="main-content">
+        <header class="main-header">
+            <h1>Provider Markets</h1>
+        </header>
+
+        <main class="split-layout">
+            <div class="form-side">
+                
+                <div style="margin-bottom: 20px;">
+                    <a href="../index.html" class="btn-secondary" style="text-decoration: none; display: inline-block;">&larr; Back to list</a>
+                </div>
+
+                <div class="info-section">
+                    <h2>Mapping Provider Market to Hermes Market</h2>
+                    <div style="display: flex; gap: 30px; font-size: 16px; color: #555; margin-top: 10px;">
+                        <p>Provider: <strong style="color: #333;">Exefeed</strong></p>
+                        <p>Sport: <strong id="displaySport" style="color: #17a2b8;">Not specified</strong></p>
+                    </div>
+                </div>
+
+                <section class="section-card">
+                    <h3 class="section-title">Provider Market Definition</h3>
+                    <div class="form-row" style="align-items: flex-end;">
+                        <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                            <label for="providerMarketSelect">Market Name</label>
+                            <select id="providerMarketSelect">
+                                <option value="" disabled selected>Select provider market...</option>
+                                <option value="1X2">1X2</option>
+                                <option value="TOTAL_GOALS">TOTAL_GOALS</option>
+                                <option value="TOTAL_GOALS_15_MIN">TOTAL_GOALS_15_MIN</option>
+                                <option value="TOTAL_GOALS_20_MIN">TOTAL_GOALS_20_MIN</option>
+                                <option value="ANY_GOAL_SCORER">ANY_GOAL_SCORER</option>
+                                <option value="ANYTIME_GOALSCORER">ANYTIME_GOALSCORER</option>
+                                <option value="NEXT_GOAL_SCORER">NEXT_GOAL_SCORER</option>
+                            </select>
+                        </div>
+                        <div style="flex: 0 0 auto;">
+                            <button type="button" id="viewMarketBtn" class="btn-secondary" disabled style="opacity: 0.5; cursor: not-allowed; padding: 10px 15px;">View Market</button>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="section-card" style="border: none; box-shadow: none; padding: 0; background: transparent;">
+                    <div class="section-header" style="background: white; padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+                        <h3 style="margin: 0;">Market mapping</h3>
+                        <button id="addMappingBtn" class="btn-primary" disabled style="opacity: 0.5; cursor: not-allowed;" title="Select Provider Market first">Add Mapping</button>
+                    </div>
+                    
+                    <div id="dynamicSections"></div>
+                </section>
+            </div>
+
+            <aside class="info-side">
+                <div class="sticky-info">
+                    <h3 class="side-title">Mapping Guidelines</h3>
+                    
+                    <div class="info-block">
+                        <h4>Provider Market Definition</h4>
+                        <p>Osnovni podaci o marketu provajdera. Klikom na <strong>View Market</strong> možete videti tačan JSON objekat marketa kakav nam stiže od provajdera.</p>
+                    </div>
+
+                    <div class="info-block">
+                        <h4>Market mapping</h4>
+                        <p>Sekcija za definisanje pravila mapiranja. Mapiranje se vrši u smeru <strong>Provider vrednost (levo) &rarr; Hermes vrednost (desno)</strong>.</p>
+                    </div>
+
+                    <div class="info-block">
+                        <h4>Choose Hermes Market</h4>
+                        <p>Izbor ciljnog Hermes marketa iz padajuće liste automatski prikazuje njegov sistemski tip u polju pored.</p>
+                    </div>
+
+                    <div class="info-block">
+                        <h4>Specifiers mapping</h4>
+                        <p>Povezivanje Hermes specifier-a sa Provider specifier-om (bira se iz dropdown liste onih specifiera koje provajder šalje).</p>
+                    </div>
+
+                    <div class="info-block">
+                        <h4>Fixed specifiers mapping</h4>
+                        <p>Povezivanje Hermes specifier-a sa ručno unetom, fiksnom vrednošću (koristi se kada provajder ne šalje vrednost kroz feed).</p>
+                    </div>
+
+                    <div class="info-block">
+                        <h4>Extended specifiers mapping</h4>
+                        <p>Povezivanje Hermes proširenih specifier-a sa vrednostima provajdera.</p>
+                    </div>
+
+                    <div class="info-block">
+                        <h4>Outcome mapping</h4>
+                        <p>Precizno povezivanje <strong>Hermes outcome-a</strong> sa <strong>Provider outcome-om</strong>.</p>
+                    </div>
+
+                </div>
+            </aside>
+        </main>
+    </div>
+
+    <div id="jsonModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" id="closeModalBtn">&times;</span>
+            <h3 style="margin-bottom: 15px; font-size: 18px; color: #333;">Provider Market Data</h3>
+            <pre id="jsonContent"></pre>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hermes Markets Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="sidebar-container" data-root="." data-active="markets-management"></div>
+
+    <div class="main-content">
+        <header class="main-header">
+            <h1>Hermes Markets Dashboard</h1>
+        </header>
+
+        <main class="dashboard-container">
+
+            <div class="top-bar">
+                <div class="filters">
+                    <div class="filter-group">
+                        <label for="sportSelect">Sport</label>
+                        <select id="sportSelect">
+                            <option value="Soccer" selected>Soccer</option>
+                            <option value="Basketball">Basketball</option>
+                            <option value="Tennis">Tennis</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="typeSelect">Market Type</label>
+                        <select id="typeSelect">
+                            <option value="all" selected>All</option>
+                            <option value="Regular">Regular</option>
+                            <option value="Statistics">Statistics</option>
+                            <option value="Player Props">Player Props</option>
+                            <option value="Outright">Outright</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="searchInput">Search</label>
+                        <input type="text" id="searchInput" placeholder="Search by name or ID..." style="padding: 10px 15px; border: 1px solid #ccc; border-radius: 4px; font-size: 15px; min-width: 250px; background-color: #fdfdfd;">
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <a href="create_market/create_market.html" class="btn-primary" style="text-decoration: none; display: inline-block;">Add Market</a>
+                </div>
+            </div>
+
+            <section class="markets-section">
+                <table class="markets-table">
+                    <thead>
+                        <tr>
+                            <th>Market ID</th>
+                            <th>Market Name</th>
+                            <th>Sport</th>
+                            <th>Market Description</th>
+                            <th>Market Type</th>
+                            <th style="text-align: right;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="hermesMarketsBody">
+                        <!-- Dinamički se puni JS-om -->
+                    </tbody>
+                </table>
+            </section>
+
+        </main>
+    </div>
+
+    <script src="sidebar.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const hermesMarketsBody = document.getElementById('hermesMarketsBody');
+            const sportSelect = document.getElementById('sportSelect');
+            const typeSelect = document.getElementById('typeSelect');
+            const searchInput = document.getElementById('searchInput');
+
+            // IZMENJENO: Total Goals je sada tipa Statistics
+            const hermesMarkets = [
+                { id: "HRM-001", name: "1X2", desc: "Home, Draw, Away match winner", type: "Regular", sport: "Soccer" },
+                { id: "HRM-002", name: "Asian Handicap", desc: "Handicap betting for the match", type: "Regular", sport: "Soccer" },
+                { id: "HRM-003", name: "Total Goals", desc: "Over/Under total goals", type: "Statistics", sport: "Soccer" },
+                { id: "HRM-004", name: "Anytime goalscorer", desc: "Player to score at any time", type: "Player Props", sport: "Soccer" },
+                { id: "HRM-005", name: "Total Corners", desc: "Over/Under total corners in the match", type: "Statistics", sport: "Soccer" }
+            ];
+
+            function renderHermesMarkets() {
+                hermesMarketsBody.innerHTML = ''; 
+
+                const searchVal = searchInput.value.toLowerCase();
+                const sportVal = sportSelect.value;
+                const typeVal = typeSelect.value;
+
+                const filteredMarkets = hermesMarkets.filter(market => {
+                    const matchesSearch = market.name.toLowerCase().includes(searchVal) || market.id.toLowerCase().includes(searchVal);
+                    const matchesSport = market.sport.toLowerCase() === sportVal.toLowerCase();
+                    const matchesType = typeVal === 'all' || market.type === typeVal;
+                    
+                    return matchesSearch && matchesSport && matchesType;
+                });
+
+                if (filteredMarkets.length === 0) {
+                    hermesMarketsBody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #888; font-style: italic;">No markets found matching the filters.</td></tr>';
+                    return;
+                }
+
+                filteredMarkets.forEach(market => {
+                    const row = document.createElement('tr');
+                    
+                    row.innerHTML = `
+                        <td style="font-weight: 500; color: #6c757d;">${market.id}</td>
+                        <td class="market-name">${market.name}</td>
+                        <td>${market.sport}</td>
+                        <td style="color: #555; font-size: 14px;">${market.desc}</td>
+                        <td><span style="background: #e9ecef; padding: 4px 10px; border-radius: 4px; font-size: 13px; border: 1px solid #ccc;">${market.type}</span></td>
+                        <td style="text-align: right;">
+                            <a href="view_hermes_market.html?id=${encodeURIComponent(market.id)}&market=${encodeURIComponent(market.name)}&sport=${encodeURIComponent(market.sport)}&type=${encodeURIComponent(market.type)}" class="btn-action" style="background-color: #007bff; text-decoration: none; display: inline-block;">View</a>
+                        </td>
+                    `;
+                    hermesMarketsBody.appendChild(row);
+                });
+            }
+
+            sportSelect.addEventListener('change', renderHermesMarkets);
+            typeSelect.addEventListener('change', renderHermesMarkets);
+            searchInput.addEventListener('input', renderHermesMarkets);
+
+            renderHermesMarkets();
+        });
+    </script>
+</body>
+</html>

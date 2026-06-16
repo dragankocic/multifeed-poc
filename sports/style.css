@@ -1,0 +1,140 @@
+/* Base styles and reset */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f4f7f6;
+  color: #333;
+}
+
+/* Split Layout */
+.split-layout {
+  display: flex;
+  max-width: 1400px;
+  margin: 30px auto;
+  padding: 0 20px;
+  gap: 30px;
+  align-items: flex-start;
+}
+
+.form-side {
+  flex: 2;
+  min-width: 0;
+}
+
+.info-side {
+  flex: 1;
+  min-width: 300px;
+}
+
+.sticky-info {
+  position: sticky;
+  top: 30px;
+  background-color: #e9ecef;
+  padding: 25px;
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+}
+
+/* Info Blocks on the right */
+.side-title {
+  font-size: 18px;
+  margin-bottom: 20px;
+  color: #2c3e50;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-bottom: 2px solid #2c3e50;
+  padding-bottom: 5px;
+}
+
+.info-block {
+  margin-bottom: 20px;
+}
+
+.info-block h4 {
+  font-size: 14px;
+  color: #495057;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.info-block p {
+  font-size: 13px;
+  line-height: 1.5;
+  color: #6c757d;
+}
+
+.info-section {
+  margin-bottom: 25px;
+}
+
+.info-section h2 {
+  font-size: 24px;
+  color: #2c3e50;
+  margin-bottom: 8px;
+}
+
+.provider-text {
+  font-size: 16px;
+  color: #555;
+}
+
+/* Card Styles */
+.section-card {
+  background-color: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.section-title {
+  margin-bottom: 15px;
+  font-size: 17px;
+  color: #333;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+}
+
+/* Form Groups */
+.form-row {
+  display: flex;
+  gap: 20px;
+}
+
+.form-column {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 10px;
+}
+
+.form-group label {
+  margin-bottom: 5px;
+  font-weight: 600;
+  font-size: 14px;
+  color: #555;
+}
+
+.form-group input,
+.form-group select {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.actions-bar {
+  text-align: right;
+  margin-bottom: 40px;
+}

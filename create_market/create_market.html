@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Hermes Market</title>
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="sidebar-container" data-root=".." data-active="markets-management"></div>
+    <script src="../sidebar.js"></script>
+
+    <div class="main-content">
+        <header class="main-header">
+            <h1>New Hermes Market</h1>
+        </header>
+
+        <main class="split-layout">
+            <div class="form-side">
+                
+                <div style="margin-bottom: 20px;">
+                    <a href="../hermes_markets.html" class="btn-secondary" style="text-decoration: none; display: inline-block;">&larr; Back to list</a>
+                </div>
+
+                <div class="info-section">
+                    <h2>Create a new market definition</h2>
+                </div>
+
+                <section class="section-card">
+                    <h3 class="section-title">Basic Information</h3>
+                    <div class="form-column">
+                        
+                        <div class="form-group">
+                            <label for="sport">Sport</label>
+                            <select id="sport">
+                                <option value="" disabled selected>Select a sport</option>
+                                <option value="soccer">Soccer</option>
+                                <option value="basketball">Basketball</option>
+                                <option value="baseball">Baseball</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="marketName">Market Name</label>
+                            <input type="text" id="marketName" placeholder="Enter market name">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="description">Description</label>
+                            <input type="text" id="description" placeholder="Enter description">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Market Type</label>
+                            <div class="radio-group">
+                                <label><input type="radio" name="marketType" value="Regular"> Regular</label>
+                                <label><input type="radio" name="marketType" value="Statistics"> Statistics</label>
+                                <label><input type="radio" name="marketType" value="Player Props"> Player Props</label>
+                                <label><input type="radio" name="marketType" value="Outright"> Outright</label>
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+
+                <section class="section-card">
+                    <div class="section-header">
+                        <h3>Specifiers</h3>
+                        <div style="display: flex; gap: 10px;">
+                            <a href="specifiers.html" class="btn-secondary" style="text-decoration: none; background-color: #17a2b8; display: inline-block;">Edit Specifiers</a>
+                            <button type="button" id="addSpecifierBtn" class="btn-secondary">Add Specifier</button>
+                        </div>
+                    </div>
+                    <div id="specifiersContainer"></div>
+                </section>
+
+                <section class="section-card">
+                    <div class="section-header">
+                        <h3>Extended specifiers</h3>
+                        <div style="display: flex; gap: 10px;">
+                            <a href="extended_specifiers.html" class="btn-secondary" style="text-decoration: none; background-color: #17a2b8; display: inline-block;">Edit Extended Specifiers</a>
+                            <button type="button" id="addExtendedSpecifierBtn" class="btn-secondary">New extended specifier</button>
+                        </div>
+                    </div>
+                    <div id="extendedSpecifiersContainer"></div>
+                </section>
+
+                <section class="section-card">
+                    <h3 class="section-title">Outcomes</h3>
+                    
+                    <div class="form-group">
+                        <label>Outcomes Type</label>
+                        <div class="radio-group" id="outcomesTypeGroup">
+                            <label><input type="radio" name="outcomesType" value="Regular"> Regular</label>
+                            <label><input type="radio" name="outcomesType" value="Competitors"> Competitors</label>
+                            <label><input type="radio" name="outcomesType" value="Players"> Players</label>
+                        </div>
+                    </div>
+
+                    <div id="regularOutcomesWrapper" style="display: none; margin-top: 20px; border-top: 1px dashed #ccc; padding-top: 15px;">
+                        <div class="section-header">
+                            <h4>Regular Outcomes Details</h4>
+                            <button type="button" id="addOutcomeBtn" class="btn-secondary">Add Outcome</button>
+                        </div>
+                        <div id="outcomesListContainer"></div>
+                    </div>
+                </section>
+
+                <div class="actions-bar">
+                    <button id="saveMarketBtn" class="btn-primary">Add Market</button>
+                </div>
+            </div>
+
+            <aside class="info-side">
+                <div class="sticky-info">
+                    <h3 class="side-title">Market Guidelines</h3>
+                    <div class="info-block">
+                        <h4>Sport</h4>
+                        <p>Izbor sporta određuje dostupnost specifiera i tipova ishoda.</p>
+                    </div>
+                </div>
+            </aside>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

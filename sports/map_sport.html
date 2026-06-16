@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Map Sport</title>
+    <!-- Povlačimo globalni CSS -->
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="sidebar-container" data-root=".." data-active="sports-mapping"></div>
+    <script src="../sidebar.js"></script>
+
+    <!-- GLAVNI SADRŽAJ -->
+    <div class="main-content">
+        <header class="main-header">
+            <h1>Map Provider Sport</h1>
+        </header>
+
+        <main class="split-layout">
+            <div class="form-side">
+                
+                <div style="margin-bottom: 20px;">
+                    <a href="sports_mapping.html" class="btn-secondary" style="text-decoration: none; display: inline-block;">&larr; Back to list</a>
+                </div>
+
+                <div class="info-section">
+                    <h2>Connect to Hermes Sport</h2>
+                    <p class="provider-text">Provider: <strong id="displayProvider"></strong></p>
+                </div>
+
+                <section class="section-card">
+                    <h3 class="section-title">Mapping Configuration</h3>
+                    
+                    <div class="form-row" style="align-items: flex-end; margin-bottom: 20px;">
+                        
+                        <!-- Leva strana (Provider Info - Readonly) -->
+                        <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                            <label>Provider Sport Name</label>
+                            <input type="text" id="displayProvName" readonly style="background-color: #f9f9f9; color: #555; font-weight: 500;">
+                        </div>
+
+                        <div style="padding: 10px; font-weight: bold; color: #888;">
+                            &rarr;
+                        </div>
+
+                        <!-- Desna strana (Hermes Selection) -->
+                        <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                            <label>Choose Hermes Sport</label>
+                            <select id="hermesSportSelect">
+                                <option value="" disabled selected>Select Hermes Sport...</option>
+                                <option value="S-001">Soccer (SOC)</option>
+                                <option value="S-002">Basketball (BKB)</option>
+                                <option value="S-003">Tennis (TEN)</option>
+                                <option value="S-004">Ice Hockey (IHO)</option>
+                                <option value="S-005">Baseball (BBS)</option>
+                            </select>
+                        </div>
+
+                    </div>
+                </section>
+
+                <div class="actions-bar">
+                    <button id="saveMappingBtn" class="btn-primary">Save Mapping</button>
+                </div>
+            </div>
+
+            <!-- Uputstvo sa desne strane -->
+            <aside class="info-side">
+                <div class="sticky-info">
+                    <h3 class="side-title">Sport Mapping Guidelines</h3>
+                    <div class="info-block">
+                        <h4>1-to-1 Mapping</h4>
+                        <p>Za razliku od marketa, mapiranje sportova je jednostavno 1-na-1 povezivanje. Izaberite Provider sport i dodelite mu odgovarajući Hermes ekvivalent.</p>
+                    </div>
+                    <div class="info-block">
+                        <h4>Hermes Sports Missing?</h4>
+                        <p>Ukoliko ne vidite traženi Hermes sport u padajućoj listi, prvo morate da ga kreirate u sekciji <strong>Sports -> Management</strong>.</p>
+                    </div>
+                </div>
+            </aside>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // Čitanje iz URL parametara
+            const urlParams = new URLSearchParams(window.location.search);
+            const provider = urlParams.get('provider') || 'Unknown Provider';
+            const provName = urlParams.get('provName') || 'Unknown Sport';
+
+            // Prikaz na formi
+            document.getElementById('displayProvider').textContent = provider;
+            document.getElementById('displayProvName').value = provName;
+
+            // Čuvanje mapiranja
+            document.getElementById('saveMappingBtn').addEventListener('click', () => {
+                const hermesSelect = document.getElementById('hermesSportSelect');
+                if(!hermesSelect.value) {
+                    alert('Please select a Hermes sport before saving.');
+                    return;
+                }
+                alert(`Mapping saved successfully! Provider "${provName}" is now mapped to Hermes sport.`);
+                window.location.href = 'sports_mapping.html';
+            });
+        });
+    </script>
+</body>
+</html>

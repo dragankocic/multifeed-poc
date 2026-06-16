@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feeds Management</title>
+    <link rel="stylesheet" href="feeds_style.css">
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+    <div id="sidebar-container" data-root=".." data-active="feeds-management"></div>
+
+    <div class="main-content">
+        <header class="main-header" style="background-color: #2c3e50; color: white;">
+            <h1>Feeds Management</h1>
+        </header>
+
+        <main class="dashboard-container">
+            
+            <div class="top-bar">
+                <div class="filters">
+                    <div class="filter-group">
+                        <label for="feedsSearchInput">Search Providers</label>
+                        <input type="text" id="feedsSearchInput" placeholder="Search by provider name..." style="padding: 10px 15px; border: 1px solid #ccc; border-radius: 4px; font-size: 15px; min-width: 280px; background-color: #fdfdfd;">
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <button id="addProviderBtn" class="btn-primary" style="background-color: #28a745; border: none;">Add provider</button>
+                </div>
+            </div>
+
+            <section class="markets-section">
+                <table class="markets-table">
+                    <thead>
+                        <tr>
+                            <th>Provider Name</th>
+                            <th>Number of Feeds</th>
+                            <th style="text-align: right;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="feedsTableBody">
+                        </tbody>
+                </table>
+            </section>
+        </main>
+    </div>
+
+    <div id="providerModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" id="closeModalBtn">&times;</span>
+            <h3>Add new provider</h3>
+            
+            <div class="form-group" style="margin-top: 15px;">
+                <label for="providerNameInput">Provider Name</label>
+                <input type="text" id="providerNameInput" placeholder="Enter provider name">
+            </div>
+            
+            <div style="text-align: right; margin-top: 20px;">
+                <button id="saveProviderBtn" class="btn-primary" style="background-color: #28a745;">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../sidebar.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const tableBody = document.getElementById('feedsTableBody');
+            const searchInput = document.getElementById('feedsSearchInput');
+            
+            // Modal elementi
+            const modal = document.getElementById('providerModal');
+            const addProviderBtn = document.getElementById('addProviderBtn');
+            const closeModalBtn = document.getElementById('closeModalBtn');
+            const saveProviderBtn = document.getElementById('saveProviderBtn');
+            const providerNameInput = document.getElementById('providerNameInput');
+
+            // Početna lista provajdera sa zahtevanim brojem feed-ova
+            const providersList = [
+                { name: "ExeFeed", count: 2 },
+                { name: "SportRadar", count: 4 },
+                { name: "Bet Genius", count: 1 },
+                { name: "IMG Arena", count: 3 },
+                { name: "Bet Construct", count: 5 },
+                { name: "LSports", count: 2 }
+            ];
+
+            // Funkcija za iscrtavanje tabele sa filtriranjem
+            function renderFeeds() {
+                tableBody.innerHTML = '';
+                const searchVal = searchInput.value.toLowerCase();
+
+                const filtered = providersList.filter(p => p.name.toLowerCase().includes(searchVal));
+
+                if (filtered.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: #888; font-style: italic;">No providers found.</td></tr>';
+                    return;
+                }
+
+                filtered.forEach(p => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td class="market-name">${p.name}</td>
+                        <td><span style="background: #e9ecef; padding: 4px 12px; border-radius: 4px; font-weight: 600; border: 1px solid #ccc; font-size: 13px;">${p.count}</span></td>
+                        <td style="text-align: right;">
+                            <a href="feeds_view.html?provider=${encodeURIComponent(p.name)}" class="btn-action" style="background-color: #007bff; text-decoration: none; display: inline-block;">View</a>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            }
+
+            // Slušač za tekstualnu pretragu uživo
+            searchInput.addEventListener('input', renderFeeds);
+
+            // --- Modal Logika ---
+            addProviderBtn.addEventListener('click', () => {
+                modal.style.display = 'flex';
+                providerNameInput.value = '';
+                providerNameInput.focus();
+            });
+
+            closeModalBtn.addEventListener('click', () => {
+                modal.style.display = 'none';
+            });
+
+            window.addEventListener('click', (e) => {
+                if (e.target === modal) modal.style.display = 'none';
+            });
+
+            saveProviderBtn.addEventListener('click', () => {
+                const name = providerNameInput.value.trim();
+                if (!name) return alert('Provider name is required');
+
+                // Dodavanje novog provajdera sa random brojem feedova (1-5)
+                const randomCount = Math.floor(Math.random() * 5) + 1;
+                providersList.push({ name: name, count: randomCount });
+
+                modal.style.display = 'none';
+                renderFeeds();
+                alert(`Provider "${name}" successfully added!`);
+            });
+
+            // Prvo učitavanje
+            renderFeeds();
+        });
+    </script>
+</body>
+</html>

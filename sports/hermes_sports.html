@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hermes Sports Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+    <div id="sidebar-container" data-root=".." data-active="sports-management"></div>
+    <script src="../sidebar.js"></script>
+
+    <div class="main-content">
+        <header class="main-header" style="background-color: #17a2b8;">
+            <h1>Hermes Sports Management</h1>
+        </header>
+
+        <main class="dashboard-container">
+            <div class="top-bar">
+                <div class="filters">
+                    <div class="filter-group">
+                        <label for="searchInput">Search Sports</label>
+                        <input type="text" id="searchInput" placeholder="Search by name or ID..." style="padding: 10px 15px; border: 1px solid #ccc; border-radius: 4px; font-size: 15px; min-width: 250px; background-color: #fdfdfd;">
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <a href="create_sport.html" class="btn-primary" style="text-decoration: none; display: inline-block;">Create Hermes Sport</a>
+                </div>
+            </div>
+
+            <section class="markets-section">
+                <table class="markets-table">
+                    <thead>
+                        <tr>
+                            <th>Sport ID</th>
+                            <th>Sport Name</th>
+                            <th>Abbreviation</th>
+                            <th style="text-align: right;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="hermesSportsBody">
+                        </tbody>
+                </table>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const tableBody = document.getElementById('hermesSportsBody');
+
+            // Mock podaci za Hermes sportove
+            const hermesSports = [
+                { id: "S-001", name: "Soccer", abbr: "SOC" },
+                { id: "S-002", name: "Basketball", abbr: "BKB" },
+                { id: "S-003", name: "Tennis", abbr: "TEN" },
+                { id: "S-004", name: "Ice Hockey", abbr: "IHO" },
+                { id: "S-005", name: "Baseball", abbr: "BBS" }
+            ];
+
+            function renderSports() {
+                tableBody.innerHTML = ''; 
+                hermesSports.forEach(sport => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td style="font-weight: 500; color: #6c757d;">${sport.id}</td>
+                        <td class="market-name">${sport.name}</td>
+                        <td><span style="background: #e9ecef; padding: 4px 10px; border-radius: 4px; font-size: 13px; font-weight: 600; border: 1px solid #ccc;">${sport.abbr}</span></td>
+                        <td style="text-align: right;">
+                            <a href="view_hermes_sport.html?id=${encodeURIComponent(sport.id)}&name=${encodeURIComponent(sport.name)}&abbr=${encodeURIComponent(sport.abbr)}" class="btn-action" style="background-color: #007bff; text-decoration: none; display: inline-block; margin-right: 5px;">View</a>
+                            <a href="create_sport.html?edit=true&name=${encodeURIComponent(sport.name)}&abbr=${encodeURIComponent(sport.abbr)}" class="btn-action" style="background-color: #17a2b8; text-decoration: none; display: inline-block;">Edit</a>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            }
+
+            renderSports();
+        });
+    </script>
+</body>
+</html>
