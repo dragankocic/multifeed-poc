@@ -16,109 +16,127 @@
             <h1>Multifeed System Messages</h1>
         </header>
 
-        <main class="dashboard-container">
-            
-            <div class="top-bar" style="flex-direction: column; align-items: stretch; gap: 20px;">
-                
-                <div class="switch-container">
-                    <span>Group by event</span>
-                    <label class="switch">
-                        <input type="checkbox" id="groupByEventToggle">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-
-                <div class="filters" style="flex-wrap: wrap; gap: 15px;">
+        <main class="split-layout">
+            <div class="form-side">
+                <div class="top-bar" style="flex-direction: column; align-items: stretch; gap: 20px;">
                     
-                    <div class="filter-group">
-                        <label for="providerSelect">Provider</label>
-                        <select id="providerSelect" style="padding: 10px; border-radius: 4px; border: 1px solid #ccc; min-width: 150px;">
-                            <option value="ExeFeed" selected>ExeFeed</option>
-                            <option value="SportRadar">SportRadar</option>
-                            <option value="Bet Genius">Bet Genius</option>
-                            <option value="IMG Arena">IMG Arena</option>
-                            <option value="Bet Construct">Bet Construct</option>
-                            <option value="LSports">LSports</option>
-                        </select>
+                    <div class="switch-container">
+                        <span>Group by event</span>
+                        <label class="switch">
+                            <input type="checkbox" id="groupByEventToggle">
+                            <span class="slider"></span>
+                        </label>
                     </div>
 
-                    <div class="filter-group">
-                        <label for="feedSelect">Feed</label>
-                        <select id="feedSelect" style="padding: 10px; border-radius: 4px; border: 1px solid #ccc; min-width: 150px;">
+                    <div class="filters" style="flex-wrap: wrap; gap: 15px;">
+                        
+                        <div class="filter-group">
+                            <label for="providerSelect">Provider</label>
+                            <select id="providerSelect" style="padding: 10px; border-radius: 4px; border: 1px solid #ccc; min-width: 150px;">
+                                <option value="ExeFeed" selected>ExeFeed</option>
+                                <option value="SportRadar">SportRadar</option>
+                                <option value="Bet Genius">Bet Genius</option>
+                                <option value="IMG Arena">IMG Arena</option>
+                                <option value="Bet Construct">Bet Construct</option>
+                                <option value="LSports">LSports</option>
                             </select>
-                    </div>
+                        </div>
 
-                    <div class="filter-group">
-                        <label>Received between</label>
-                        <div class="date-range-container">
-                            <input type="datetime-local" id="dateFrom" style="padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
-                            <span>-</span>
-                            <input type="datetime-local" id="dateTo" style="padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                        <div class="filter-group">
+                            <label for="feedSelect">Feed</label>
+                            <select id="feedSelect" style="padding: 10px; border-radius: 4px; border: 1px solid #ccc; min-width: 150px;">
+                                </select>
+                        </div>
+
+                        <div class="filter-group">
+                            <label>Received between</label>
+                            <div class="date-range-container">
+                                <input type="datetime-local" id="dateFrom" style="padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                                <span>-</span>
+                                <input type="datetime-local" id="dateTo" style="padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                            </div>
+                        </div>
+
+                        <div class="filter-group">
+                            <label for="sportSelect">Sport</label>
+                            <select id="sportSelect" style="padding: 10px; border-radius: 4px; border: 1px solid #ccc;">
+                                <option value="all" selected>All</option>
+                                <option value="Soccer">Soccer</option>
+                                <option value="Basketball">Basketball</option>
+                                <option value="Tennis">Tennis</option>
+                                <option value="Motorsport">Motorsport</option>
+                            </select>
+                        </div>
+
+                        <div class="filter-group">
+                            <label for="statusSelect">Status</label>
+                            <select id="statusSelect" style="padding: 10px; border-radius: 4px; border: 1px solid #ccc;">
+                                <option value="all" selected>All Statuses</option>
+                                <option value="Not started">Not started</option>
+                                <option value="Live">Live</option>
+                                <option value="Ended">Ended</option>
+                                <option value="Closed">Closed</option>
+                                <option value="Cancelled">Cancelled</option>
+                                <option value="Delayed">Delayed</option>
+                                <option value="Interrupted">Interrupted</option>
+                                <option value="Suspended">Suspended</option>
+                                <option value="Postponed">Postponed</option>
+                                <option value="Abandoned">Abandoned</option>
+                            </select>
+                        </div>
+
+                        <div class="filter-group">
+                            <label for="searchInput">Search</label>
+                            <input type="text" id="searchInput" placeholder="Search ID or description..." style="padding: 10px 15px; border: 1px solid #ccc; border-radius: 4px; font-size: 15px; min-width: 200px; background-color: #fdfdfd;">
                         </div>
                     </div>
-
-                    <div class="filter-group">
-                        <label for="sportSelect">Sport</label>
-                        <select id="sportSelect" style="padding: 10px; border-radius: 4px; border: 1px solid #ccc;">
-                            <option value="all" selected>All</option>
-                            <option value="Soccer">Soccer</option>
-                            <option value="Basketball">Basketball</option>
-                            <option value="Tennis">Tennis</option>
-                            <option value="Motorsport">Motorsport</option>
-                        </select>
-                    </div>
-
-                    <div class="filter-group">
-                        <label for="statusSelect">Status</label>
-                        <select id="statusSelect" style="padding: 10px; border-radius: 4px; border: 1px solid #ccc;">
-                            <option value="all" selected>All Statuses</option>
-                            <option value="Not started">Not started</option>
-                            <option value="Live">Live</option>
-                            <option value="Ended">Ended</option>
-                            <option value="Closed">Closed</option>
-                            <option value="Cancelled">Cancelled</option>
-                            <option value="Delayed">Delayed</option>
-                            <option value="Interrupted">Interrupted</option>
-                            <option value="Suspended">Suspended</option>
-                            <option value="Postponed">Postponed</option>
-                            <option value="Abandoned">Abandoned</option>
-                        </select>
-                    </div>
-
-                    <div class="filter-group">
-                        <label for="searchInput">Search</label>
-                        <input type="text" id="searchInput" placeholder="Search ID or description..." style="padding: 10px 15px; border: 1px solid #ccc; border-radius: 4px; font-size: 15px; min-width: 200px; background-color: #fdfdfd;">
-                    </div>
                 </div>
+
+                <section class="markets-section">
+                    <table class="markets-table">
+                        <thead id="tableHeader">
+                            </thead>
+                        <tbody id="messagesTableBody">
+                            </tbody>
+                    </table>
+                    
+                    <div class="pagination-container">
+                        <div class="rows-per-page">
+                            <label style="font-size: 14px; color: #555; margin-right: 10px;">Rows per page:</label>
+                            <select id="rowsPerPage" style="padding: 5px 10px; border-radius: 4px; border: 1px solid #ccc;">
+                                <option value="5">5</option>
+                                <option value="10" selected>10</option>
+                                <option value="20">20</option>
+                                <option value="50">50</option>
+                            </select>
+                        </div>
+                        
+                        <div class="pagination-controls">
+                            <span id="pageInfo" style="font-size: 14px; color: #555;">Page 1 of 1</span>
+                            <button class="page-btn" id="prevPageBtn">Previous</button>
+                            <button class="page-btn" id="nextPageBtn">Next</button>
+                        </div>
+                    </div>
+                </section>
             </div>
 
-            <section class="markets-section">
-                <table class="markets-table">
-                    <thead id="tableHeader">
-                        </thead>
-                    <tbody id="messagesTableBody">
-                        </tbody>
-                </table>
-                
-                <div class="pagination-container">
-                    <div class="rows-per-page">
-                        <label style="font-size: 14px; color: #555; margin-right: 10px;">Rows per page:</label>
-                        <select id="rowsPerPage" style="padding: 5px 10px; border-radius: 4px; border: 1px solid #ccc;">
-                            <option value="5">5</option>
-                            <option value="10" selected>10</option>
-                            <option value="20">20</option>
-                            <option value="50">50</option>
-                        </select>
+            <aside class="info-side">
+                <div class="sticky-info">
+                    <h3 class="side-title">Business Guidelines</h3>
+                    <div class="info-block">
+                        <h4>Sistemske Poruke (Multifeed Messages)</h4>
+                        <p>Ovaj panel služi za praćenje sirovih poruka koje ulaze u naš sistem u realnom vremenu. Pomaže u otklanjanju grešaka na konekcijama.</p>
                     </div>
-                    
-                    <div class="pagination-controls">
-                        <span id="pageInfo" style="font-size: 14px; color: #555;">Page 1 of 1</span>
-                        <button class="page-btn" id="prevPageBtn">Previous</button>
-                        <button class="page-btn" id="nextPageBtn">Next</button>
+                    <div class="info-block">
+                        <h4>Grupisanje (Group by Event)</h4>
+                        <p><strong>Uključeno:</strong> Prikazuje listu jedinstvenih utakmica/događaja i njihov trenutni status.<br><strong>Isključeno:</strong> Prikazuje hronološki spisak svih pojedinačnih poruka/paketa koji su stigli od provajdera.</p>
+                    </div>
+                    <div class="info-block">
+                        <h4>Statusi mečeva (Match Statuses)</h4>
+                        <p>Kvote se automatski zaustavljaju ili suspenduju na osnovu statusa događaja (npr. Suspended, Interrupted, Abandoned).</p>
                     </div>
                 </div>
-            </section>
-
+            </aside>
         </main>
     </div>
 

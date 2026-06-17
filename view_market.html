@@ -16,41 +16,59 @@
             <h1>Market Mappings Overview</h1>
         </header>
 
-        <main class="dashboard-container" style="max-width: 900px;">
-            
-            <div style="margin-bottom: 20px;">
-                <a href="index.html" class="btn-secondary" style="text-decoration: none; display: inline-block;">&larr; Back to Dashboard</a>
+        <main class="split-layout">
+            <div class="form-side">
+                <div style="margin-bottom: 20px;">
+                    <a href="index.html" class="btn-secondary" style="text-decoration: none; display: inline-block;">&larr; Back to Dashboard</a>
+                </div>
+
+                <section class="top-bar" style="display: block; background-color: white; padding: 25px; border-radius: 8px; border: 1px solid #e0e0e0;">
+                    <h2 style="margin-bottom: 15px; color: #2c3e50; font-size: 24px;">
+                        Provider Market: <span id="displayMarketName" style="color: #007bff;"></span>
+                    </h2>
+                    <div style="display: flex; gap: 30px; border-top: 1px dashed #ccc; padding-top: 15px;">
+                        <p style="font-size: 16px; color: #555;">Market ID: <strong id="displayMarketId" style="color: #333;"></strong></p>
+                        <p style="font-size: 16px; color: #555;">Sport: <strong id="displaySport" style="color: #333;"></strong></p>
+                    </div>
+                </section>
+
+                <section class="markets-section" style="margin-top: 25px; padding: 25px; background: white; border-radius: 8px; border: 1px solid #e0e0e0;">
+                    <h3 style="margin-bottom: 20px; color: #333; font-size: 18px; border-bottom: 1px solid #eee; padding-bottom: 10px;">Mapped Hermes Markets</h3>
+                    
+                    <table class="markets-table" style="margin-bottom: 25px;">
+                        <thead>
+                            <tr>
+                                <th>Hermes Market Name</th>
+                                <th style="text-align: right;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="mappedMarketsList">
+                            </tbody>
+                    </table>
+
+                    <div style="text-align: left;">
+                        <a href="#" id="addMappingBtn" class="btn-primary" style="text-decoration: none; display: inline-block;">Add new mapping</a>
+                    </div>
+                </section>
             </div>
 
-            <section class="top-bar" style="display: block; background-color: white; padding: 25px; border-radius: 8px; border: 1px solid #e0e0e0;">
-                <h2 style="margin-bottom: 15px; color: #2c3e50; font-size: 24px;">
-                    Provider Market: <span id="displayMarketName" style="color: #007bff;"></span>
-                </h2>
-                <div style="display: flex; gap: 30px; border-top: 1px dashed #ccc; padding-top: 15px;">
-                    <p style="font-size: 16px; color: #555;">Market ID: <strong id="displayMarketId" style="color: #333;"></strong></p>
-                    <p style="font-size: 16px; color: #555;">Sport: <strong id="displaySport" style="color: #333;"></strong></p>
+            <aside class="info-side">
+                <div class="sticky-info">
+                    <h3 class="side-title">Business Guidelines</h3>
+                    <div class="info-block">
+                        <h4>Pregled Mape za Izabrani Market</h4>
+                        <p>Ovaj prozor prikazuje listu svih standardizovanih <strong>Hermes marketa</strong> na koje se preslikava odabrani provajderski market.</p>
+                    </div>
+                    <div class="info-block">
+                        <h4>Višestruko Mapiranje (1-to-Many)</h4>
+                        <p>Često se jedan provajderski market može mapirati na više različitih Hermes marketa (npr. zbroj golova se može mapirati na regularni zbroj i na fiksni zbroj golova).</p>
+                    </div>
+                    <div class="info-block">
+                        <h4>Upravljanje Mapiranjima</h4>
+                        <p><strong>Edit Mapping:</strong> Omogućava izmenu specifikatora i ishoda.<br><strong>Remove:</strong> Briše mapiranje iz baze. Pažnja: Ovo može prekinuti feed kvota za dati market.</p>
+                    </div>
                 </div>
-            </section>
-
-            <section class="markets-section" style="margin-top: 25px; padding: 25px; background: white; border-radius: 8px; border: 1px solid #e0e0e0;">
-                <h3 style="margin-bottom: 20px; color: #333; font-size: 18px; border-bottom: 1px solid #eee; padding-bottom: 10px;">Mapped Hermes Markets</h3>
-                
-                <table class="markets-table" style="margin-bottom: 25px;">
-                    <thead>
-                        <tr>
-                            <th>Hermes Market Name</th>
-                            <th style="text-align: right;">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="mappedMarketsList">
-                        </tbody>
-                </table>
-
-                <div style="text-align: left;">
-                    <a href="#" id="addMappingBtn" class="btn-primary" style="text-decoration: none; display: inline-block;">Add new mapping</a>
-                </div>
-            </section>
-
+            </aside>
         </main>
     </div>
 

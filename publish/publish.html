@@ -16,85 +16,104 @@
             <h1>Publish Mappings</h1>
         </header>
 
-        <main class="dashboard-container">
-            
-            <div class="top-bar" style="display: flex; justify-content: space-between; align-items: center;">
-                <div class="info-text" style="max-width: 700px;">
-                    <h3 style="color: #2c3e50; margin-bottom: 5px;">Ready for Release</h3>
-                    <p style="color: #666; font-size: 14px; line-height: 1.5;">
-                        Izaberite mapiranja koja želite da objavite drugim sistemima. <strong>Pravilo zavisnosti:</strong> Mapiranje marketa ne može biti objavljeno bez mapiranja pripadajućeg sporta.
-                    </p>
+        <main class="split-layout">
+            <div class="form-side">
+                <div class="top-bar" style="display: flex; justify-content: space-between; align-items: center;">
+                    <div class="info-text" style="max-width: 700px;">
+                        <h3 style="color: #2c3e50; margin-bottom: 5px;">Ready for Release</h3>
+                        <p style="color: #666; font-size: 14px; line-height: 1.5;">
+                            Izaberite mapiranja koja želite da objavite drugim sistemima. <strong>Pravilo zavisnosti:</strong> Mapiranje marketa ne može biti objavljeno bez mapiranja pripadajućeg sporta.
+                        </p>
+                    </div>
+                    <div class="actions">
+                        <button id="triggerPublishBtn" class="btn-primary" style="background-color: #28a745; font-size: 16px; padding: 12px 30px; border: none; box-shadow: 0 4px 6px rgba(40, 167, 69, 0.2);">
+                            Publish Selected
+                        </button>
+                    </div>
                 </div>
-                <div class="actions">
-                    <button id="triggerPublishBtn" class="btn-primary" style="background-color: #28a745; font-size: 16px; padding: 12px 30px; border: none; box-shadow: 0 4px 6px rgba(40, 167, 69, 0.2);">
-                        Publish Selected
-                    </button>
-                </div>
+
+                <section class="markets-section">
+                    <table class="markets-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 50px; text-align: center;"></th>
+                                <th>Entity Type</th>
+                                <th>Provider Mapping</th>
+                                <th>Hermes Mapping</th>
+                                <th style="text-align: right;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="publishTableBody">
+                            
+                            <tr class="sport-row" data-sport="S-001">
+                                <td style="text-align: center;"><input type="checkbox" class="cb-sport" data-id="S-001" data-name="Soccer"></td>
+                                <td><span style="background: #e9ecef; padding: 3px 8px; border-radius: 4px; font-size: 12px;">SPORT</span></td>
+                                <td style="color: #007bff;">Soccer (ExeFeed)</td>
+                                <td>Soccer</td>
+                                <td style="text-align: right;">
+                                    <button class="btn-action view-btn" style="background-color: #17a2b8;" data-type="sport" data-prov="Soccer" data-herm="Soccer">View Message</button>
+                                </td>
+                            </tr>
+                            <tr class="market-row" data-parent="S-001">
+                                <td class="market-indent"><input type="checkbox" class="cb-market" data-id="M-001" data-parent="S-001" data-name="1X2"></td>
+                                <td><span style="background: #f8d7da; color: #721c24; padding: 3px 8px; border-radius: 4px; font-size: 12px;">MARKET</span></td>
+                                <td>1X2</td>
+                                <td>1X2</td>
+                                <td style="text-align: right;">
+                                    <button class="btn-action view-btn" style="background-color: #17a2b8;" data-type="market" data-prov="1X2" data-herm="1X2">View Message</button>
+                                </td>
+                            </tr>
+                            <tr class="market-row" data-parent="S-001">
+                                <td class="market-indent"><input type="checkbox" class="cb-market" data-id="M-002" data-parent="S-001" data-name="Total Goals"></td>
+                                <td><span style="background: #f8d7da; color: #721c24; padding: 3px 8px; border-radius: 4px; font-size: 12px;">MARKET</span></td>
+                                <td>TOTAL_GOALS</td>
+                                <td>Total Goals</td>
+                                <td style="text-align: right;">
+                                    <button class="btn-action view-btn" style="background-color: #17a2b8;" data-type="market" data-prov="TOTAL_GOALS" data-herm="Total Goals">View Message</button>
+                                </td>
+                            </tr>
+
+                            <tr class="sport-row" data-sport="S-002">
+                                <td style="text-align: center;"><input type="checkbox" class="cb-sport" data-id="S-002" data-name="Basketball"></td>
+                                <td><span style="background: #e9ecef; padding: 3px 8px; border-radius: 4px; font-size: 12px;">SPORT</span></td>
+                                <td style="color: #007bff;">Basketball (SportRadar)</td>
+                                <td>Basketball</td>
+                                <td style="text-align: right;">
+                                    <button class="btn-action view-btn" style="background-color: #17a2b8;" data-type="sport" data-prov="Basketball" data-herm="Basketball">View Message</button>
+                                </td>
+                            </tr>
+                            <tr class="market-row" data-parent="S-002">
+                                <td class="market-indent"><input type="checkbox" class="cb-market" data-id="M-003" data-parent="S-002" data-name="Match Winner"></td>
+                                <td><span style="background: #f8d7da; color: #721c24; padding: 3px 8px; border-radius: 4px; font-size: 12px;">MARKET</span></td>
+                                <td>MONEYLINE</td>
+                                <td>Match Winner</td>
+                                <td style="text-align: right;">
+                                    <button class="btn-action view-btn" style="background-color: #17a2b8;" data-type="market" data-prov="MONEYLINE" data-herm="Match Winner">View Message</button>
+                                </td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </section>
             </div>
 
-            <section class="markets-section">
-                <table class="markets-table">
-                    <thead>
-                        <tr>
-                            <th style="width: 50px; text-align: center;"></th>
-                            <th>Entity Type</th>
-                            <th>Provider Mapping</th>
-                            <th>Hermes Mapping</th>
-                            <th style="text-align: right;">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="publishTableBody">
-                        
-                        <tr class="sport-row" data-sport="S-001">
-                            <td style="text-align: center;"><input type="checkbox" class="cb-sport" data-id="S-001" data-name="Soccer"></td>
-                            <td><span style="background: #e9ecef; padding: 3px 8px; border-radius: 4px; font-size: 12px;">SPORT</span></td>
-                            <td style="color: #007bff;">Soccer (ExeFeed)</td>
-                            <td>Soccer</td>
-                            <td style="text-align: right;">
-                                <button class="btn-action view-btn" style="background-color: #17a2b8;" data-type="sport" data-prov="Soccer" data-herm="Soccer">View Message</button>
-                            </td>
-                        </tr>
-                        <tr class="market-row" data-parent="S-001">
-                            <td class="market-indent"><input type="checkbox" class="cb-market" data-id="M-001" data-parent="S-001" data-name="1X2"></td>
-                            <td><span style="background: #f8d7da; color: #721c24; padding: 3px 8px; border-radius: 4px; font-size: 12px;">MARKET</span></td>
-                            <td>1X2</td>
-                            <td>1X2</td>
-                            <td style="text-align: right;">
-                                <button class="btn-action view-btn" style="background-color: #17a2b8;" data-type="market" data-prov="1X2" data-herm="1X2">View Message</button>
-                            </td>
-                        </tr>
-                        <tr class="market-row" data-parent="S-001">
-                            <td class="market-indent"><input type="checkbox" class="cb-market" data-id="M-002" data-parent="S-001" data-name="Total Goals"></td>
-                            <td><span style="background: #f8d7da; color: #721c24; padding: 3px 8px; border-radius: 4px; font-size: 12px;">MARKET</span></td>
-                            <td>TOTAL_GOALS</td>
-                            <td>Total Goals</td>
-                            <td style="text-align: right;">
-                                <button class="btn-action view-btn" style="background-color: #17a2b8;" data-type="market" data-prov="TOTAL_GOALS" data-herm="Total Goals">View Message</button>
-                            </td>
-                        </tr>
-
-                        <tr class="sport-row" data-sport="S-002">
-                            <td style="text-align: center;"><input type="checkbox" class="cb-sport" data-id="S-002" data-name="Basketball"></td>
-                            <td><span style="background: #e9ecef; padding: 3px 8px; border-radius: 4px; font-size: 12px;">SPORT</span></td>
-                            <td style="color: #007bff;">Basketball (SportRadar)</td>
-                            <td>Basketball</td>
-                            <td style="text-align: right;">
-                                <button class="btn-action view-btn" style="background-color: #17a2b8;" data-type="sport" data-prov="Basketball" data-herm="Basketball">View Message</button>
-                            </td>
-                        </tr>
-                        <tr class="market-row" data-parent="S-002">
-                            <td class="market-indent"><input type="checkbox" class="cb-market" data-id="M-003" data-parent="S-002" data-name="Match Winner"></td>
-                            <td><span style="background: #f8d7da; color: #721c24; padding: 3px 8px; border-radius: 4px; font-size: 12px;">MARKET</span></td>
-                            <td>MONEYLINE</td>
-                            <td>Match Winner</td>
-                            <td style="text-align: right;">
-                                <button class="btn-action view-btn" style="background-color: #17a2b8;" data-type="market" data-prov="MONEYLINE" data-herm="Match Winner">View Message</button>
-                            </td>
-                        </tr>
-
-                    </tbody>
-                </table>
-            </section>
+            <aside class="info-side">
+                <div class="sticky-info">
+                    <h3 class="side-title">Business Guidelines</h3>
+                    <div class="info-block">
+                        <h4>Objavljivanje Mapiranja (Publishing)</h4>
+                        <p>Sva mapiranja se kreiraju kao draftovi na klijentskoj strani. Kada ste sigurni u ispravnost pravila, morate ih objaviti (publish-ovati) kako bi core sistem počeo da procesira kvote po tim pravilima.</p>
+                    </div>
+                    <div class="info-block">
+                        <h4>Zavisnost Entiteta (Dependencies)</h4>
+                        <p>Sistem ne dozvoljava objavljivanje marketa ukoliko pripadajući sport već nije objavljen. Označavanje marketa će automatski označiti i njegov sport roditelj.</p>
+                    </div>
+                    <div class="info-block">
+                        <h4>Verifikacija Poruka (View Message)</h4>
+                        <p>Klikom na <strong>View Message</strong> možete uporediti sirovi provajderov JSON (Input) sa transformisanim Hermes JSON-om (Output) da biste potvrdili tačnost pre slanja.</p>
+                    </div>
+                </div>
+            </aside>
         </main>
     </div>
 

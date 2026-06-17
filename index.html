@@ -18,78 +18,100 @@
             <h1>Provider Markets Dashboard</h1>
         </header>
 
-        <main class="dashboard-container">
-            
-            <div class="top-bar">
-                <div class="filters">
-                    
-                    <!-- Filter za Provajdera -->
-                    <div class="filter-group">
-                        <label for="providerSelect">Provider</label>
-                        <select id="providerSelect">
-                            <option value="all" selected>All Providers</option>
-                            <option value="ExeFeed">ExeFeed</option>
-                            <option value="SportRadar">SportRadar</option>
-                            <option value="Bet Genius">Bet Genius</option>
-                            <option value="IMG Arena">IMG Arena</option>
-                            <option value="Bet Construct">Bet Construct</option>
-                            <option value="LSports">LSports</option>
-                        </select>
-                    </div>
-                    
-                    <!-- Filter za Sport (Vraćeno All) -->
-                    <div class="filter-group">
-                        <label for="sportSelect">Sport</label>
-                        <select id="sportSelect">
-                            <option value="all" selected>All</option>
-                            <option value="Soccer">Soccer</option>
-                            <option value="Basketball">Basketball</option>
-                            <option value="Tennis">Tennis</option>
-                        </select>
+        <main class="split-layout">
+            <div class="form-side">
+                <div class="top-bar">
+                    <div class="filters">
+                        
+                        <!-- Filter za Provajdera -->
+                        <div class="filter-group">
+                            <label for="providerSelect">Provider</label>
+                            <select id="providerSelect">
+                                <option value="all" selected>All Providers</option>
+                                <option value="ExeFeed">ExeFeed</option>
+                                <option value="SportRadar">SportRadar</option>
+                                <option value="Bet Genius">Bet Genius</option>
+                                <option value="IMG Arena">IMG Arena</option>
+                                <option value="Bet Construct">Bet Construct</option>
+                                <option value="LSports">LSports</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Filter za Sport (Vraćeno All) -->
+                        <div class="filter-group">
+                            <label for="sportSelect">Sport</label>
+                            <select id="sportSelect">
+                                <option value="all" selected>All</option>
+                                <option value="Soccer">Soccer</option>
+                                <option value="Basketball">Basketball</option>
+                                <option value="Tennis">Tennis</option>
+                            </select>
+                        </div>
+
+                        <!-- Filter za Pretragu -->
+                        <div class="filter-group">
+                            <label for="searchInput">Search</label>
+                            <input type="text" id="searchInput" placeholder="Search by name or ID..." style="padding: 10px 15px; border: 1px solid #ccc; border-radius: 4px; font-size: 15px; min-width: 200px; background-color: #fdfdfd;">
+                        </div>
+
+                        <!-- Filter za Status mapiranja (Dodato Partially mapped) -->
+                        <div class="filter-group">
+                            <label for="statusSelect">Mapping status</label>
+                            <select id="statusSelect">
+                                <option value="all" selected>All</option>
+                                <option value="mapped">Mapped</option>
+                                <option value="partially mapped">Partially mapped</option>
+                                <option value="unmapped">Unmapped</option>
+                            </select>
+                        </div>
                     </div>
 
-                    <!-- Filter za Pretragu -->
-                    <div class="filter-group">
-                        <label for="searchInput">Search</label>
-                        <input type="text" id="searchInput" placeholder="Search by name or ID..." style="padding: 10px 15px; border: 1px solid #ccc; border-radius: 4px; font-size: 15px; min-width: 200px; background-color: #fdfdfd;">
-                    </div>
-
-                    <!-- Filter za Status mapiranja (Dodato Partially mapped) -->
-                    <div class="filter-group">
-                        <label for="statusSelect">Mapping status</label>
-                        <select id="statusSelect">
-                            <option value="all" selected>All</option>
-                            <option value="mapped">Mapped</option>
-                            <option value="partially mapped">Partially mapped</option>
-                            <option value="unmapped">Unmapped</option>
-                        </select>
+                    <div class="actions">
+                        <a href="create_market/create_market.html" class="btn-primary" style="text-decoration: none; display: inline-block;">Add Market</a>
                     </div>
                 </div>
 
-                <div class="actions">
-                    <a href="create_market/create_market.html" class="btn-primary" style="text-decoration: none; display: inline-block;">Add Market</a>
-                </div>
+                <!-- TABELA (Uklonjena Feed kolona) -->
+                <section class="markets-section">
+                    <table class="markets-table">
+                        <thead>
+                            <tr>
+                                <th>Market ID</th>
+                                <th>Provider Market Name</th>
+                                <th>Provider</th>
+                                <th>Sport</th>
+                                <th>Status</th>
+                                <th style="text-align: right;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="marketsTableBody">
+                            <!-- Dinamički se puni preko script.js -->
+                        </tbody>
+                    </table>
+                </section>
             </div>
 
-            <!-- TABELA (Uklonjena Feed kolona) -->
-            <section class="markets-section">
-                <table class="markets-table">
-                    <thead>
-                        <tr>
-                            <th>Market ID</th>
-                            <th>Provider Market Name</th>
-                            <th>Provider</th>
-                            <th>Sport</th>
-                            <th>Status</th>
-                            <th style="text-align: right;">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="marketsTableBody">
-                        <!-- Dinamički se puni preko script.js -->
-                    </tbody>
-                </table>
-            </section>
-
+            <aside class="info-side">
+                <div class="sticky-info">
+                    <h3 class="side-title">Business Guidelines</h3>
+                    <div class="info-block">
+                        <h4>Provajderski Marketi</h4>
+                        <p>Prikaz sirovih sportskih marketa koji stižu sa eksternih feed-ova. Ovi marketi moraju biti prevedeni u jedinstvenu Hermes strukturu.</p>
+                    </div>
+                    <div class="info-block">
+                        <h4>Filteri i Pretraga</h4>
+                        <p>Brza pretraga i filtriranje po provajderu, sportu i statusu mapiranja za lako lociranje nemapiranih marketa.</p>
+                    </div>
+                    <div class="info-block">
+                        <h4>Statusi Mapiranja</h4>
+                        <p><strong>Mapped:</strong> Potpuno spojeni i operativni marketi.<br><strong>Partially mapped:</strong> Nedostaju neki ishodi ili specifikatori.<br><strong>Unmapped:</strong> Novi marketi koji zahtevaju konfiguraciju.</p>
+                    </div>
+                    <div class="info-block">
+                        <h4>Akcije</h4>
+                        <p>Koristite <strong>View</strong> da proverite postojeća mapiranja ili <strong>Map</strong> da kreirate nova pravila.</p>
+                    </div>
+                </div>
+            </aside>
         </main>
     </div>
 

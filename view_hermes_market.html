@@ -16,40 +16,58 @@
             <h1>Hermes Market Overview</h1>
         </header>
 
-        <main class="dashboard-container" style="max-width: 900px;">
-            
-            <div style="margin-bottom: 20px;">
-                <a href="hermes_markets.html" class="btn-secondary" style="text-decoration: none; display: inline-block;">&larr; Back to Hermes Markets</a>
+        <main class="split-layout">
+            <div class="form-side">
+                <div style="margin-bottom: 20px;">
+                    <a href="hermes_markets.html" class="btn-secondary" style="text-decoration: none; display: inline-block;">&larr; Back to Hermes Markets</a>
+                </div>
+
+                <section class="top-bar" style="display: block; background-color: white; padding: 25px; border-radius: 8px; border: 1px solid #e0e0e0;">
+                    <h2 style="margin-bottom: 15px; color: #2c3e50; font-size: 24px;">
+                        Hermes Market: <span id="displayMarketName" style="color: #17a2b8;"></span>
+                    </h2>
+                    <div style="display: flex; gap: 30px; border-top: 1px dashed #ccc; padding-top: 15px;">
+                        <p style="font-size: 16px; color: #555;">Market ID: <strong id="displayMarketId" style="color: #333;"></strong></p>
+                        <p style="font-size: 16px; color: #555;">Sport: <strong id="displaySport" style="color: #333;"></strong></p>
+                        <p style="font-size: 16px; color: #555;">Type: <strong id="displayType" style="color: #333;"></strong></p>
+                    </div>
+                </section>
+
+                <section class="markets-section" style="margin-top: 25px; padding: 25px; background: white; border-radius: 8px; border: 1px solid #e0e0e0;">
+                    <h3 style="margin-bottom: 20px; color: #333; font-size: 18px; border-bottom: 1px solid #eee; padding-bottom: 10px;">Mapped Provider Markets</h3>
+                    <p style="margin-bottom: 15px; font-size: 14px; color: #666;">Ovo je lista provider marketa koji su izmapirani na ovaj Hermes market.</p>
+                    
+                    <table class="markets-table" style="margin-bottom: 25px;">
+                        <thead>
+                            <tr>
+                                <th>Provider Market Name</th>
+                                <th>Provider</th>
+                                <th style="text-align: right;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="providerMarketsList">
+                            </tbody>
+                    </table>
+                </section>
             </div>
 
-            <section class="top-bar" style="display: block; background-color: white; padding: 25px; border-radius: 8px; border: 1px solid #e0e0e0;">
-                <h2 style="margin-bottom: 15px; color: #2c3e50; font-size: 24px;">
-                    Hermes Market: <span id="displayMarketName" style="color: #17a2b8;"></span>
-                </h2>
-                <div style="display: flex; gap: 30px; border-top: 1px dashed #ccc; padding-top: 15px;">
-                    <p style="font-size: 16px; color: #555;">Market ID: <strong id="displayMarketId" style="color: #333;"></strong></p>
-                    <p style="font-size: 16px; color: #555;">Sport: <strong id="displaySport" style="color: #333;"></strong></p>
-                    <p style="font-size: 16px; color: #555;">Type: <strong id="displayType" style="color: #333;"></strong></p>
+            <aside class="info-side">
+                <div class="sticky-info">
+                    <h3 class="side-title">Business Guidelines</h3>
+                    <div class="info-block">
+                        <h4>Definicija Hermes Marketa</h4>
+                        <p>Prikaz standardizovanih parametara za Hermes market. Ovi podaci se koriste za obradu opklada i izračunavanje dobitaka.</p>
+                    </div>
+                    <div class="info-block">
+                        <h4>Spoljni Provajderi (Mapped Providers)</h4>
+                        <p>Ova sekcija prikazuje koji spoljni provajderi trenutno šalju kvote za ovaj konkretni Hermes market. Ako provajder nije izmapiran, njegove kvote neće biti vidljive u ponudi.</p>
+                    </div>
+                    <div class="info-block">
+                        <h4>Analiza Konekcije</h4>
+                        <p>Brzim skokom na <strong>View Provider Market</strong> možete proveriti tačna pravila mapiranja i proveriti da li su svi specifikatori i ishodi pravilno podešeni.</p>
+                    </div>
                 </div>
-            </section>
-
-            <section class="markets-section" style="margin-top: 25px; padding: 25px; background: white; border-radius: 8px; border: 1px solid #e0e0e0;">
-                <h3 style="margin-bottom: 20px; color: #333; font-size: 18px; border-bottom: 1px solid #eee; padding-bottom: 10px;">Mapped Provider Markets</h3>
-                <p style="margin-bottom: 15px; font-size: 14px; color: #666;">Ovo je lista provider marketa koji su izmapirani na ovaj Hermes market.</p>
-                
-                <table class="markets-table" style="margin-bottom: 25px;">
-                    <thead>
-                        <tr>
-                            <th>Provider Market Name</th>
-                            <th>Provider</th>
-                            <th style="text-align: right;">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="providerMarketsList">
-                        </tbody>
-                </table>
-            </section>
-
+            </aside>
         </main>
     </div>
 

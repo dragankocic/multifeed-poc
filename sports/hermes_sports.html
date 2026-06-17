@@ -17,34 +17,54 @@
             <h1>Hermes Sports Management</h1>
         </header>
 
-        <main class="dashboard-container">
-            <div class="top-bar">
-                <div class="filters">
-                    <div class="filter-group">
-                        <label for="searchInput">Search Sports</label>
-                        <input type="text" id="searchInput" placeholder="Search by name or ID..." style="padding: 10px 15px; border: 1px solid #ccc; border-radius: 4px; font-size: 15px; min-width: 250px; background-color: #fdfdfd;">
+        <main class="split-layout">
+            <div class="form-side">
+                <div class="top-bar">
+                    <div class="filters">
+                        <div class="filter-group">
+                            <label for="searchInput">Search Sports</label>
+                            <input type="text" id="searchInput" placeholder="Search by name or ID..." style="padding: 10px 15px; border: 1px solid #ccc; border-radius: 4px; font-size: 15px; min-width: 250px; background-color: #fdfdfd;">
+                        </div>
+                    </div>
+
+                    <div class="actions">
+                        <a href="create_sport.html" class="btn-primary" style="text-decoration: none; display: inline-block;">Create Hermes Sport</a>
                     </div>
                 </div>
 
-                <div class="actions">
-                    <a href="create_sport.html" class="btn-primary" style="text-decoration: none; display: inline-block;">Create Hermes Sport</a>
-                </div>
+                <section class="markets-section">
+                    <table class="markets-table">
+                        <thead>
+                            <tr>
+                                <th>Sport ID</th>
+                                <th>Sport Name</th>
+                                <th>Abbreviation</th>
+                                <th style="text-align: right;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="hermesSportsBody">
+                            </tbody>
+                    </table>
+                </section>
             </div>
 
-            <section class="markets-section">
-                <table class="markets-table">
-                    <thead>
-                        <tr>
-                            <th>Sport ID</th>
-                            <th>Sport Name</th>
-                            <th>Abbreviation</th>
-                            <th style="text-align: right;">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="hermesSportsBody">
-                        </tbody>
-                </table>
-            </section>
+            <aside class="info-side">
+                <div class="sticky-info">
+                    <h3 class="side-title">Business Guidelines</h3>
+                    <div class="info-block">
+                        <h4>Registar Hermes Sportova</h4>
+                        <p>Lista internih standardizovanih sportova koje Hermes sistem podržava. Kvote se procesiraju isključivo za sportove sa ove liste.</p>
+                    </div>
+                    <div class="info-block">
+                        <h4>Skraćenica (Abbreviation)</h4>
+                        <p>Skraćenice se koriste kao sistemski identifikatori u feed porukama (npr. SOC za Soccer, BKB za Basketball).</p>
+                    </div>
+                    <div class="info-block">
+                        <h4>Dodavanje i Izmena</h4>
+                        <p>Novi sport se može kreirati klikom na <strong>Create Hermes Sport</strong>. Izmene naziva ili skraćenice radite preko opcije <strong>Edit</strong>.</p>
+                    </div>
+                </div>
+            </aside>
         </main>
     </div>
 

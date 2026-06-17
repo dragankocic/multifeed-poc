@@ -15,59 +15,77 @@
             <h1>Hermes Markets Dashboard</h1>
         </header>
 
-        <main class="dashboard-container">
+        <main class="split-layout">
+            <div class="form-side">
+                <div class="top-bar">
+                    <div class="filters">
+                        <div class="filter-group">
+                            <label for="sportSelect">Sport</label>
+                            <select id="sportSelect">
+                                <option value="Soccer" selected>Soccer</option>
+                                <option value="Basketball">Basketball</option>
+                                <option value="Tennis">Tennis</option>
+                            </select>
+                        </div>
 
-            <div class="top-bar">
-                <div class="filters">
-                    <div class="filter-group">
-                        <label for="sportSelect">Sport</label>
-                        <select id="sportSelect">
-                            <option value="Soccer" selected>Soccer</option>
-                            <option value="Basketball">Basketball</option>
-                            <option value="Tennis">Tennis</option>
-                        </select>
+                        <div class="filter-group">
+                            <label for="typeSelect">Market Type</label>
+                            <select id="typeSelect">
+                                <option value="all" selected>All</option>
+                                <option value="Regular">Regular</option>
+                                <option value="Statistics">Statistics</option>
+                                <option value="Player Props">Player Props</option>
+                                <option value="Outright">Outright</option>
+                            </select>
+                        </div>
+
+                        <div class="filter-group">
+                            <label for="searchInput">Search</label>
+                            <input type="text" id="searchInput" placeholder="Search by name or ID..." style="padding: 10px 15px; border: 1px solid #ccc; border-radius: 4px; font-size: 15px; min-width: 250px; background-color: #fdfdfd;">
+                        </div>
                     </div>
 
-                    <div class="filter-group">
-                        <label for="typeSelect">Market Type</label>
-                        <select id="typeSelect">
-                            <option value="all" selected>All</option>
-                            <option value="Regular">Regular</option>
-                            <option value="Statistics">Statistics</option>
-                            <option value="Player Props">Player Props</option>
-                            <option value="Outright">Outright</option>
-                        </select>
-                    </div>
-
-                    <div class="filter-group">
-                        <label for="searchInput">Search</label>
-                        <input type="text" id="searchInput" placeholder="Search by name or ID..." style="padding: 10px 15px; border: 1px solid #ccc; border-radius: 4px; font-size: 15px; min-width: 250px; background-color: #fdfdfd;">
+                    <div class="actions">
+                        <a href="create_market/create_market.html" class="btn-primary" style="text-decoration: none; display: inline-block;">Add Market</a>
                     </div>
                 </div>
 
-                <div class="actions">
-                    <a href="create_market/create_market.html" class="btn-primary" style="text-decoration: none; display: inline-block;">Add Market</a>
-                </div>
+                <section class="markets-section">
+                    <table class="markets-table">
+                        <thead>
+                            <tr>
+                                <th>Market ID</th>
+                                <th>Market Name</th>
+                                <th>Sport</th>
+                                <th>Market Description</th>
+                                <th>Market Type</th>
+                                <th style="text-align: right;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="hermesMarketsBody">
+                            <!-- Dinamički se puni JS-om -->
+                        </tbody>
+                    </table>
+                </section>
             </div>
 
-            <section class="markets-section">
-                <table class="markets-table">
-                    <thead>
-                        <tr>
-                            <th>Market ID</th>
-                            <th>Market Name</th>
-                            <th>Sport</th>
-                            <th>Market Description</th>
-                            <th>Market Type</th>
-                            <th style="text-align: right;">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="hermesMarketsBody">
-                        <!-- Dinamički se puni JS-om -->
-                    </tbody>
-                </table>
-            </section>
-
+            <aside class="info-side">
+                <div class="sticky-info">
+                    <h3 class="side-title">Business Guidelines</h3>
+                    <div class="info-block">
+                        <h4>Registar Standardnih Marketa</h4>
+                        <p>Hermes standardni marketi predstavljaju jedinstvenu specifikaciju marketa klađenja. Svi dolazni marketi sa provajdera se prevode u ovaj format.</p>
+                    </div>
+                    <div class="info-block">
+                        <h4>Kategorizacija (Market Type)</h4>
+                        <p><strong>Regular:</strong> Ishod meča, hendikep i zbrojevi.<br><strong>Statistics:</strong> Korneri, kartoni, faulovi i ostala statistika.<br><strong>Player Props:</strong> Individualni učinak igrača.<br><strong>Outright:</strong> Dugoročna tržišta.</p>
+                    </div>
+                    <div class="info-block">
+                        <h4>Kreiranje Marketa</h4>
+                        <p>Možete definisati potpuno novi Hermes market preko dugmeta <strong>Add Market</strong>, uključujući njegove ishode i specifikatore.</p>
+                    </div>
+                </div>
+            </aside>
         </main>
     </div>
 

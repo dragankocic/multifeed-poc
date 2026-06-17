@@ -105,6 +105,17 @@ function createSpecifierRowHtml(providerSpecifiers = []) {
     `;
 }
 
+// Rečnik za ishode specifične za svaki market
+const marketOutcomes = {
+    "1X2": ["home", "draw", "away"],
+    "Asian Handicap": ["home", "away"],
+    "Total Goals": ["Over", "Under"],
+    "Total Goals flat": ["Over", "Under"],
+    "5 minutes - total from {from} to {to}": ["Over", "Under"],
+    "Anytime goalscorer": ["Yes", "No"],
+    "{!goalnr} goalscorer": ["Yes", "No"]
+};
+
 // Fixed Specifier levo, Hermes desno
 function createFixedSpecifierRowHtml() {
     const hermesSpecifiers = ["goalnr", "hcp", "total", "from", "to"];
@@ -113,7 +124,7 @@ function createFixedSpecifierRowHtml() {
     return `
         <div style="display: flex; gap: 20px; flex: 1; align-items: flex-end;">
             <div class="form-group" style="flex: 1; margin-bottom: 0;">
-                <label>Provider fixed specifier</label>
+                <label>Fixed Specifier Value</label>
                 <input type="text" placeholder="e.g. fiksna vrednost...">
             </div>
             <div class="form-group" style="flex: 1; margin-bottom: 0;">
@@ -132,12 +143,19 @@ function createFixedSpecifierRowHtml() {
 function createExtSpecifierRowHtml() {
     const extSpecifiers = ["match_status", "score_info", "set_number", "score"];
     const optionsHtml = extSpecifiers.map(ext => `<option value="${ext}">${ext}</option>`).join('');
+    
+    // Promena Provider value u dropdown
+    const providerValues = ["live", "prematch", "1st_half", "2nd_half", "ot", "set1", "set2", "set3", "any"];
+    const providerOptionsHtml = providerValues.map(val => `<option value="${val}">${val}</option>`).join('');
 
     return `
         <div style="display: flex; gap: 20px; flex: 1; align-items: flex-end;">
             <div class="form-group" style="flex: 1; margin-bottom: 0;">
                 <label>Provider value</label>
-                <input type="text" placeholder="Provider value or variable...">
+                <select>
+                    <option value="" disabled selected>Select provider value...</option>
+                    ${providerOptionsHtml}
+                </select>
             </div>
             <div class="form-group" style="flex: 1; margin-bottom: 0;">
                 <label>Hermes extended specifier</label>
@@ -151,9 +169,11 @@ function createExtSpecifierRowHtml() {
     `;
 }
 
-// Provider select (levo), Hermes select (desno)
-function createOutcomeRowHtml() {
+// Provider select (levo), Hermes select (desno) - specifični ishodi po marketu
+function createOutcomeRowHtml(selectedHermesMarket = "1X2") {
     const providerOptionsHtml = currentProviderOutcomes.map(o => `<option value="${o}">${o}</option>`).join('');
+    const outcomesListForMarket = marketOutcomes[selectedHermesMarket] || ["home", "draw", "away"];
+    const hermesOptionsHtml = outcomesListForMarket.map(o => `<option value="${o}">${o}</option>`).join('');
     
     return `
         <div style="display: flex; gap: 20px; flex: 1; align-items: flex-end;">
@@ -166,25 +186,30 @@ function createOutcomeRowHtml() {
             </div>
             <div class="form-group" style="flex: 1; margin-bottom: 0;">
                 <label>Hermes outcome</label>
-                <select>
+                <select class="hermes-outcome-select">
                     <option value="" disabled selected>Select Hermes outcome...</option>
-                    <option value="{$competitor1}">{$competitor1}</option>
-                    <option value="draw">draw</option>
-                    <option value="{$competitor2}">{$competitor2}</option>
-                    <option value="home">home</option>
-                    <option value="away">away</option>
-                    <option value="Over">Over</option>
-                    <option value="Under">Under</option>
-                    <option value="0-2">0-2</option>
-                    <option value="3+">3+</option>
-                    <option value="1">1</option>
-                    <option value="X">X</option>
-                    <option value="2">2</option>
+                    ${hermesOptionsHtml}
                 </select>
             </div>
         </div>
         <button type="button" class="btn-remove btn-remove-outcome" style="margin-bottom: 10px; margin-left: 10px;" title="Remove">X</button>
     `;
+}
+
+// Funkcija za dinamičko osvežavanje Hermes outcome dropdown-a kada se promeni Hermes market
+function updateOutcomeDropdowns(container, hermesMarket) {
+    const dropdowns = container.querySelectorAll('.hermes-outcome-select');
+    const outcomesListForMarket = marketOutcomes[hermesMarket] || ["home", "draw", "away"];
+    const hermesOptionsHtml = `<option value="" disabled selected>Select Hermes outcome...</option>` + 
+        outcomesListForMarket.map(o => `<option value="${o}">${o}</option>`).join('');
+    
+    dropdowns.forEach(select => {
+        const currentValue = select.value;
+        select.innerHTML = hermesOptionsHtml;
+        if (outcomesListForMarket.includes(currentValue)) {
+            select.value = currentValue;
+        }
+    });
 }
 
 // Event listener za dodavanje nove kartice mapiranja
@@ -235,7 +260,7 @@ addMappingBtn.addEventListener('click', function() {
         <div class="mapping-details-wrapper" style="display: none;">
             
             <div class="specifiers-group-section" style="margin-top: 20px; padding-top: 15px; border-top: 1px dashed #ccc;">
-                <h4 style="margin: 0 0 15px 0; color: #2c3e50; font-size: 16px;">Specifiers Mapping Group</h4>
+                <h4 style="margin: 0 0 15px 0; color: #2c3e50; font-size: 16px;">Specifiers Mapping</h4>
                 
                 <div class="specifier-mapping-section" style="background: #fcfcfc; border: 1px solid #eaeaea; padding: 15px; border-radius: 6px; margin-bottom: 15px;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
@@ -246,7 +271,7 @@ addMappingBtn.addEventListener('click', function() {
                         <div class="specifier-row">${createSpecifierRowHtml(currentProviderSpecifiers)}</div>
                     </div>
                 </div>
-
+ 
                 <div class="fixed-specifier-mapping-section" style="background: #fcfcfc; border: 1px solid #eaeaea; padding: 15px; border-radius: 6px;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                         <h5 style="margin: 0; color: #555; font-size: 14px;">Fixed Values</h5>
@@ -257,7 +282,7 @@ addMappingBtn.addEventListener('click', function() {
                     </div>
                 </div>
             </div>
-
+ 
             <div class="ext-specifier-mapping-section" style="margin-top: 20px; padding-top: 15px; border-top: 1px dashed #ccc;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                     <h4 style="margin: 0; color: #2c3e50; font-size: 16px;">Extended specifiers mapping</h4>
@@ -275,11 +300,11 @@ addMappingBtn.addEventListener('click', function() {
                     <div class="outcome-row">${createOutcomeRowHtml()}</div>
                 </div>
             </div>
-
+ 
             <div style="text-align: right; margin-top: 25px; border-top: 1px solid #eee; padding-top: 15px;">
                 <button type="button" class="btn-primary btn-save-single-mapping">Save mapping</button>
             </div>
-
+ 
         </div>
     `;
     
@@ -292,22 +317,23 @@ addMappingBtn.addEventListener('click', function() {
     
     const addFixedSpecifierBtn = newSection.querySelector('.btn-add-fixed-specifier');
     const fixedSpecifiersList = newSection.querySelector('.fixed-specifiers-list');
-
+ 
     const addExtSpecifierBtn = newSection.querySelector('.btn-add-ext-specifier');
     const extSpecifiersList = newSection.querySelector('.ext-specifiers-list');
     
     const addOutcomeBtn = newSection.querySelector('.btn-add-outcome');
     const outcomesList = newSection.querySelector('.outcomes-list');
     const saveSingleMappingBtn = newSection.querySelector('.btn-save-single-mapping');
-
+ 
     // Kada se izabere Hermes Market
     selectMarket.addEventListener('change', function() {
         if(this.value) {
             marketTypeDisplay.value = hermesMarketTypes[this.value] || "Unknown";
             mappingDetailsWrapper.style.display = 'block';
+            updateOutcomeDropdowns(outcomesList, this.value);
         }
     });
-
+ 
     // --- LOGIKA ZA DODAVANJE REDOVA ---
     
     addSpecifierBtn.addEventListener('click', () => {
@@ -317,14 +343,14 @@ addMappingBtn.addEventListener('click', function() {
         newRow.querySelector('.btn-remove-specifier').addEventListener('click', () => newRow.remove());
         specifiersList.appendChild(newRow);
     });
-
+ 
     const initialRemoveSpecifierBtn = newSection.querySelector('.btn-remove-specifier');
     if (initialRemoveSpecifierBtn) {
         initialRemoveSpecifierBtn.addEventListener('click', function() {
             this.parentElement.remove();
         });
     }
-
+ 
     addFixedSpecifierBtn.addEventListener('click', () => {
         const newRow = document.createElement('div');
         newRow.classList.add('specifier-row');
@@ -332,14 +358,14 @@ addMappingBtn.addEventListener('click', function() {
         newRow.querySelector('.btn-remove-fixed-specifier').addEventListener('click', () => newRow.remove());
         fixedSpecifiersList.appendChild(newRow);
     });
-
+ 
     const initialRemoveFixedSpecifierBtn = newSection.querySelector('.btn-remove-fixed-specifier');
     if (initialRemoveFixedSpecifierBtn) {
         initialRemoveFixedSpecifierBtn.addEventListener('click', function() {
             this.parentElement.remove();
         });
     }
-
+ 
     addExtSpecifierBtn.addEventListener('click', () => {
         const newRow = document.createElement('div');
         newRow.classList.add('ext-specifier-row');
@@ -347,22 +373,22 @@ addMappingBtn.addEventListener('click', function() {
         newRow.querySelector('.btn-remove-ext-specifier').addEventListener('click', () => newRow.remove());
         extSpecifiersList.appendChild(newRow);
     });
-
+ 
     addOutcomeBtn.addEventListener('click', () => {
         const newRow = document.createElement('div');
         newRow.classList.add('outcome-row');
-        newRow.innerHTML = createOutcomeRowHtml();
+        newRow.innerHTML = createOutcomeRowHtml(selectMarket.value);
         newRow.querySelector('.btn-remove-outcome').addEventListener('click', () => newRow.remove());
         outcomesList.appendChild(newRow);
     });
-
+ 
     const initialRemoveOutcomeBtn = newSection.querySelector('.btn-remove-outcome');
     if (initialRemoveOutcomeBtn) {
         initialRemoveOutcomeBtn.addEventListener('click', function() {
             this.parentElement.remove();
         });
     }
-
+ 
     saveSingleMappingBtn.addEventListener('click', () => {
         const selectedMarket = selectMarket.value;
         alert(`Mapping #${currentMappingId} for Hermes Market "${selectedMarket}" has been saved!`);

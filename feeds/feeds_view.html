@@ -16,37 +16,55 @@
             <h1>Provider Feeds Configuration</h1>
         </header>
 
-        <main class="dashboard-container">
-            
-            <div style="margin-bottom: 20px;">
-                <a href="feeds.html" class="btn-secondary" style="text-decoration: none; display: inline-block;">&larr; Back to Management</a>
+        <main class="split-layout">
+            <div class="form-side">
+                <div style="margin-bottom: 20px;">
+                    <a href="feeds.html" class="btn-secondary" style="text-decoration: none; display: inline-block;">&larr; Back to Management</a>
+                </div>
+
+                <div class="top-bar" style="display: flex; justify-content: space-between; align-items: center; background-color: white; padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; box-shadow: 0 2px 5px rgba(0,0,0,0.05); margin-bottom: 30px;">
+                    <div>
+                        <h2 style="color: #2c3e50; font-size: 22px; margin: 0;">
+                            Provider: <span id="displayProviderName" style="color: #007bff;"></span>
+                        </h2>
+                    </div>
+                    <div class="actions">
+                        <button id="addNewFeedBtn" class="btn-primary" style="background-color: #28a745; border: none;">Add new feed</button>
+                    </div>
+                </div>
+
+                <section class="markets-section">
+                    <table class="markets-table">
+                        <thead>
+                            <tr>
+                                <th>Feed Name</th>
+                                <th>Description</th>
+                                <th style="text-align: right;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="feedsListBody">
+                            </tbody>
+                    </table>
+                </section>
             </div>
 
-            <div class="top-bar" style="display: flex; justify-content: space-between; align-items: center; background-color: white; padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; box-shadow: 0 2px 5px rgba(0,0,0,0.05); margin-bottom: 30px;">
-                <div>
-                    <h2 style="color: #2c3e50; font-size: 22px; margin: 0;">
-                        Provider: <span id="displayProviderName" style="color: #007bff;"></span>
-                    </h2>
+            <aside class="info-side">
+                <div class="sticky-info">
+                    <h3 class="side-title">Business Guidelines</h3>
+                    <div class="info-block">
+                        <h4>Data Kanali Provajdera</h4>
+                        <p>Svaki spoljni provajder ima specifične kanale (feed-ove) za različite faze utakmice i tipove podataka (npr. live klađenje vs pre-match ponuda).</p>
+                    </div>
+                    <div class="info-block">
+                        <h4>Konfiguracija i Opisi</h4>
+                        <p>Nazivi i opisi feed-ova moraju tačno opisivati svrhu konekcije kako bi tehnička podrška mogla brzo reagovati u slučaju prekida prenosa podataka.</p>
+                    </div>
+                    <div class="info-block">
+                        <h4>Ažuriranje Feed-a</h4>
+                        <p>Preko dugmeta <strong>Add new feed</strong> ili <strong>Edit</strong> možete konfigurisati parametre konekcija.</p>
+                    </div>
                 </div>
-                <div class="actions">
-                    <button id="addNewFeedBtn" class="btn-primary" style="background-color: #28a745; border: none;">Add new feed</button>
-                </div>
-            </div>
-
-            <section class="markets-section">
-                <table class="markets-table">
-                    <thead>
-                        <tr>
-                            <th>Feed Name</th>
-                            <th>Description</th>
-                            <th style="text-align: right;">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="feedsListBody">
-                        </tbody>
-                </table>
-            </section>
-
+            </aside>
         </main>
     </div>
 

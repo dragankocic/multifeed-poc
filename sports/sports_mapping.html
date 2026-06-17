@@ -16,55 +16,73 @@
             <h1>Sports Mappings Dashboard</h1>
         </header>
 
-        <main class="dashboard-container">
-            
-            <div class="top-bar">
-                <div class="filters">
-                    <div class="filter-group">
-                        <label for="providerSelect">Provider</label>
-                        <select id="providerSelect">
-                            <option value="all">All Providers</option>
-                            <option value="ExeFeed" selected>ExeFeed</option>
-                            <option value="SportRadar">SportRadar</option>
-                            <option value="SportGenius">SportGenius</option>
-                        </select>
-                    </div>
+        <main class="split-layout">
+            <div class="form-side">
+                <div class="top-bar">
+                    <div class="filters">
+                        <div class="filter-group">
+                            <label for="providerSelect">Provider</label>
+                            <select id="providerSelect">
+                                <option value="all">All Providers</option>
+                                <option value="ExeFeed" selected>ExeFeed</option>
+                                <option value="SportRadar">SportRadar</option>
+                                <option value="SportGenius">SportGenius</option>
+                            </select>
+                        </div>
 
-                    <div class="filter-group">
-                        <label for="statusSelect">Mapping status</label>
-                        <select id="statusSelect">
-                            <option value="all" selected>All</option>
-                            <option value="mapped">Mapped</option>
-                            <option value="unmapped">Unmapped</option>
-                        </select>
-                    </div>
+                        <div class="filter-group">
+                            <label for="statusSelect">Mapping status</label>
+                            <select id="statusSelect">
+                                <option value="all" selected>All</option>
+                                <option value="mapped">Mapped</option>
+                                <option value="unmapped">Unmapped</option>
+                            </select>
+                        </div>
 
-                    <div class="filter-group">
-                        <label for="searchInput">Search</label>
-                        <input type="text" id="searchInput" placeholder="Search sport..." style="padding: 10px 15px; border: 1px solid #ccc; border-radius: 4px; font-size: 15px; min-width: 200px; background-color: #fdfdfd;">
+                        <div class="filter-group">
+                            <label for="searchInput">Search</label>
+                            <input type="text" id="searchInput" placeholder="Search sport..." style="padding: 10px 15px; border: 1px solid #ccc; border-radius: 4px; font-size: 15px; min-width: 200px; background-color: #fdfdfd;">
+                        </div>
                     </div>
                 </div>
+
+                <section class="markets-section" style="overflow-x: auto;">
+                    <table class="markets-table" style="min-width: 1000px;">
+                        <thead>
+                            <tr>
+                                <th>Provider</th>
+                                <th>Prov. Sport ID</th>
+                                <th>Prov. Sport Name</th>
+                                <th>Hermes Sport ID</th>
+                                <th>Hermes Sport Name</th>
+                                <th>Hermes Abbr.</th>
+                                <th>Status</th>
+                                <th style="text-align: right;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sportsTableBody">
+                            </tbody>
+                    </table>
+                </section>
             </div>
 
-            <section class="markets-section" style="overflow-x: auto;">
-                <table class="markets-table" style="min-width: 1000px;">
-                    <thead>
-                        <tr>
-                            <th>Provider</th>
-                            <th>Prov. Sport ID</th>
-                            <th>Prov. Sport Name</th>
-                            <th>Hermes Sport ID</th>
-                            <th>Hermes Sport Name</th>
-                            <th>Hermes Abbr.</th>
-                            <th>Status</th>
-                            <th style="text-align: right;">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="sportsTableBody">
-                        </tbody>
-                </table>
-            </section>
-
+            <aside class="info-side">
+                <div class="sticky-info">
+                    <h3 class="side-title">Business Guidelines</h3>
+                    <div class="info-block">
+                        <h4>Mapiranje Sportova</h4>
+                        <p>Pre nego što možemo mapirati markete za neki sport, sam sport mora biti mapiran. Provajderi često šalju različita imena za isti sport (npr. Football vs Soccer).</p>
+                    </div>
+                    <div class="info-block">
+                        <h4>Provajderi i Statusi</h4>
+                        <p><strong>Mapped:</strong> Sport je uspešno povezan sa internim Hermes sportom.<br><strong>Unmapped:</strong> Sport je neaktivan i Hermes ne procesira njegove markete niti kvote.</p>
+                    </div>
+                    <div class="info-block">
+                        <h4>Upravljanje</h4>
+                        <p>Klikom na <strong>Map</strong> ili <strong>Edit</strong> pokreće se interfejs za mapiranje pojedinačnog sporta.</p>
+                    </div>
+                </div>
+            </aside>
         </main>
     </div>
 

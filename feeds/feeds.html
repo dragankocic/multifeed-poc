@@ -16,34 +16,53 @@
             <h1>Feeds Management</h1>
         </header>
 
-        <main class="dashboard-container">
-            
-            <div class="top-bar">
-                <div class="filters">
-                    <div class="filter-group">
-                        <label for="feedsSearchInput">Search Providers</label>
-                        <input type="text" id="feedsSearchInput" placeholder="Search by provider name..." style="padding: 10px 15px; border: 1px solid #ccc; border-radius: 4px; font-size: 15px; min-width: 280px; background-color: #fdfdfd;">
+        <main class="split-layout">
+            <div class="form-side">
+                <div class="top-bar">
+                    <div class="filters">
+                        <div class="filter-group">
+                            <label for="feedsSearchInput">Search Providers</label>
+                            <input type="text" id="feedsSearchInput" placeholder="Search by provider name..." style="padding: 10px 15px; border: 1px solid #ccc; border-radius: 4px; font-size: 15px; min-width: 280px; background-color: #fdfdfd;">
+                        </div>
+                    </div>
+
+                    <div class="actions">
+                        <button id="addProviderBtn" class="btn-primary" style="background-color: #28a745; border: none;">Add provider</button>
                     </div>
                 </div>
 
-                <div class="actions">
-                    <button id="addProviderBtn" class="btn-primary" style="background-color: #28a745; border: none;">Add provider</button>
-                </div>
+                <section class="markets-section">
+                    <table class="markets-table">
+                        <thead>
+                            <tr>
+                                <th>Provider Name</th>
+                                <th>Number of Feeds</th>
+                                <th style="text-align: right;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="feedsTableBody">
+                            </tbody>
+                    </table>
+                </section>
             </div>
 
-            <section class="markets-section">
-                <table class="markets-table">
-                    <thead>
-                        <tr>
-                            <th>Provider Name</th>
-                            <th>Number of Feeds</th>
-                            <th style="text-align: right;">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="feedsTableBody">
-                        </tbody>
-                </table>
-            </section>
+            <aside class="info-side">
+                <div class="sticky-info">
+                    <h3 class="side-title">Business Guidelines</h3>
+                    <div class="info-block">
+                        <h4>Upravljanje Provajderima</h4>
+                        <p>Lista svih eksternih provajdera podataka koji su integrisani u sistem. Svaki provajder može imati jedan ili više feed-ova kvota i rezultata.</p>
+                    </div>
+                    <div class="info-block">
+                        <h4>Broj Feed-ova (Feeds Count)</h4>
+                        <p>Označava broj aktivnih data-konekcija ili XML/JSON kanala koje dati provajder koristi za slanje podataka (npr. live feed, prematch feed, statistika, itd.).</p>
+                    </div>
+                    <div class="info-block">
+                        <h4>Registracija Provajdera</h4>
+                        <p>Preko dugmeta <strong>Add provider</strong> možete dodati novi brend u sistem, nakon čega se mogu definisati njegove specifične data konekcije.</p>
+                    </div>
+                </div>
+            </aside>
         </main>
     </div>
 
