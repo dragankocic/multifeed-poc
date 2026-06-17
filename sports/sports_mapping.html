@@ -136,7 +136,7 @@
 
                     // Menjamo tekst i boju dugmeta u zavisnosti od statusa mapiranja
                     const actionButton = sport.status === "Mapped"
-                        ? `<a href="map_sport.html?provider=${sport.provider}&provName=${sport.provName}" class="btn-action" style="background-color: #17a2b8; text-decoration: none; display: inline-block;">Edit</a>`
+                        ? `<a href="map_sport.html?provider=${sport.provider}&provName=${sport.provName}&hermesId=${encodeURIComponent(sport.hermesId)}" class="btn-action" style="background-color: #17a2b8; text-decoration: none; display: inline-block;">Edit</a>`
                         : `<a href="map_sport.html?provider=${sport.provider}&provName=${sport.provName}" class="btn-action" style="text-decoration: none; display: inline-block;">Map</a>`;
 
                     row.innerHTML = `

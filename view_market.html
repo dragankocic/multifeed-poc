@@ -65,7 +65,7 @@
                     </div>
                     <div class="info-block">
                         <h4>Upravljanje Mapiranjima</h4>
-                        <p><strong>Edit Mapping:</strong> Omogućava izmenu specifikatora i ishoda.<br><strong>Remove:</strong> Briše mapiranje iz baze. Pažnja: Ovo može prekinuti feed kvota za dati market.</p>
+                        <p><strong>Edit Mapping:</strong> Omogućava izmenu specifikatora i ishoda.<br><strong>Remove:</strong> Briše mapiranje iz baze samo ako mapiranje nije publishovano. Publishovano mapiranje ne može biti izbrisano.</p>
                     </div>
                 </div>
             </aside>
@@ -103,7 +103,7 @@
                     tr.innerHTML = `
                         <td style="font-weight: 500; color: #2c3e50;">${hermesMarket}</td>
                         <td style="text-align: right;">
-                            <a href="view_hermes_market.html?market=${encodeURIComponent(hermesMarket)}&sport=${encodeURIComponent(sportName)}" class="btn-secondary" style="text-decoration: none; display: inline-block; margin-right: 8px;">View Market</a>
+                            <a href="view_hermes_market.html?market=${encodeURIComponent(hermesMarket)}&sport=${encodeURIComponent(sportName)}" class="btn-action" style="background-color: #007bff; text-decoration: none; display: inline-block; margin-right: 8px;">View</a>
                             <a href="mapping/mapping.html?market=${encodeURIComponent(marketName)}&edit=${encodeURIComponent(hermesMarket)}" class="btn-action" style="background-color: #17a2b8; text-decoration: none; display: inline-block; margin-right: 8px;">Edit Mapping</a>
                             <button class="btn-remove-mapping" style="background-color: #dc3545; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 600;">Remove</button>
                         </td>

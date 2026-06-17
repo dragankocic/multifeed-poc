@@ -26,17 +26,19 @@ document.addEventListener("DOMContentLoaded", () => {
                 <li><a href="${link('sports/hermes_sports.html')}" class="${activeItem === 'sports-management' ? 'active' : ''}">Management</a></li>
             </ul>
 
-            <div class="sidebar-section">Feeds</div>
-            <ul class="sidebar-menu">
-                <li><a href="${link('feeds/feeds.html')}" class="${activeItem === 'feeds-management' ? 'active' : ''}">Management</a></li>
-            </ul>
-
             <div class="sidebar-section">Publish</div>
             <ul class="sidebar-menu">
                 <li><a href="${link('publish/publish.html')}" class="${activeItem === 'publish-management' ? 'active' : ''}">Release Mappings</a></li>
             </ul>
 
             <hr style="border: 0; height: 1px; background-color: #34495e; margin: 15px 20px;">
+
+            <div class="sidebar-section" style="color: #ffc107;">NOT PREPARED FOR REVIEW</div>
+
+            <div class="sidebar-section">Feeds</div>
+            <ul class="sidebar-menu">
+                <li><a href="${link('feeds/feeds.html')}" class="${activeItem === 'feeds-management' ? 'active' : ''}">Management</a></li>
+            </ul>
 
             <div class="sidebar-section">Multifeed</div>
             <ul class="sidebar-menu">

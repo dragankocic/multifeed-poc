@@ -8,6 +8,7 @@ const viewMarketBtn = document.getElementById('viewMarketBtn');
 const jsonModal = document.getElementById('jsonModal');
 const closeModalBtn = document.getElementById('closeModalBtn');
 const jsonContent = document.getElementById('jsonContent');
+const jsonModalTitle = document.getElementById('jsonModalTitle');
 
 // State
 let mappingCounter = 0;
@@ -39,6 +40,7 @@ const hermesMarketTypes = {
 viewMarketBtn.addEventListener('click', () => {
     const selectedMarketName = providerMarketSelect.value;
     const marketData = providerMarketsData[selectedMarketName];
+    jsonModalTitle.textContent = "Provider Market Data";
     jsonContent.textContent = JSON.stringify(marketData, null, 4);
     jsonModal.style.display = "flex";
 });
@@ -212,6 +214,56 @@ function updateOutcomeDropdowns(container, hermesMarket) {
     });
 }
 
+function selectedValue(row, selector) {
+    const field = row.querySelector(selector);
+    return field ? field.value || null : null;
+}
+
+function selectedByIndex(row, selector, index) {
+    const field = row.querySelectorAll(selector)[index];
+    return field ? field.value || null : null;
+}
+
+function buildMappingDefinition(section, mappingId, selectedProviderMarketName) {
+    const hermesMarket = selectedValue(section, '.hermes-market-select') || 'Total Goals';
+    const providerMarket = selectedProviderMarketName || 'TOTAL_GOALS';
+    const marketType = selectedValue(section, '.hermes-market-type-display') || hermesMarketTypes[hermesMarket] || 'Regular';
+
+    const specifiers = Array.from(section.querySelectorAll('.specifiers-list .specifier-row')).map(row => ({
+        providerSpecifier: selectedByIndex(row, 'select', 0) || 'band',
+        hermesSpecifier: selectedByIndex(row, 'select', 1) || 'total'
+    }));
+
+    const fixedSpecifiers = Array.from(section.querySelectorAll('.fixed-specifiers-list .specifier-row')).map(row => ({
+        value: selectedValue(row, 'input') || 'full_match',
+        hermesSpecifier: selectedValue(row, 'select') || 'period'
+    }));
+
+    const extendedSpecifiers = Array.from(section.querySelectorAll('.ext-specifiers-list .ext-specifier-row')).map(row => ({
+        providerValue: selectedByIndex(row, 'select', 0) || 'live',
+        hermesExtendedSpecifier: selectedByIndex(row, 'select', 1) || 'match_status'
+    }));
+
+    const outcomes = Array.from(section.querySelectorAll('.outcomes-list .outcome-row')).map(row => ({
+        providerOutcome: selectedValue(row, 'select') || 'Over',
+        hermesOutcome: selectedValue(row, '.hermes-outcome-select') || 'Over'
+    }));
+
+    return {
+        mappingId: `draft-${mappingId}`,
+        provider: 'ExeFeed',
+        sport: document.getElementById('displaySport')?.textContent || 'Soccer',
+        providerMarket,
+        hermesMarket,
+        marketType,
+        specifiers,
+        fixedSpecifiers,
+        extendedSpecifiers,
+        outcomes,
+        publishStatus: 'draft'
+    };
+}
+
 // Event listener za dodavanje nove kartice mapiranja
 addMappingBtn.addEventListener('click', function() {
     mappingCounter++;
@@ -301,7 +353,8 @@ addMappingBtn.addEventListener('click', function() {
                 </div>
             </div>
  
-            <div style="text-align: right; margin-top: 25px; border-top: 1px solid #eee; padding-top: 15px;">
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 25px; border-top: 1px solid #eee; padding-top: 15px;">
+                <button type="button" class="btn-secondary btn-view-single-mapping">View mapping</button>
                 <button type="button" class="btn-primary btn-save-single-mapping">Save mapping</button>
             </div>
  
@@ -323,6 +376,7 @@ addMappingBtn.addEventListener('click', function() {
     
     const addOutcomeBtn = newSection.querySelector('.btn-add-outcome');
     const outcomesList = newSection.querySelector('.outcomes-list');
+    const viewSingleMappingBtn = newSection.querySelector('.btn-view-single-mapping');
     const saveSingleMappingBtn = newSection.querySelector('.btn-save-single-mapping');
  
     // Kada se izabere Hermes Market
@@ -388,6 +442,13 @@ addMappingBtn.addEventListener('click', function() {
             this.parentElement.remove();
         });
     }
+
+    viewSingleMappingBtn.addEventListener('click', () => {
+        const mappingDefinition = buildMappingDefinition(newSection, currentMappingId, selectedProviderMarketName);
+        jsonModalTitle.textContent = "Mapping Definition";
+        jsonContent.textContent = JSON.stringify(mappingDefinition, null, 4);
+        jsonModal.style.display = "flex";
+    });
  
     saveSingleMappingBtn.addEventListener('click', () => {
         const selectedMarket = selectMarket.value;

@@ -49,8 +49,9 @@
                         <!-- Desna strana (Hermes Selection) -->
                         <div class="form-group" style="flex: 1; margin-bottom: 0;">
                             <label>Choose Hermes Sport</label>
+                            <input type="text" id="hermesSportSearch" placeholder="Search sports..." style="margin-bottom: 8px;">
                             <select id="hermesSportSelect">
-                                <option value="" disabled selected>Select Hermes Sport...</option>
+                                <option value="" disabled selected>Search sports...</option>
                                 <option value="S-001">Soccer (SOC)</option>
                                 <option value="S-002">Basketball (BKB)</option>
                                 <option value="S-003">Tennis (TEN)</option>
@@ -73,7 +74,7 @@
                     <h3 class="side-title">Sport Mapping Guidelines</h3>
                     <div class="info-block">
                         <h4>1-to-1 Mapping</h4>
-                        <p>Za razliku od marketa, mapiranje sportova je jednostavno 1-na-1 povezivanje. Izaberite Provider sport i dodelite mu odgovarajući Hermes ekvivalent.</p>
+                        <p>Za razliku od marketa, mapiranje sportova je jednostavno 1-na-1 povezivanje. Izaberite Provider sport i dodelite mu odgovarajući Hermes ekvivalent. Search polje iznad liste filtrira dostupne Hermes sportove.</p>
                     </div>
                     <div class="info-block">
                         <h4>Hermes Sports Missing?</h4>
@@ -90,15 +91,50 @@
             const urlParams = new URLSearchParams(window.location.search);
             const provider = urlParams.get('provider') || 'Unknown Provider';
             const provName = urlParams.get('provName') || 'Unknown Sport';
+            const hermesId = urlParams.get('hermesId');
+            const hermesSportSelect = document.getElementById('hermesSportSelect');
+            const hermesSportSearch = document.getElementById('hermesSportSearch');
+            const allHermesOptions = Array.from(hermesSportSelect.options).map(option => ({
+                value: option.value,
+                text: option.textContent,
+                disabled: option.disabled,
+                selected: option.selected
+            }));
 
             // Prikaz na formi
             document.getElementById('displayProvider').textContent = provider;
             document.getElementById('displayProvName').value = provName;
+            if (hermesId) {
+                hermesSportSelect.value = hermesId;
+            }
+
+            function renderHermesOptions(searchValue = '') {
+                const currentValue = hermesSportSelect.value;
+                const normalizedSearch = searchValue.toLowerCase();
+                hermesSportSelect.innerHTML = '';
+
+                allHermesOptions.forEach(optionData => {
+                    if (optionData.value && !optionData.text.toLowerCase().includes(normalizedSearch)) return;
+
+                    const option = document.createElement('option');
+                    option.value = optionData.value;
+                    option.textContent = optionData.text;
+                    option.disabled = optionData.disabled;
+                    hermesSportSelect.appendChild(option);
+                });
+
+                if (Array.from(hermesSportSelect.options).some(option => option.value === currentValue)) {
+                    hermesSportSelect.value = currentValue;
+                }
+            }
+
+            hermesSportSearch.addEventListener('input', () => {
+                renderHermesOptions(hermesSportSearch.value);
+            });
 
             // Čuvanje mapiranja
             document.getElementById('saveMappingBtn').addEventListener('click', () => {
-                const hermesSelect = document.getElementById('hermesSportSelect');
-                if(!hermesSelect.value) {
+                if(!hermesSportSelect.value) {
                     alert('Please select a Hermes sport before saving.');
                     return;
                 }
