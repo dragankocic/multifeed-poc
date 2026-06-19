@@ -26,6 +26,13 @@ body {
     font-weight: 600;
 }
 
+.page-subtitle {
+    margin-top: 6px;
+    color: #6c757d;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
 /* Dashboard Container */
 .dashboard-container {
     max-width: 1200px;

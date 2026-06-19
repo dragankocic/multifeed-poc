@@ -15,6 +15,7 @@
     <div class="main-content">
         <header class="main-header">
             <h1>Provider Markets</h1>
+            <p class="page-subtitle">Create mapping rules from a provider market to Hermes markets.</p>
         </header>
 
         <main class="split-layout">
@@ -27,7 +28,7 @@
                 <div class="info-section">
                     <h2>Mapping Provider Market to Hermes Market</h2>
                     <div style="display: flex; gap: 30px; font-size: 16px; color: #555; margin-top: 10px;">
-                        <p>Provider: <strong style="color: #333;">Exefeed</strong></p>
+                        <p>Provider: <strong id="displayProvider" style="color: #333;">Exefeed</strong></p>
                         <p>Sport: <strong id="displaySport" style="color: #17a2b8;">Not specified</strong></p>
                     </div>
                 </div>
@@ -37,16 +38,7 @@
                     <div class="form-row" style="align-items: flex-end;">
                         <div class="form-group" style="flex: 1; margin-bottom: 0;">
                             <label for="providerMarketSelect">Market Name</label>
-                            <select id="providerMarketSelect">
-                                <option value="" disabled selected>Select provider market...</option>
-                                <option value="1X2">1X2</option>
-                                <option value="TOTAL_GOALS">TOTAL_GOALS</option>
-                                <option value="TOTAL_GOALS_15_MIN">TOTAL_GOALS_15_MIN</option>
-                                <option value="TOTAL_GOALS_20_MIN">TOTAL_GOALS_20_MIN</option>
-                                <option value="ANY_GOAL_SCORER">ANY_GOAL_SCORER</option>
-                                <option value="ANYTIME_GOALSCORER">ANYTIME_GOALSCORER</option>
-                                <option value="NEXT_GOAL_SCORER">NEXT_GOAL_SCORER</option>
-                            </select>
+                            <input type="text" id="providerMarketSelect" readonly placeholder="Provider market is filled from the selected row" style="background-color: #f9f9f9; color: #333; font-weight: 600;">
                         </div>
                         <div style="flex: 0 0 auto;">
                             <button type="button" id="viewMarketBtn" class="btn-secondary" disabled style="opacity: 0.5; cursor: not-allowed; padding: 10px 15px;">View Market</button>

@@ -14,6 +14,7 @@
     <div class="main-content">
         <header class="main-header">
             <h1>Market Mappings Overview</h1>
+            <p class="page-subtitle">Review the Hermes markets connected to a provider market.</p>
         </header>
 
         <main class="split-layout">
@@ -28,6 +29,7 @@
                     </h2>
                     <div style="display: flex; gap: 30px; border-top: 1px dashed #ccc; padding-top: 15px;">
                         <p style="font-size: 16px; color: #555;">Market ID: <strong id="displayMarketId" style="color: #333;"></strong></p>
+                        <p style="font-size: 16px; color: #555;">Provider: <strong id="displayProvider" style="color: #333;"></strong></p>
                         <p style="font-size: 16px; color: #555;">Sport: <strong id="displaySport" style="color: #333;"></strong></p>
                     </div>
                 </section>
@@ -78,13 +80,15 @@
             const marketId = urlParams.get('id') || '-';
             const marketName = urlParams.get('market') || 'Unknown Market';
             const sportName = urlParams.get('sport') || 'Unknown Sport';
+            const providerName = urlParams.get('provider') || 'Unknown Provider';
 
             document.getElementById('displayMarketId').textContent = marketId;
             document.getElementById('displayMarketName').textContent = marketName;
+            document.getElementById('displayProvider').textContent = providerName;
             document.getElementById('displaySport').textContent = sportName;
 
             const addMappingBtn = document.getElementById('addMappingBtn');
-            addMappingBtn.href = `mapping/mapping.html?market=${encodeURIComponent(marketName)}`;
+            addMappingBtn.href = `mapping/mapping.html?market=${encodeURIComponent(marketName)}&sport=${encodeURIComponent(sportName)}&provider=${encodeURIComponent(providerName)}`;
 
             const mockMappings = {
                 "1X2": ["1X2", "Asian Handicap"],
@@ -104,7 +108,7 @@
                         <td style="font-weight: 500; color: #2c3e50;">${hermesMarket}</td>
                         <td style="text-align: right;">
                             <a href="view_hermes_market.html?market=${encodeURIComponent(hermesMarket)}&sport=${encodeURIComponent(sportName)}" class="btn-action" style="background-color: #007bff; text-decoration: none; display: inline-block; margin-right: 8px;">View</a>
-                            <a href="mapping/mapping.html?market=${encodeURIComponent(marketName)}&edit=${encodeURIComponent(hermesMarket)}" class="btn-action" style="background-color: #17a2b8; text-decoration: none; display: inline-block; margin-right: 8px;">Edit Mapping</a>
+                            <a href="mapping/mapping.html?market=${encodeURIComponent(marketName)}&sport=${encodeURIComponent(sportName)}&provider=${encodeURIComponent(providerName)}&edit=${encodeURIComponent(hermesMarket)}" class="btn-action" style="background-color: #17a2b8; text-decoration: none; display: inline-block; margin-right: 8px;">Edit Mapping</a>
                             <button class="btn-remove-mapping" style="background-color: #dc3545; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 600;">Remove</button>
                         </td>
                     `;

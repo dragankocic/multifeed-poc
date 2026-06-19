@@ -65,8 +65,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     <span class="status-badge" style="${badgeStyle}">${market.status}</span>
                 </td>
                 <td style="text-align: right;">
-                    <a href="view_market.html?id=${encodeURIComponent(market.id)}&market=${encodeURIComponent(market.name)}&sport=${encodeURIComponent(market.sport)}" class="btn-action" style="margin-right: 8px; background-color: #007bff; text-decoration: none; display: inline-block;">View</a>
-                    <a href="mapping/mapping.html?market=${encodeURIComponent(market.name)}&sport=${encodeURIComponent(market.sport)}" class="btn-action" style="text-decoration: none; display: inline-block;">Map</a>
+                    <a href="view_market.html?id=${encodeURIComponent(market.id)}&market=${encodeURIComponent(market.name)}&sport=${encodeURIComponent(market.sport)}&provider=${encodeURIComponent(market.provider)}" class="btn-action" style="margin-right: 8px; background-color: #007bff; text-decoration: none; display: inline-block;">View</a>
+                    <a href="mapping/mapping.html?market=${encodeURIComponent(market.name)}&sport=${encodeURIComponent(market.sport)}&provider=${encodeURIComponent(market.provider)}" class="btn-action" style="text-decoration: none; display: inline-block;">Map</a>
                 </td>
             `;
 

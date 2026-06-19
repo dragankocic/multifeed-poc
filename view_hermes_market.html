@@ -14,6 +14,7 @@
     <div class="main-content">
         <header class="main-header" style="background-color: #17a2b8; color: white;">
             <h1>Hermes Market Overview</h1>
+            <p class="page-subtitle">Inspect a Hermes market and the provider markets mapped to it.</p>
         </header>
 
         <main class="split-layout">
@@ -29,7 +30,7 @@
                     <div style="display: flex; gap: 30px; border-top: 1px dashed #ccc; padding-top: 15px;">
                         <p style="font-size: 16px; color: #555;">Market ID: <strong id="displayMarketId" style="color: #333;"></strong></p>
                         <p style="font-size: 16px; color: #555;">Sport: <strong id="displaySport" style="color: #333;"></strong></p>
-                        <p style="font-size: 16px; color: #555;">Type: <strong id="displayType" style="color: #333;"></strong></p>
+                        <p style="font-size: 16px; color: #555;">Sport abbreviation: <strong id="displaySportAbbreviation" style="color: #333;"></strong></p>
                     </div>
                 </section>
 
@@ -77,12 +78,18 @@
             const marketId = urlParams.get('id') || '-';
             const marketName = urlParams.get('market') || 'Unknown Hermes Market';
             const sportName = urlParams.get('sport') || 'Unknown Sport';
-            const typeName = urlParams.get('type') || 'Unknown Type';
+            const sportAbbreviations = {
+                Soccer: 'SOC',
+                Basketball: 'BKB',
+                Tennis: 'TEN',
+                Baseball: 'BSB'
+            };
+            const sportAbbreviation = urlParams.get('abbr') || sportAbbreviations[sportName] || '-';
 
             document.getElementById('displayMarketId').textContent = marketId;
             document.getElementById('displayMarketName').textContent = marketName;
             document.getElementById('displaySport').textContent = sportName;
-            document.getElementById('displayType').textContent = typeName;
+            document.getElementById('displaySportAbbreviation').textContent = sportAbbreviation;
 
             const reverseMappings = {
                 "1X2": [
@@ -106,7 +113,7 @@
                         <td style="font-weight: 500; color: #2c3e50;">${prov.providerName}</td>
                         <td><span style="background: #e9ecef; padding: 4px 10px; border-radius: 4px; font-size: 13px; border: 1px solid #ccc;">${prov.provider}</span></td>
                         <td style="text-align: right;">
-                            <a href="view_market.html?market=${encodeURIComponent(prov.providerName)}&sport=${encodeURIComponent(sportName)}" class="btn-action" style="background-color: #007bff; text-decoration: none; display: inline-block;">View Provider Market</a>
+                            <a href="view_market.html?market=${encodeURIComponent(prov.providerName)}&sport=${encodeURIComponent(sportName)}&provider=${encodeURIComponent(prov.provider)}" class="btn-action" style="background-color: #007bff; text-decoration: none; display: inline-block;">View Provider Market</a>
                         </td>
                     `;
                     listContainer.appendChild(tr);

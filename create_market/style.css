@@ -24,6 +24,13 @@ body {
   font-weight: 600;
 }
 
+.page-subtitle {
+  margin-top: 6px;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
 /* Split Layout */
 .split-layout {
   display: flex;

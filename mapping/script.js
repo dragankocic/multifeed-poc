@@ -57,21 +57,7 @@ window.addEventListener('click', (event) => {
 
 // Logika prilikom izbora Provider Marketa
 providerMarketSelect.addEventListener('change', function() {
-    const selectedMarketName = this.value;
-    const marketData = providerMarketsData[selectedMarketName];
-    
-    addMappingBtn.disabled = false;
-    addMappingBtn.style.opacity = "1";
-    addMappingBtn.style.cursor = "pointer";
-    
-    viewMarketBtn.disabled = false;
-    viewMarketBtn.style.opacity = "1";
-    viewMarketBtn.style.cursor = "pointer";
-
-    currentProviderOutcomes = marketData.outcomes;
-
-    dynamicSections.innerHTML = '';
-    mappingCounter = 0;
+    loadProviderMarket(this.value);
 });
 
 // Specifier iz providera (dropdown) levo, Hermes desno
@@ -251,7 +237,7 @@ function buildMappingDefinition(section, mappingId, selectedProviderMarketName) 
 
     return {
         mappingId: `draft-${mappingId}`,
-        provider: 'ExeFeed',
+        provider: document.getElementById('displayProvider')?.textContent || 'ExeFeed',
         sport: document.getElementById('displaySport')?.textContent || 'Soccer',
         providerMarket,
         hermesMarket,
@@ -262,6 +248,35 @@ function buildMappingDefinition(section, mappingId, selectedProviderMarketName) 
         outcomes,
         publishStatus: 'draft'
     };
+}
+
+function enableMarketActions() {
+    addMappingBtn.disabled = false;
+    addMappingBtn.style.opacity = "1";
+    addMappingBtn.style.cursor = "pointer";
+
+    viewMarketBtn.disabled = false;
+    viewMarketBtn.style.opacity = "1";
+    viewMarketBtn.style.cursor = "pointer";
+}
+
+function loadProviderMarket(selectedMarketName) {
+    if (!selectedMarketName) return;
+
+    if (!providerMarketsData[selectedMarketName]) {
+        providerMarketsData[selectedMarketName] = {
+            type: "Regular",
+            specifiers: [],
+            outcomes: ["Home", "Away"]
+        };
+    }
+
+    const marketData = providerMarketsData[selectedMarketName];
+
+    enableMarketActions();
+    currentProviderOutcomes = marketData.outcomes;
+    dynamicSections.innerHTML = '';
+    mappingCounter = 0;
 }
 
 // Event listener za dodavanje nove kartice mapiranja
@@ -355,6 +370,8 @@ addMappingBtn.addEventListener('click', function() {
  
             <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 25px; border-top: 1px solid #eee; padding-top: 15px;">
                 <button type="button" class="btn-secondary btn-view-single-mapping">View mapping</button>
+                <button type="button" class="btn-secondary btn-reset-single-mapping">Reset</button>
+                <button type="button" class="btn-secondary btn-cancel-single-mapping">Cancel</button>
                 <button type="button" class="btn-primary btn-save-single-mapping">Save mapping</button>
             </div>
  
@@ -377,6 +394,8 @@ addMappingBtn.addEventListener('click', function() {
     const addOutcomeBtn = newSection.querySelector('.btn-add-outcome');
     const outcomesList = newSection.querySelector('.outcomes-list');
     const viewSingleMappingBtn = newSection.querySelector('.btn-view-single-mapping');
+    const resetSingleMappingBtn = newSection.querySelector('.btn-reset-single-mapping');
+    const cancelSingleMappingBtn = newSection.querySelector('.btn-cancel-single-mapping');
     const saveSingleMappingBtn = newSection.querySelector('.btn-save-single-mapping');
  
     // Kada se izabere Hermes Market
@@ -449,6 +468,25 @@ addMappingBtn.addEventListener('click', function() {
         jsonContent.textContent = JSON.stringify(mappingDefinition, null, 4);
         jsonModal.style.display = "flex";
     });
+
+    resetSingleMappingBtn.addEventListener('click', () => {
+        newSection.querySelectorAll('select').forEach(select => {
+            select.selectedIndex = 0;
+        });
+        newSection.querySelectorAll('input').forEach(input => {
+            input.value = '';
+        });
+
+        Array.from(specifiersList.querySelectorAll('.specifier-row')).slice(1).forEach(row => row.remove());
+        Array.from(fixedSpecifiersList.querySelectorAll('.specifier-row')).slice(1).forEach(row => row.remove());
+        extSpecifiersList.innerHTML = '';
+        Array.from(outcomesList.querySelectorAll('.outcome-row')).slice(1).forEach(row => row.remove());
+        mappingDetailsWrapper.style.display = 'none';
+    });
+
+    cancelSingleMappingBtn.addEventListener('click', () => {
+        newSection.remove();
+    });
  
     saveSingleMappingBtn.addEventListener('click', () => {
         const selectedMarket = selectMarket.value;
@@ -463,30 +501,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
     const urlMarket = urlParams.get('market');
     const urlSport = urlParams.get('sport');
+    const urlProvider = urlParams.get('provider');
 
     if (urlSport) {
         const sportDisplay = document.getElementById('displaySport');
         if (sportDisplay) sportDisplay.textContent = urlSport;
     }
 
+    if (urlProvider) {
+        const providerDisplay = document.getElementById('displayProvider');
+        if (providerDisplay) providerDisplay.textContent = urlProvider;
+    }
+
     if (urlMarket) {
-        if (!providerMarketsData[urlMarket]) {
-            providerMarketsData[urlMarket] = { 
-                type: "Regular", 
-                specifiers: [], 
-                outcomes: ["Home", "Away"]
-            };
-        }
-
-        const optionExists = Array.from(providerMarketSelect.options).some(opt => opt.value === urlMarket);
-        if (!optionExists) {
-            const newOption = document.createElement('option');
-            newOption.value = urlMarket;
-            newOption.textContent = urlMarket;
-            providerMarketSelect.appendChild(newOption);
-        }
-
         providerMarketSelect.value = urlMarket;
-        providerMarketSelect.dispatchEvent(new Event('change'));
+        loadProviderMarket(urlMarket);
     }
 });
