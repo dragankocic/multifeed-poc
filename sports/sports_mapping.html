@@ -23,7 +23,6 @@
                         <div class="filter-group">
                             <label for="providerSelect">Provider</label>
                             <select id="providerSelect">
-                                <option value="all">All Providers</option>
                                 <option value="ExeFeed" selected>ExeFeed</option>
                                 <option value="SportRadar">SportRadar</option>
                                 <option value="SportGenius">SportGenius</option>
@@ -111,7 +110,7 @@
 
                 // Logika za filtriranje
                 const filteredSports = providerSports.filter(sport => {
-                    const matchesProvider = providerVal === 'all' || sport.provider === providerVal;
+                    const matchesProvider = sport.provider === providerVal;
                     const matchesStatus = statusVal === 'all' || sport.status.toLowerCase() === statusVal;
                     
                     // Pretraga po nazivu Provider sporta ili Hermes sporta
