@@ -6,6 +6,7 @@
     <title>Provider Markets POC</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="../style.css">
+    <script src="../auth.js"></script>
 </head>
 <body>
 
@@ -15,7 +16,7 @@
     <div class="main-content">
         <header class="main-header">
             <h1>Provider Markets</h1>
-            <p class="page-subtitle">Create mapping rules from a provider market to Hermes markets.</p>
+            <p class="page-subtitle">Create mapping rules from a provider market to internal markets.</p>
         </header>
 
         <main class="split-layout">
@@ -26,7 +27,7 @@
                 </div>
 
                 <div class="info-section">
-                    <h2>Mapping Provider Market to Hermes Market</h2>
+                    <h2>Mapping Provider Market to Internal Market</h2>
                     <div style="display: flex; gap: 30px; font-size: 16px; color: #555; margin-top: 10px;">
                         <p>Provider: <strong id="displayProvider" style="color: #333;">Exefeed</strong></p>
                         <p>Sport: <strong id="displaySport" style="color: #17a2b8;">Not specified</strong></p>
@@ -56,47 +57,6 @@
                 </section>
             </div>
 
-            <aside class="info-side">
-                <div class="sticky-info">
-                    <h3 class="side-title">Mapping Guidelines</h3>
-                    
-                    <div class="info-block">
-                        <h4>Provider Market Definition</h4>
-                        <p>Osnovni podaci o marketu provajdera. Klikom na <strong>View Market</strong> možete videti tačan JSON objekat marketa kakav nam stiže od provajdera.</p>
-                    </div>
-
-                    <div class="info-block">
-                        <h4>Market mapping</h4>
-                        <p>Sekcija za definisanje pravila mapiranja. Mapiranje se vrši u smeru <strong>Provider vrednost (levo) &rarr; Hermes vrednost (desno)</strong>.</p>
-                    </div>
-
-                    <div class="info-block">
-                        <h4>Choose Hermes Market</h4>
-                        <p>Izbor ciljnog Hermes marketa iz padajuće liste automatski prikazuje njegov sistemski tip u polju pored.</p>
-                    </div>
-
-                    <div class="info-block">
-                        <h4>Specifiers Mapping</h4>
-                        <p>Grupa u kojoj definišete specifiere. <strong>Mapped from Provider</strong> služi za direktno povezivanje specifiera iz feed-a, dok <strong>Fixed Values</strong> služi za ručni unos fiksne vrednosti (ako provajder istu ne šalje).</p>
-                    </div>
-
-                    <div class="info-block">
-                        <h4>Extended specifiers mapping</h4>
-                        <p>Povezivanje Hermes proširenih specifier-a sa vrednostima provajdera.</p>
-                    </div>
-
-                    <div class="info-block">
-                        <h4>Outcome mapping</h4>
-                        <p>Precizno povezivanje <strong>Hermes outcome-a</strong> sa <strong>Provider outcome-om</strong>.</p>
-                    </div>
-
-                    <div class="info-block">
-                        <h4>View mapping</h4>
-                        <p>Prikazuje trenutnu definiciju mapiranja u JSON formatu pre čuvanja. Koristite ga za proveru provider marketa, Hermes marketa, specifiera i outcome pravila.</p>
-                    </div>
-
-                </div>
-            </aside>
         </main>
     </div>
 

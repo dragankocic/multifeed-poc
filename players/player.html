@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Players</title>
+    <link rel="stylesheet" href="../sports/style.css">
+    <link rel="stylesheet" href="../style.css">
+    <script src="../auth.js"></script>
+</head>
+<body>
+
+    <div id="sidebar-container" data-root=".." data-active="player-management" data-service="sportsbook"></div>
+    <script src="../sidebar.js"></script>
+
+    <div class="main-content">
+        <header class="main-header" style="background-color: #17a2b8;">
+            <h1>Players</h1>
+            <p class="page-subtitle">Manage players for team-based competitors and Player Props markets.</p>
+        </header>
+
+        <main class="split-layout">
+            <div class="form-side">
+                <div class="top-bar">
+                    <div class="filters">
+                        <div class="filter-group">
+                            <label for="sportFilter">Sport</label>
+                            <select id="sportFilter">
+                                <option value="all" selected>All</option>
+                                <option value="Soccer">Soccer</option>
+                                <option value="Basketball">Basketball</option>
+                            </select>
+                        </div>
+
+                        <div class="filter-group">
+                            <label for="searchInput">Search Players</label>
+                            <input type="text" id="searchInput" placeholder="Search by player, competitor or ID..." style="padding: 10px 15px; border: 1px solid #ccc; border-radius: 4px; font-size: 15px; min-width: 250px; background-color: #fdfdfd;">
+                        </div>
+                    </div>
+
+                    <div class="actions">
+                        <a href="create_player.html" class="btn-primary" style="text-decoration: none; display: inline-block;">Create Player</a>
+                    </div>
+                </div>
+
+                <section class="markets-section">
+                    <table class="markets-table">
+                        <thead>
+                            <tr>
+                                <th>Player ID</th>
+                                <th>Player Name</th>
+                                <th>Sport</th>
+                                <th>Competitor</th>
+                                <th style="text-align: right;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="playersBody"></tbody>
+                    </table>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" id="closeDeleteModalBtn">&times;</span>
+            <h3>Delete Player</h3>
+            <p id="deleteModalText" style="font-size: 14px; line-height: 1.5; color: #555; margin-bottom: 20px;"></p>
+            <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                <button id="cancelDeleteBtn" class="btn-secondary">Cancel</button>
+                <button id="confirmDeleteBtn" class="btn-primary" style="background-color: #dc3545;">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../pagination.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const tableBody = document.getElementById('playersBody');
+            const searchInput = document.getElementById('searchInput');
+            const sportFilter = document.getElementById('sportFilter');
+            const deleteModal = document.getElementById('deleteModal');
+            const closeDeleteModalBtn = document.getElementById('closeDeleteModalBtn');
+            const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+            const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+            const deleteModalText = document.getElementById('deleteModalText');
+            let playerToDelete = null;
+
+            let players = [
+                { id: "P-001", name: "Mohamed Salah", sport: "Soccer", competitor: "Liverpool" },
+                { id: "P-002", name: "Virgil van Dijk", sport: "Soccer", competitor: "Liverpool" },
+                { id: "P-003", name: "Darwin Nunez", sport: "Soccer", competitor: "Liverpool" },
+                { id: "P-004", name: "Bukayo Saka", sport: "Soccer", competitor: "Arsenal" },
+                { id: "P-005", name: "Martin Odegaard", sport: "Soccer", competitor: "Arsenal" },
+                { id: "P-006", name: "Erling Haaland", sport: "Soccer", competitor: "Manchester City" },
+                { id: "P-007", name: "Kevin De Bruyne", sport: "Soccer", competitor: "Manchester City" },
+                { id: "P-008", name: "Jude Bellingham", sport: "Soccer", competitor: "Real Madrid" },
+                { id: "P-009", name: "Vinicius Junior", sport: "Soccer", competitor: "Real Madrid" },
+                { id: "P-010", name: "Jayson Tatum", sport: "Basketball", competitor: "Boston Celtics" },
+                { id: "P-011", name: "Jaylen Brown", sport: "Basketball", competitor: "Boston Celtics" }
+            ];
+
+            function openDeleteModal(player) {
+                playerToDelete = player;
+                deleteModalText.textContent = `Are you sure you want to delete player "${player.name}" (${player.id})?`;
+                deleteModal.style.display = 'flex';
+            }
+
+            function closeDeleteModal() {
+                playerToDelete = null;
+                deleteModal.style.display = 'none';
+            }
+
+            function renderPlayers() {
+                tableBody.innerHTML = '';
+                const searchVal = searchInput.value.toLowerCase();
+                const sportVal = sportFilter.value;
+                const filteredPlayers = players.filter(player => {
+                    const matchesSearch = player.id.toLowerCase().includes(searchVal) ||
+                        player.name.toLowerCase().includes(searchVal) ||
+                        player.competitor.toLowerCase().includes(searchVal);
+                    const matchesSport = sportVal === 'all' || player.sport === sportVal;
+                    return matchesSearch && matchesSport;
+                });
+
+                if (filteredPlayers.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #888; font-style: italic;">No players found.</td></tr>';
+                    return;
+                }
+
+                filteredPlayers.forEach(player => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td style="font-weight: 500; color: #6c757d;">${player.id}</td>
+                        <td class="market-name">${player.name}</td>
+                        <td>${player.sport}</td>
+                        <td>${player.competitor}</td>
+                        <td style="text-align: right;">
+                            <a href="view_player.html?id=${encodeURIComponent(player.id)}&name=${encodeURIComponent(player.name)}&sport=${encodeURIComponent(player.sport)}&competitor=${encodeURIComponent(player.competitor)}" class="btn-action" style="background-color: #007bff; text-decoration: none; display: inline-block; margin-right: 5px;">View</a>
+                            <a href="create_player.html?edit=true&id=${encodeURIComponent(player.id)}&name=${encodeURIComponent(player.name)}&sport=${encodeURIComponent(player.sport)}&competitor=${encodeURIComponent(player.competitor)}" class="btn-action" style="background-color: #17a2b8; text-decoration: none; display: inline-block; margin-right: 5px;">Edit</a>
+                            <button type="button" class="btn-action delete-player-btn" style="background-color: #dc3545; border: none;" data-id="${player.id}">Delete</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+
+                document.querySelectorAll('.delete-player-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const player = players.find(item => item.id === btn.dataset.id);
+                        if (player) openDeleteModal(player);
+                    });
+                });
+            }
+
+            searchInput.addEventListener('input', renderPlayers);
+            sportFilter.addEventListener('change', renderPlayers);
+            closeDeleteModalBtn.addEventListener('click', closeDeleteModal);
+            cancelDeleteBtn.addEventListener('click', closeDeleteModal);
+            confirmDeleteBtn.addEventListener('click', () => {
+                if (!playerToDelete) return;
+                players = players.filter(player => player.id !== playerToDelete.id);
+                closeDeleteModal();
+                renderPlayers();
+            });
+            window.addEventListener('click', event => {
+                if (event.target === deleteModal) closeDeleteModal();
+            });
+
+            renderPlayers();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Category Mapping</title>
+    <link rel="stylesheet" href="../style.css">
+    <script src="../auth.js"></script>
+</head>
+<body>
+
+    <div id="sidebar-container" data-root=".." data-active="category-mapping" data-service="sportsbook"></div>
+    <script src="../sidebar.js"></script>
+
+    <div class="main-content">
+        <header class="main-header">
+            <h1>Category Mapping</h1>
+            <p class="page-subtitle">Track and maintain mappings between provider categories and internal categories.</p>
+        </header>
+
+        <main class="split-layout">
+            <div class="form-side">
+                <div class="top-bar">
+                    <div class="filters">
+                        <div class="filter-group">
+                            <label for="providerSelect">Provider</label>
+                            <select id="providerSelect">
+                                <option value="all" selected>All</option>
+                                <option value="ExeFeed">ExeFeed</option>
+                                <option value="SportRadar">SportRadar</option>
+                                <option value="SportGenius">SportGenius</option>
+                            </select>
+                        </div>
+
+                        <div class="filter-group">
+                            <label for="sportSelect">Sport</label>
+                            <select id="sportSelect">
+                                <option value="all" selected>All</option>
+                                <option value="Soccer">Soccer</option>
+                                <option value="Basketball">Basketball</option>
+                                <option value="Tennis">Tennis</option>
+                                <option value="Formula 1">Formula 1</option>
+                            </select>
+                        </div>
+
+                        <div class="filter-group">
+                            <label for="statusSelect">Mapping status</label>
+                            <select id="statusSelect">
+                                <option value="all" selected>All</option>
+                                <option value="mapped">Mapped</option>
+                                <option value="unmapped">Unmapped</option>
+                            </select>
+                        </div>
+
+                        <div class="filter-group">
+                            <label for="searchInput">Search</label>
+                            <input type="text" id="searchInput" placeholder="Search category..." style="padding: 10px 15px; border: 1px solid #ccc; border-radius: 4px; font-size: 15px; min-width: 220px; background-color: #fdfdfd;">
+                        </div>
+                    </div>
+                </div>
+
+                <section class="markets-section" style="overflow-x: auto;">
+                    <table class="markets-table" style="min-width: 1100px;">
+                        <thead>
+                            <tr>
+                                <th>Provider</th>
+                                <th>Sport</th>
+                                <th>Prov. Category ID</th>
+                                <th>Prov. Category Name</th>
+                                <th>Internal Category ID</th>
+                                <th>Internal Category Name</th>
+                                <th>Status</th>
+                                <th style="text-align: right; min-width: 150px;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="categoriesTableBody"></tbody>
+                    </table>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script src="../pagination.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const tableBody = document.getElementById("categoriesTableBody");
+            const providerSelect = document.getElementById("providerSelect");
+            const sportSelect = document.getElementById("sportSelect");
+            const statusSelect = document.getElementById("statusSelect");
+            const searchInput = document.getElementById("searchInput");
+
+            const providerCategories = [
+                { provider: "ExeFeed", sport: "Soccer", provId: "cat:england", provName: "England", internalId: "C-001", internalName: "England", status: "Mapped" },
+                { provider: "ExeFeed", sport: "Soccer", provId: "cat:spain", provName: "Spain", internalId: "C-002", internalName: "Spain", status: "Mapped" },
+                { provider: "ExeFeed", sport: "Soccer", provId: "cat:germany", provName: "Germany", internalId: "C-003", internalName: "Germany", status: "Mapped" },
+                { provider: "ExeFeed", sport: "Basketball", provId: "cat:usa", provName: "United States", internalId: "C-007", internalName: "United States", status: "Mapped" },
+                { provider: "ExeFeed", sport: "Tennis", provId: "cat:france", provName: "France", internalId: "C-005", internalName: "France", status: "Mapped" },
+                { provider: "SportRadar", sport: "Soccer", provId: "sr:category:1", provName: "England", internalId: "C-001", internalName: "England", status: "Mapped" },
+                { provider: "SportRadar", sport: "Soccer", provId: "sr:category:32", provName: "Spain", internalId: "C-002", internalName: "Spain", status: "Mapped" },
+                { provider: "SportRadar", sport: "Soccer", provId: "sr:category:30", provName: "Germany", internalId: "C-003", internalName: "Germany", status: "Mapped" },
+                { provider: "SportRadar", sport: "Formula 1", provId: "sr:category:39", provName: "International", internalId: "-", internalName: "-", status: "Unmapped" },
+                { provider: "SportRadar", sport: "Basketball", provId: "sr:category:15", provName: "Europe", internalId: "-", internalName: "-", status: "Unmapped" },
+                { provider: "SportGenius", sport: "Soccer", provId: "sg-cat-uk", provName: "UK", internalId: "-", internalName: "-", status: "Unmapped" },
+                { provider: "SportGenius", sport: "Soccer", provId: "sg-cat-it", provName: "Italy", internalId: "C-004", internalName: "Italy", status: "Mapped" },
+                { provider: "SportGenius", sport: "Soccer", provId: "sg-cat-rs", provName: "Serbia", internalId: "C-006", internalName: "Serbia", status: "Mapped" }
+            ];
+
+            function renderCategories() {
+                tableBody.innerHTML = "";
+
+                const providerVal = providerSelect.value;
+                const sportVal = sportSelect.value;
+                const statusVal = statusSelect.value;
+                const searchVal = searchInput.value.toLowerCase();
+
+                const filteredCategories = providerCategories.filter(category => {
+                    const matchesProvider = providerVal === 'all' || category.provider === providerVal;
+                    const matchesSport = sportVal === 'all' || category.sport === sportVal;
+                    const matchesStatus = statusVal === 'all' || category.status.toLowerCase() === statusVal;
+                    const matchesSearch = category.provId.toLowerCase().includes(searchVal) ||
+                        category.provName.toLowerCase().includes(searchVal) ||
+                        category.internalId.toLowerCase().includes(searchVal) ||
+                        category.internalName.toLowerCase().includes(searchVal);
+
+                    return matchesProvider && matchesSport && matchesStatus && matchesSearch;
+                });
+
+                if (filteredCategories.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: #888; font-style: italic; padding: 20px;">No categories found matching the filters.</td></tr>';
+                    return;
+                }
+
+                filteredCategories.forEach(category => {
+                    const row = document.createElement("tr");
+                    const badgeStyle = category.status === "Mapped"
+                        ? "background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb;"
+                        : "background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba;";
+                    const actionButton = category.status === "Mapped"
+                        ? `
+                            <a href="view_category.html?id=${encodeURIComponent(category.internalId)}&name=${encodeURIComponent(category.internalName)}" class="btn-action" style="background-color: #007bff; text-decoration: none; display: inline-block; margin-right: 5px;">View</a>
+                            <a href="map_category.html?provider=${encodeURIComponent(category.provider)}&sport=${encodeURIComponent(category.sport)}&provId=${encodeURIComponent(category.provId)}&provName=${encodeURIComponent(category.provName)}&internalId=${encodeURIComponent(category.internalId)}" class="btn-action" style="background-color: #17a2b8; text-decoration: none; display: inline-block;">Edit</a>
+                        `
+                        : `<a href="map_category.html?provider=${encodeURIComponent(category.provider)}&sport=${encodeURIComponent(category.sport)}&provId=${encodeURIComponent(category.provId)}&provName=${encodeURIComponent(category.provName)}" class="btn-action" style="text-decoration: none; display: inline-block;">Map</a>`;
+
+                    row.innerHTML = `
+                        <td style="font-weight: 500;">${category.provider}</td>
+                        <td>${category.sport}</td>
+                        <td style="color: #6c757d;">${category.provId}</td>
+                        <td class="market-name" style="color: #007bff;">${category.provName}</td>
+                        <td style="color: #6c757d;">${category.internalId}</td>
+                        <td style="font-weight: 500;">${category.internalName}</td>
+                        <td><span class="status-badge" style="${badgeStyle}">${category.status}</span></td>
+                        <td style="text-align: right;">${actionButton}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            }
+
+            providerSelect.addEventListener('change', renderCategories);
+            sportSelect.addEventListener('change', renderCategories);
+            statusSelect.addEventListener('change', renderCategories);
+            searchInput.addEventListener('input', renderCategories);
+            renderCategories();
+        });
+    </script>
+</body>
+</html>

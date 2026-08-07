@@ -3,26 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hermes POC - Select Service</title>
+    <title>Hermes Back Office</title>
     <link rel="stylesheet" href="style.css">
+    <script src="auth.js"></script>
 </head>
 <body class="service-select-body">
     <main class="service-select-shell">
         <section class="service-select-panel" aria-labelledby="serviceSelectTitle">
-            <div class="service-select-brand">HERMES POC</div>
-            <h1 id="serviceSelectTitle">Select service</h1>
-            <p class="service-select-subtitle">Choose the operational area you want to review or configure.</p>
+            <h1 id="serviceSelectTitle">Welcome to Hermes Back Office!</h1>
+            <p class="service-select-subtitle">Your central hub for managing operations efficiently. Access your tools, monitor key insights, and stay in control - all in one place.</p>
 
-            <div class="service-option-grid">
-                <a class="service-option" href="multifeed/messages/messages.html" aria-label="Open Multifeed">
-                    <strong>Multifeed</strong>
-                    <span class="service-option-warning">NOT PREPARED FOR REVIEW</span>
-                </a>
+            <section class="service-section" aria-labelledby="generalSettingsTitle">
+                <h2 id="generalSettingsTitle">General Settings</h2>
+                <div class="service-option-grid service-option-grid-single">
+                    <div class="service-option service-option-disabled">
+                        <span class="service-option-icon" aria-hidden="true"></span>
+                        <span class="service-option-copy">
+                            <strong>Master Data</strong>
+                            <span>General Master Data Management</span>
+                        </span>
+                        <span class="service-option-arrow" aria-hidden="true">&rarr;</span>
+                    </div>
+                </div>
+            </section>
 
-                <a class="service-option" href="sportsbook_masterdata.html" aria-label="Open Sportsbook Masterdata">
-                    <strong>Sportsbook Masterdata</strong>
-                </a>
-            </div>
+            <section class="service-section" aria-labelledby="sportsbookTitle">
+                <h2 id="sportsbookTitle">Sportsbook</h2>
+                <div class="service-option-grid service-option-grid-three">
+                    <div class="service-option service-option-disabled">
+                        <span class="service-option-icon" aria-hidden="true"></span>
+                        <span class="service-option-copy">
+                            <strong>Test Feed Provider</strong>
+                            <span>Real-time sports event data simulator</span>
+                        </span>
+                        <span class="service-option-arrow" aria-hidden="true">&rarr;</span>
+                    </div>
+
+                    <a class="service-option" href="multifeed/messages/messages.html" aria-label="Open Multifeed">
+                        <span class="service-option-icon" aria-hidden="true"></span>
+                        <span class="service-option-copy">
+                            <strong>Multifeed</strong>
+                            <span>Feed Provider Aggregator</span>
+                        </span>
+                        <span class="service-option-arrow" aria-hidden="true">&rarr;</span>
+                    </a>
+                </div>
+            </section>
+
+            <section class="service-section" aria-labelledby="casinoTitle">
+                <h2 id="casinoTitle">Casino</h2>
+                <div class="service-option-grid service-option-grid-two">
+                    <div class="service-option service-option-disabled">
+                        <span class="service-option-icon" aria-hidden="true"></span>
+                        <span class="service-option-copy">
+                            <strong>Test Game Launch</strong>
+                            <span>Test Game Launch Management</span>
+                        </span>
+                        <span class="service-option-arrow" aria-hidden="true">&rarr;</span>
+                    </div>
+
+                    <div class="service-option service-option-disabled">
+                        <span class="service-option-icon" aria-hidden="true"></span>
+                        <span class="service-option-copy">
+                            <strong>Casino System Settings</strong>
+                            <span>Configure provider settings.</span>
+                        </span>
+                        <span class="service-option-arrow" aria-hidden="true">&rarr;</span>
+                    </div>
+                </div>
+            </section>
         </section>
     </main>
 </body>

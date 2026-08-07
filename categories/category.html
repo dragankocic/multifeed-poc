@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Categories</title>
+    <link rel="stylesheet" href="../sports/style.css">
+    <link rel="stylesheet" href="../style.css">
+    <script src="../auth.js"></script>
+</head>
+<body>
+
+    <div id="sidebar-container" data-root=".." data-active="category-management" data-service="sportsbook"></div>
+    <script src="../sidebar.js"></script>
+
+    <div class="main-content">
+        <header class="main-header" style="background-color: #17a2b8;">
+            <h1>Categories</h1>
+            <p class="page-subtitle">Manage geographical categories used to organize competitions.</p>
+        </header>
+
+        <main class="split-layout">
+            <div class="form-side">
+                <div class="top-bar">
+                    <div class="filters">
+                        <div class="filter-group">
+                            <label for="searchInput">Search Categories</label>
+                            <input type="text" id="searchInput" placeholder="Search by name or ID..." style="padding: 10px 15px; border: 1px solid #ccc; border-radius: 4px; font-size: 15px; min-width: 250px; background-color: #fdfdfd;">
+                        </div>
+                    </div>
+
+                    <div class="actions">
+                        <a href="create_category.html" class="btn-primary" style="text-decoration: none; display: inline-block;">Create Category</a>
+                    </div>
+                </div>
+
+                <section class="markets-section">
+                    <table class="markets-table">
+                        <thead>
+                            <tr>
+                                <th>Category ID</th>
+                                <th>Category Name</th>
+                                <th style="text-align: right;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="categoriesBody"></tbody>
+                    </table>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" id="closeDeleteModalBtn">&times;</span>
+            <h3>Delete Category</h3>
+            <p id="deleteModalText" style="font-size: 14px; line-height: 1.5; color: #555; margin-bottom: 20px;"></p>
+            <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                <button id="cancelDeleteBtn" class="btn-secondary">Cancel</button>
+                <button id="confirmDeleteBtn" class="btn-primary" style="background-color: #dc3545;">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../pagination.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const tableBody = document.getElementById('categoriesBody');
+            const searchInput = document.getElementById('searchInput');
+            const deleteModal = document.getElementById('deleteModal');
+            const closeDeleteModalBtn = document.getElementById('closeDeleteModalBtn');
+            const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+            const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+            const deleteModalText = document.getElementById('deleteModalText');
+            let categoryToDelete = null;
+
+            let categories = [
+                { id: "C-001", name: "England" },
+                { id: "C-002", name: "Spain" },
+                { id: "C-003", name: "Germany" },
+                { id: "C-004", name: "Italy" },
+                { id: "C-005", name: "France" },
+                { id: "C-006", name: "Serbia" }
+            ];
+
+            function openDeleteModal(category) {
+                categoryToDelete = category;
+                deleteModalText.textContent = `Are you sure you want to delete category "${category.name}" (${category.id})?`;
+                deleteModal.style.display = 'flex';
+            }
+
+            function closeDeleteModal() {
+                categoryToDelete = null;
+                deleteModal.style.display = 'none';
+            }
+
+            function renderCategories() {
+                tableBody.innerHTML = '';
+                const searchVal = searchInput.value.toLowerCase();
+                const filteredCategories = categories.filter(category =>
+                    category.id.toLowerCase().includes(searchVal) ||
+                    category.name.toLowerCase().includes(searchVal)
+                );
+
+                if (filteredCategories.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: #888; font-style: italic;">No categories found.</td></tr>';
+                    return;
+                }
+
+                filteredCategories.forEach(category => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td style="font-weight: 500; color: #6c757d;">${category.id}</td>
+                        <td class="market-name">${category.name}</td>
+                        <td style="text-align: right;">
+                            <a href="view_category.html?id=${encodeURIComponent(category.id)}&name=${encodeURIComponent(category.name)}" class="btn-action" style="background-color: #007bff; text-decoration: none; display: inline-block; margin-right: 5px;">View</a>
+                            <a href="create_category.html?edit=true&id=${encodeURIComponent(category.id)}&name=${encodeURIComponent(category.name)}" class="btn-action" style="background-color: #17a2b8; text-decoration: none; display: inline-block; margin-right: 5px;">Edit</a>
+                            <button type="button" class="btn-action delete-category-btn" style="background-color: #dc3545; border: none;" data-id="${category.id}">Delete</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+
+                document.querySelectorAll('.delete-category-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const category = categories.find(item => item.id === btn.dataset.id);
+                        if (category) openDeleteModal(category);
+                    });
+                });
+            }
+
+            searchInput.addEventListener('input', renderCategories);
+            closeDeleteModalBtn.addEventListener('click', closeDeleteModal);
+            cancelDeleteBtn.addEventListener('click', closeDeleteModal);
+            confirmDeleteBtn.addEventListener('click', () => {
+                if (!categoryToDelete) return;
+                categories = categories.filter(category => category.id !== categoryToDelete.id);
+                closeDeleteModal();
+                renderCategories();
+            });
+            window.addEventListener('click', event => {
+                if (event.target === deleteModal) closeDeleteModal();
+            });
+
+            renderCategories();
+        });
+    </script>
+</body>
+</html>

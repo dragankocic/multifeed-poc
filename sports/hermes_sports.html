@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hermes Sports Dashboard</title>
+    <title>Sports Dashboard</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="../style.css">
+    <script src="../auth.js"></script>
 </head>
 <body>
 
@@ -14,8 +15,8 @@
 
     <div class="main-content">
         <header class="main-header" style="background-color: #17a2b8;">
-            <h1>Hermes Sports Management</h1>
-            <p class="page-subtitle">Manage the internal Hermes sports registry and sport abbreviations.</p>
+            <h1>Sports Management</h1>
+            <p class="page-subtitle">Manage the internal sports registry and sport abbreviations.</p>
         </header>
 
         <main class="split-layout">
@@ -29,7 +30,7 @@
                     </div>
 
                     <div class="actions">
-                        <a href="create_sport.html" class="btn-primary" style="text-decoration: none; display: inline-block;">Create Hermes Sport</a>
+                        <a href="create_sport.html" class="btn-primary" style="text-decoration: none; display: inline-block;">Create Sport</a>
                     </div>
                 </div>
 
@@ -48,28 +49,6 @@
                     </table>
                 </section>
             </div>
-
-            <aside class="info-side">
-                <div class="sticky-info">
-                    <h3 class="side-title">Business Guidelines</h3>
-                    <div class="info-block">
-                        <h4>Registar Hermes Sportova</h4>
-                        <p>Lista internih standardizovanih sportova koje Hermes sistem podržava. Kvote se procesiraju isključivo za sportove sa ove liste.</p>
-                    </div>
-                    <div class="info-block">
-                        <h4>Skraćenica (Abbreviation)</h4>
-                        <p>Skraćenice se koriste kao sistemski identifikatori u feed porukama (npr. SOC za Soccer, BKB za Basketball).</p>
-                    </div>
-                    <div class="info-block">
-                        <h4>Dodavanje i Izmena</h4>
-                        <p>Novi sport se može kreirati klikom na <strong>Create Hermes Sport</strong>. Izmene naziva ili skraćenice radite preko opcije <strong>Edit</strong>.</p>
-                    </div>
-                    <div class="info-block">
-                        <h4>View</h4>
-                        <p>Opcija <strong>View</strong> prikazuje detalje izabranog Hermes sporta, kao i listu provider sportova koji su mapirani na taj interni sport.</p>
-                    </div>
-                </div>
-            </aside>
         </main>
     </div>
 
@@ -78,7 +57,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             const tableBody = document.getElementById('hermesSportsBody');
 
-            // Mock podaci za Hermes sportove
+            // Mock podaci za sportove
             const hermesSports = [
                 { id: "S-001", name: "Soccer", abbr: "SOC" },
                 { id: "S-002", name: "Basketball", abbr: "BKB" },

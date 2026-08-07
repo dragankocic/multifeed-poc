@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Player</title>
+    <link rel="stylesheet" href="../sports/style.css">
+    <link rel="stylesheet" href="../style.css">
+    <script src="../auth.js"></script>
+</head>
+<body>
+
+    <div id="sidebar-container" data-root=".." data-active="player-management" data-service="sportsbook"></div>
+    <script src="../sidebar.js"></script>
+
+    <div class="main-content">
+        <header class="main-header" style="background-color: #17a2b8;">
+            <h1 id="pageMainTitle">Create Player</h1>
+            <p class="page-subtitle">Create or update a player for a team-based competitor.</p>
+        </header>
+
+        <main class="split-layout">
+            <div class="form-side">
+                <div style="margin-bottom: 20px;">
+                    <a href="player.html" class="btn-secondary" style="text-decoration: none; display: inline-block;">&larr; Back to list</a>
+                </div>
+
+                <div class="info-section">
+                    <h2 id="pageSubTitle">Define a new Player</h2>
+                </div>
+
+                <section class="section-card">
+                    <h3 class="section-title">Player Details</h3>
+                    <div class="form-column">
+                        <div class="form-group">
+                            <label for="sportSelect">Sport</label>
+                            <select id="sportSelect">
+                                <option value="" disabled selected>Select sport</option>
+                                <option value="Soccer">Soccer</option>
+                                <option value="Basketball">Basketball</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="competitorSelect">Competitor</label>
+                            <select id="competitorSelect">
+                                <option value="" disabled selected>Select competitor</option>
+                                <option value="Liverpool">Liverpool</option>
+                                <option value="Arsenal">Arsenal</option>
+                                <option value="Manchester City">Manchester City</option>
+                                <option value="Real Madrid">Real Madrid</option>
+                                <option value="Boston Celtics">Boston Celtics</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="playerName">Player Name</label>
+                            <input type="text" id="playerName" placeholder="e.g. Mohamed Salah">
+                        </div>
+                    </div>
+                </section>
+
+                <div class="actions-bar">
+                    <button id="savePlayerBtn" class="btn-primary">Save player</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const isEdit = urlParams.get('edit') === 'true';
+            const editId = urlParams.get('id') || 'auto-generated';
+            const editName = urlParams.get('name');
+            const editSport = urlParams.get('sport');
+            const editCompetitor = urlParams.get('competitor');
+
+            if (isEdit) {
+                document.getElementById('pageMainTitle').textContent = 'Edit Player';
+                document.getElementById('pageSubTitle').textContent = 'Update existing Player';
+                document.getElementById('savePlayerBtn').textContent = 'Update player';
+                document.title = 'Edit Player';
+
+                if (editSport) document.getElementById('sportSelect').value = editSport;
+                if (editCompetitor) document.getElementById('competitorSelect').value = editCompetitor;
+                if (editName) document.getElementById('playerName').value = editName;
+            }
+
+            document.getElementById('savePlayerBtn').addEventListener('click', () => {
+                const sport = document.getElementById('sportSelect').value;
+                const competitor = document.getElementById('competitorSelect').value;
+                const name = document.getElementById('playerName').value.trim();
+
+                if (!sport || !competitor || !name) {
+                    alert("Please fill in all fields.");
+                    return;
+                }
+
+                const actionText = isEdit ? "updated" : "created";
+                const idText = isEdit ? ` (${editId})` : '';
+                alert(`Player "${name}"${idText} successfully ${actionText}!`);
+                window.location.href = 'player.html';
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Competitor</title>
+    <link rel="stylesheet" href="../sports/style.css">
+    <link rel="stylesheet" href="../style.css">
+    <script src="../auth.js"></script>
+</head>
+<body>
+
+    <div id="sidebar-container" data-root=".." data-active="competitor-management" data-service="sportsbook"></div>
+    <script src="../sidebar.js"></script>
+
+    <div class="main-content">
+        <header class="main-header" style="background-color: #17a2b8;">
+            <h1 id="pageMainTitle">Create Competitor</h1>
+            <p class="page-subtitle">Create or update a competitor with sport.</p>
+        </header>
+
+        <main class="split-layout">
+            <div class="form-side">
+                <div style="margin-bottom: 20px;">
+                    <a href="competitor.html" class="btn-secondary" style="text-decoration: none; display: inline-block;">&larr; Back to list</a>
+                </div>
+
+                <div class="info-section">
+                    <h2 id="pageSubTitle">Define a new Competitor</h2>
+                </div>
+
+                <section class="section-card">
+                    <h3 class="section-title">Competitor Details</h3>
+                    <div class="form-column">
+                        <div class="form-group">
+                            <label for="sportSelect">Sport</label>
+                            <select id="sportSelect">
+                                <option value="" disabled selected>Select sport</option>
+                                <option value="Soccer">Soccer</option>
+                                <option value="Basketball">Basketball</option>
+                                <option value="Tennis">Tennis</option>
+                                <option value="Formula 1">Formula 1</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="competitorName">Competitor Name</label>
+                            <input type="text" id="competitorName" placeholder="e.g. Arsenal">
+                        </div>
+                    </div>
+                </section>
+
+                <div class="actions-bar">
+                    <button id="saveCompetitorBtn" class="btn-primary">Save competitor</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const isEdit = urlParams.get('edit') === 'true';
+            const editId = urlParams.get('id') || 'auto-generated';
+            const editName = urlParams.get('name');
+            const editSport = urlParams.get('sport');
+
+            if (isEdit) {
+                document.getElementById('pageMainTitle').textContent = 'Edit Competitor';
+                document.getElementById('pageSubTitle').textContent = 'Update existing Competitor';
+                document.getElementById('saveCompetitorBtn').textContent = 'Update competitor';
+                document.title = 'Edit Competitor';
+
+                if (editSport) document.getElementById('sportSelect').value = editSport;
+                if (editName) document.getElementById('competitorName').value = editName;
+            }
+
+            document.getElementById('saveCompetitorBtn').addEventListener('click', () => {
+                const sport = document.getElementById('sportSelect').value;
+                const name = document.getElementById('competitorName').value.trim();
+
+                if (!sport || !name) {
+                    alert("Please fill in all fields.");
+                    return;
+                }
+
+                const actionText = isEdit ? "updated" : "created";
+                const idText = isEdit ? ` (${editId})` : '';
+                alert(`Competitor "${name}"${idText} successfully ${actionText}!`);
+                window.location.href = 'competitor.html';
+            });
+        });
+    </script>
+</body>
+</html>

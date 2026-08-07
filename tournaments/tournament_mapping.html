@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tournament Mapping</title>
+    <link rel="stylesheet" href="../style.css">
+    <script src="../auth.js"></script>
+</head>
+<body>
+
+    <div id="sidebar-container" data-root=".." data-active="tournament-mapping" data-service="sportsbook"></div>
+    <script src="../sidebar.js"></script>
+
+    <div class="main-content">
+        <header class="main-header">
+            <h1>Tournament Mapping</h1>
+            <p class="page-subtitle">Track and maintain mappings between provider tournaments and internal tournaments.</p>
+        </header>
+
+        <main class="split-layout">
+            <div class="form-side">
+                <div class="top-bar">
+                    <div class="filters">
+                        <div class="filter-group">
+                            <label for="providerSelect">Provider</label>
+                            <select id="providerSelect">
+                                <option value="all" selected>All</option>
+                                <option value="ExeFeed">ExeFeed</option>
+                                <option value="SportRadar">SportRadar</option>
+                                <option value="SportGenius">SportGenius</option>
+                            </select>
+                        </div>
+
+                        <div class="filter-group">
+                            <label for="sportSelect">Sport</label>
+                            <select id="sportSelect">
+                                <option value="all" selected>All</option>
+                                <option value="Soccer">Soccer</option>
+                                <option value="Basketball">Basketball</option>
+                                <option value="Tennis">Tennis</option>
+                            </select>
+                        </div>
+
+                        <div class="filter-group">
+                            <label for="categorySelect">Category</label>
+                            <select id="categorySelect">
+                                <option value="all" selected>All</option>
+                                <option value="England">England</option>
+                                <option value="Spain">Spain</option>
+                                <option value="Germany">Germany</option>
+                                <option value="Italy">Italy</option>
+                                <option value="France">France</option>
+                                <option value="Serbia">Serbia</option>
+                            </select>
+                        </div>
+
+                        <div class="filter-group">
+                            <label for="statusSelect">Mapping status</label>
+                            <select id="statusSelect">
+                                <option value="all" selected>All</option>
+                                <option value="mapped">Mapped</option>
+                                <option value="unmapped">Unmapped</option>
+                            </select>
+                        </div>
+
+                        <div class="filter-group">
+                            <label for="searchInput">Search</label>
+                            <input type="text" id="searchInput" placeholder="Search tournament..." style="padding: 10px 15px; border: 1px solid #ccc; border-radius: 4px; font-size: 15px; min-width: 220px; background-color: #fdfdfd;">
+                        </div>
+                    </div>
+                </div>
+
+                <section class="markets-section" style="overflow-x: auto;">
+                    <table class="markets-table" style="min-width: 1250px;">
+                        <thead>
+                            <tr>
+                                <th>Provider</th>
+                                <th>Sport</th>
+                                <th>Category</th>
+                                <th>Prov. Tournament ID</th>
+                                <th>Prov. Tournament Name</th>
+                                <th>Internal Tournament ID</th>
+                                <th>Internal Tournament Name</th>
+                                <th>Status</th>
+                                <th style="text-align: right; min-width: 150px;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tournamentsTableBody"></tbody>
+                    </table>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script src="../pagination.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const tableBody = document.getElementById("tournamentsTableBody");
+            const providerSelect = document.getElementById("providerSelect");
+            const sportSelect = document.getElementById("sportSelect");
+            const categorySelect = document.getElementById("categorySelect");
+            const statusSelect = document.getElementById("statusSelect");
+            const searchInput = document.getElementById("searchInput");
+
+            const providerTournaments = [
+                { provider: "ExeFeed", sport: "Soccer", category: "England", provId: "trn:eng:premier-league", provName: "Premier League", internalId: "T-001", internalName: "Premier League", primaryFeed: "EXE", status: "Mapped" },
+                { provider: "ExeFeed", sport: "Soccer", category: "England", provId: "trn:eng:championship", provName: "Championship", internalId: "T-002", internalName: "Championship", primaryFeed: "SR", status: "Mapped" },
+                { provider: "ExeFeed", sport: "Soccer", category: "Spain", provId: "trn:esp:laliga", provName: "LaLiga", internalId: "T-005", internalName: "LaLiga", primaryFeed: "SR", status: "Mapped" },
+                { provider: "ExeFeed", sport: "Soccer", category: "Spain", provId: "trn:esp:copa-del-rey", provName: "Copa del Rey", internalId: "-", internalName: "-", primaryFeed: "-", status: "Unmapped" },
+                { provider: "SportRadar", sport: "Soccer", category: "England", provId: "sr:tournament:17", provName: "Premier League", internalId: "T-001", internalName: "Premier League", primaryFeed: "EXE", status: "Mapped" },
+                { provider: "SportRadar", sport: "Soccer", category: "England", provId: "sr:tournament:24", provName: "League One", internalId: "T-003", internalName: "League One", primaryFeed: "SR", status: "Mapped" },
+                { provider: "SportRadar", sport: "Soccer", category: "Spain", provId: "sr:tournament:8", provName: "LaLiga", internalId: "T-005", internalName: "LaLiga", primaryFeed: "SR", status: "Mapped" },
+                { provider: "SportRadar", sport: "Basketball", category: "Germany", provId: "sr:tournament:1192", provName: "BBL", internalId: "T-012", internalName: "BBL", primaryFeed: "SR", status: "Mapped" },
+                { provider: "SportRadar", sport: "Tennis", category: "France", provId: "sr:tournament:2480", provName: "Roland Garros", internalId: "T-013", internalName: "Roland Garros", primaryFeed: "BG", status: "Mapped" },
+                { provider: "SportGenius", sport: "Soccer", category: "Germany", provId: "sg-trn-bundesliga", provName: "Bundesliga", internalId: "T-008", internalName: "Bundesliga", primaryFeed: "SR", status: "Mapped" },
+                { provider: "SportGenius", sport: "Soccer", category: "Italy", provId: "sg-trn-serie-a", provName: "Serie A", internalId: "T-009", internalName: "Serie A", primaryFeed: "BG", status: "Mapped" },
+                { provider: "SportGenius", sport: "Soccer", category: "Serbia", provId: "sg-trn-cup", provName: "Serbian Cup", internalId: "-", internalName: "-", primaryFeed: "-", status: "Unmapped" }
+            ];
+
+            function renderTournaments() {
+                tableBody.innerHTML = "";
+
+                const providerVal = providerSelect.value;
+                const sportVal = sportSelect.value;
+                const categoryVal = categorySelect.value;
+                const statusVal = statusSelect.value;
+                const searchVal = searchInput.value.toLowerCase();
+
+                const filteredTournaments = providerTournaments.filter(tournament => {
+                    const matchesProvider = providerVal === 'all' || tournament.provider === providerVal;
+                    const matchesSport = sportVal === 'all' || tournament.sport === sportVal;
+                    const matchesCategory = categoryVal === 'all' || tournament.category === categoryVal;
+                    const matchesStatus = statusVal === 'all' || tournament.status.toLowerCase() === statusVal;
+                    const matchesSearch = tournament.provId.toLowerCase().includes(searchVal) ||
+                        tournament.provName.toLowerCase().includes(searchVal) ||
+                        tournament.internalId.toLowerCase().includes(searchVal) ||
+                        tournament.internalName.toLowerCase().includes(searchVal) ||
+                        tournament.category.toLowerCase().includes(searchVal);
+
+                    return matchesProvider && matchesSport && matchesCategory && matchesStatus && matchesSearch;
+                });
+
+                if (filteredTournaments.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="9" style="text-align: center; color: #888; font-style: italic; padding: 20px;">No tournaments found matching the filters.</td></tr>';
+                    return;
+                }
+
+                filteredTournaments.forEach(tournament => {
+                    const row = document.createElement("tr");
+                    const badgeStyle = tournament.status === "Mapped"
+                        ? "background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb;"
+                        : "background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba;";
+                    const actionButton = tournament.status === "Mapped"
+                        ? `
+                            <a href="view_tournament.html?id=${encodeURIComponent(tournament.internalId)}&name=${encodeURIComponent(tournament.internalName)}&sport=${encodeURIComponent(tournament.sport)}&category=${encodeURIComponent(tournament.category)}&primaryFeed=${encodeURIComponent(tournament.primaryFeed)}" class="btn-action" style="background-color: #007bff; text-decoration: none; display: inline-block; margin-right: 5px;">View</a>
+                            <a href="map_tournament.html?provider=${encodeURIComponent(tournament.provider)}&sport=${encodeURIComponent(tournament.sport)}&category=${encodeURIComponent(tournament.category)}&provId=${encodeURIComponent(tournament.provId)}&provName=${encodeURIComponent(tournament.provName)}&internalId=${encodeURIComponent(tournament.internalId)}" class="btn-action" style="background-color: #17a2b8; text-decoration: none; display: inline-block;">Edit</a>
+                        `
+                        : `<a href="map_tournament.html?provider=${encodeURIComponent(tournament.provider)}&sport=${encodeURIComponent(tournament.sport)}&category=${encodeURIComponent(tournament.category)}&provId=${encodeURIComponent(tournament.provId)}&provName=${encodeURIComponent(tournament.provName)}" class="btn-action" style="text-decoration: none; display: inline-block;">Map</a>`;
+
+                    row.innerHTML = `
+                        <td style="font-weight: 500;">${tournament.provider}</td>
+                        <td>${tournament.sport}</td>
+                        <td>${tournament.category}</td>
+                        <td style="color: #6c757d;">${tournament.provId}</td>
+                        <td class="market-name" style="color: #007bff;">${tournament.provName}</td>
+                        <td style="color: #6c757d;">${tournament.internalId}</td>
+                        <td style="font-weight: 500;">${tournament.internalName}</td>
+                        <td><span class="status-badge" style="${badgeStyle}">${tournament.status}</span></td>
+                        <td style="text-align: right;">${actionButton}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            }
+
+            providerSelect.addEventListener('change', renderTournaments);
+            sportSelect.addEventListener('change', renderTournaments);
+            categorySelect.addEventListener('change', renderTournaments);
+            statusSelect.addEventListener('change', renderTournaments);
+            searchInput.addEventListener('input', renderTournaments);
+            renderTournaments();
+        });
+    </script>
+</body>
+</html>

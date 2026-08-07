@@ -25,7 +25,7 @@ const providerMarketsData = {
     "NEXT_GOAL_SCORER": { type: "Player props", specifiers: ["B", "R"], outcomes: [] }
 };
 
-// Rečnik za automatsko povlačenje Hermes Market Type-a
+// Rečnik za automatsko povlačenje Internal Market Type-a
 const hermesMarketTypes = {
     "1X2": "Regular",
     "Asian Handicap": "Regular",
@@ -82,7 +82,7 @@ function createSpecifierRowHtml(providerSpecifiers = []) {
                 </select>
             </div>
             <div class="form-group" style="flex: 1; margin-bottom: 0;">
-                <label>Hermes specifier</label>
+                <label>Internal specifier</label>
                 <select>
                     <option value="" disabled selected>Select specifier...</option>
                     ${hermesOptionsHtml}
@@ -116,7 +116,7 @@ function createFixedSpecifierRowHtml() {
                 <input type="text" placeholder="e.g. fiksna vrednost...">
             </div>
             <div class="form-group" style="flex: 1; margin-bottom: 0;">
-                <label>Hermes specifier</label>
+                <label>Internal specifier</label>
                 <select>
                     <option value="" disabled selected>Select specifier...</option>
                     ${hermesOptionsHtml}
@@ -146,7 +146,7 @@ function createExtSpecifierRowHtml() {
                 </select>
             </div>
             <div class="form-group" style="flex: 1; margin-bottom: 0;">
-                <label>Hermes extended specifier</label>
+                <label>Internal extended specifier</label>
                 <select>
                     <option value="" disabled selected>Select extended specifier...</option>
                     ${optionsHtml}
@@ -173,9 +173,9 @@ function createOutcomeRowHtml(selectedHermesMarket = "1X2") {
                 </select>
             </div>
             <div class="form-group" style="flex: 1; margin-bottom: 0;">
-                <label>Hermes outcome</label>
+                <label>Internal outcome</label>
                 <select class="hermes-outcome-select">
-                    <option value="" disabled selected>Select Hermes outcome...</option>
+                    <option value="" disabled selected>Select Internal outcome...</option>
                     ${hermesOptionsHtml}
                 </select>
             </div>
@@ -184,11 +184,11 @@ function createOutcomeRowHtml(selectedHermesMarket = "1X2") {
     `;
 }
 
-// Funkcija za dinamičko osvežavanje Hermes outcome dropdown-a kada se promeni Hermes market
+// Funkcija za dinamičko osvežavanje Internal outcome dropdown-a kada se promeni Hermes market
 function updateOutcomeDropdowns(container, hermesMarket) {
     const dropdowns = container.querySelectorAll('.hermes-outcome-select');
     const outcomesListForMarket = marketOutcomes[hermesMarket] || ["home", "draw", "away"];
-    const hermesOptionsHtml = `<option value="" disabled selected>Select Hermes outcome...</option>` + 
+    const hermesOptionsHtml = `<option value="" disabled selected>Select Internal outcome...</option>` + 
         outcomesListForMarket.map(o => `<option value="${o}">${o}</option>`).join('');
     
     dropdowns.forEach(select => {
@@ -306,7 +306,7 @@ addMappingBtn.addEventListener('click', function() {
         
         <div class="form-row">
             <div class="form-group" style="flex: 2;">
-                <label>Choose Hermes Market</label>
+                <label>Choose Internal Market</label>
                 <select class="hermes-market-select">
                     <option value="" disabled selected>Select a market...</option>
                     <option value="1X2">1X2</option>
@@ -398,7 +398,7 @@ addMappingBtn.addEventListener('click', function() {
     const cancelSingleMappingBtn = newSection.querySelector('.btn-cancel-single-mapping');
     const saveSingleMappingBtn = newSection.querySelector('.btn-save-single-mapping');
  
-    // Kada se izabere Hermes Market
+    // Kada se izabere Internal Market
     selectMarket.addEventListener('change', function() {
         if(this.value) {
             marketTypeDisplay.value = hermesMarketTypes[this.value] || "Unknown";
@@ -490,7 +490,7 @@ addMappingBtn.addEventListener('click', function() {
  
     saveSingleMappingBtn.addEventListener('click', () => {
         const selectedMarket = selectMarket.value;
-        alert(`Mapping #${currentMappingId} for Hermes Market "${selectedMarket}" has been saved!`);
+        alert(`Mapping #${currentMappingId} for Internal Market "${selectedMarket}" has been saved!`);
     });
 
     dynamicSections.appendChild(newSection);

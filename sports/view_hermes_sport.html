@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hermes Sport Overview</title>
+    <title>Sport Overview</title>
     <!-- Lokalni i globalni CSS -->
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="../style.css">
+    <script src="../auth.js"></script>
 </head>
 <body>
 
@@ -16,20 +17,20 @@
     <!-- GLAVNI SADRŽAJ -->
     <div class="main-content">
         <header class="main-header" style="background-color: #17a2b8; color: white;">
-            <h1>Hermes Sport Overview</h1>
-            <p class="page-subtitle">Inspect a Hermes sport and the provider sports mapped to it.</p>
+            <h1>Sport Overview</h1>
+            <p class="page-subtitle">Inspect a sport and the provider sports mapped to it.</p>
         </header>
 
         <main class="split-layout">
             <div class="form-side">
                 <div style="margin-bottom: 20px;">
-                    <a href="hermes_sports.html" class="btn-secondary" style="text-decoration: none; display: inline-block;">&larr; Back to Hermes Sports</a>
+                    <a href="hermes_sports.html" class="btn-secondary" style="text-decoration: none; display: inline-block;">&larr; Back to Sports</a>
                 </div>
 
                 <!-- Zaglavlje sa detaljima o sportu -->
                 <section class="top-bar" style="display: block; background-color: white; padding: 25px; border-radius: 8px; border: 1px solid #e0e0e0;">
                     <h2 style="margin-bottom: 15px; color: #2c3e50; font-size: 24px;">
-                        Hermes Sport: <span id="displaySportName" style="color: #17a2b8;"></span>
+                        Sport: <span id="displaySportName" style="color: #17a2b8;"></span>
                     </h2>
                     <div style="display: flex; gap: 30px; border-top: 1px dashed #ccc; padding-top: 15px;">
                         <p style="font-size: 16px; color: #555;">Sport ID: <strong id="displaySportId" style="color: #333;"></strong></p>
@@ -40,7 +41,7 @@
                 <!-- Tabela mapiranih provider sportova -->
                 <section class="markets-section" style="margin-top: 25px; padding: 25px; background: white; border-radius: 8px; border: 1px solid #e0e0e0;">
                     <h3 style="margin-bottom: 20px; color: #333; font-size: 18px; border-bottom: 1px solid #eee; padding-bottom: 10px;">Mapped Provider Sports</h3>
-                    <p style="margin-bottom: 15px; font-size: 14px; color: #666;">Lista sportova od različitih provajdera koji su izmapirani na ovaj Hermes sport.</p>
+                    <p style="margin-bottom: 15px; font-size: 14px; color: #666;">Lista sportova od različitih provajdera koji su izmapirani na ovaj sport.</p>
                     
                     <table class="markets-table" style="margin-bottom: 25px;">
                         <thead>
@@ -57,24 +58,6 @@
                     </table>
                 </section>
             </div>
-
-            <aside class="info-side">
-                <div class="sticky-info">
-                    <h3 class="side-title">Business Guidelines</h3>
-                    <div class="info-block">
-                        <h4>Struktura Hermes Sporta</h4>
-                        <p>Prikaz standardizovanih detalja za izabrani interni sport. Ovde vidimo jedinstveni Hermes ID i sistemsku skraćenicu.</p>
-                    </div>
-                    <div class="info-block">
-                        <h4>Mapiranja Provajdera</h4>
-                        <p>Prikaz svih provajderskih sportskih feed-ova koji su preusmereni na ovaj interni sport. Na primer, provajderov "Football" i provajderov "Soccer" se oba mapiraju na naš interni "Soccer".</p>
-                    </div>
-                    <div class="info-block">
-                        <h4>Upravljanje Konekcijama</h4>
-                        <p>Dugme <strong>Edit Mapping</strong> vas vodi direktno na formu gde možete promeniti ili raskinuti vezu između provajderskog sporta i našeg Hermes sporta.</p>
-                    </div>
-                </div>
-            </aside>
         </main>
     </div>
 
@@ -92,7 +75,7 @@
             document.getElementById('displaySportName').textContent = sportName;
             document.getElementById('displaySportAbbr').textContent = sportAbbr;
 
-            // Mock podaci: Koji provajder sportovi pokazuju na ovaj Hermes sport
+            // Mock podaci: koji provajder sportovi pokazuju na ovaj sport
             const reverseMappings = {
                 "Soccer": [
                     { provider: "ExeFeed", provId: "-", provName: "Soccer" },
@@ -107,7 +90,7 @@
             const listContainer = document.getElementById('providerSportsList');
 
             if (mappedList.length === 0) {
-                listContainer.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #888; font-style: italic;">No provider sports mapped to this Hermes sport yet.</td></tr>';
+                listContainer.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #888; font-style: italic;">No provider sports mapped to this sport yet.</td></tr>';
             } else {
                 mappedList.forEach(prov => {
                     const tr = document.createElement('tr');

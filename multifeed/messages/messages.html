@@ -3,18 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Multifeed Messages</title>
+    <title>View Events</title>
     <link rel="stylesheet" href="../../style.css">
     <link rel="stylesheet" href="messages_style.css">
+    <script src="../../auth.js"></script>
 </head>
 <body>
 
-    <div id="sidebar-container" data-root="../.." data-active="multifeed-messages" data-service="multifeed"></div>
+    <div id="sidebar-container" data-root="../.." data-active="view-events" data-service="sportsbook"></div>
 
     <div class="main-content">
         <header class="main-header">
-            <h1>Multifeed System Messages</h1>
-            <p class="page-subtitle">Search, filter and inspect incoming multifeed messages.</p>
+            <h1>View Events</h1>
+            <p class="page-subtitle">Search, filter and inspect incoming event messages.</p>
         </header>
 
         <main class="split-layout">
@@ -121,23 +122,6 @@
                 </section>
             </div>
 
-            <aside class="info-side">
-                <div class="sticky-info">
-                    <h3 class="side-title">Business Guidelines</h3>
-                    <div class="info-block">
-                        <h4>Sistemske Poruke (Multifeed Messages)</h4>
-                        <p>Ovaj panel služi za praćenje sirovih poruka koje ulaze u naš sistem u realnom vremenu. Pomaže u otklanjanju grešaka na konekcijama.</p>
-                    </div>
-                    <div class="info-block">
-                        <h4>Grupisanje (Group by Event)</h4>
-                        <p><strong>Uključeno:</strong> Prikazuje listu jedinstvenih utakmica/događaja i njihov trenutni status.<br><strong>Isključeno:</strong> Prikazuje hronološki spisak svih pojedinačnih poruka/paketa koji su stigli od provajdera.</p>
-                    </div>
-                    <div class="info-block">
-                        <h4>Statusi mečeva (Match Statuses)</h4>
-                        <p>Kvote se automatski zaustavljaju ili suspenduju na osnovu statusa događaja (npr. Suspended, Interrupted, Abandoned).</p>
-                    </div>
-                </div>
-            </aside>
         </main>
     </div>
 

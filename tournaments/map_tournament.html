@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Map Tournament</title>
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="../sports/style.css">
+    <script src="../auth.js"></script>
+</head>
+<body>
+
+    <div id="sidebar-container" data-root=".." data-active="tournament-mapping" data-service="sportsbook"></div>
+    <script src="../sidebar.js"></script>
+
+    <div class="main-content">
+        <header class="main-header">
+            <h1>Map Provider Tournament</h1>
+            <p class="page-subtitle">Connect a provider tournament to the correct internal tournament.</p>
+        </header>
+
+        <main class="split-layout">
+            <div class="form-side">
+                <div style="margin-bottom: 20px;">
+                    <a href="tournament_mapping.html" class="btn-secondary" style="text-decoration: none; display: inline-block;">&larr; Back to list</a>
+                </div>
+
+                <div class="info-section">
+                    <h2>Connect to Internal Tournament</h2>
+                    <p class="provider-text">Provider: <strong id="displayProvider"></strong></p>
+                </div>
+
+                <section class="section-card">
+                    <h3 class="section-title">Mapping Configuration</h3>
+                    <div class="form-row" style="align-items: flex-end; gap: 18px;">
+                        <div class="form-column" style="flex: 1;">
+                            <div class="form-group">
+                                <label>Provider Sport</label>
+                                <input type="text" id="displaySport" readonly style="background-color: #f9f9f9; color: #555; font-weight: 500;">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Provider Category</label>
+                                <input type="text" id="displayCategory" readonly style="background-color: #f9f9f9; color: #555; font-weight: 500;">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Provider Tournament ID</label>
+                                <input type="text" id="displayProvId" readonly style="background-color: #f9f9f9; color: #555; font-weight: 500;">
+                            </div>
+
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label>Provider Tournament Name</label>
+                                <input type="text" id="displayProvName" readonly style="background-color: #f9f9f9; color: #555; font-weight: 500;">
+                            </div>
+                        </div>
+
+                        <div style="padding: 0 4px 12px; font-weight: bold; color: #888;">
+                            &rarr;
+                        </div>
+
+                        <div class="form-column" style="flex: 1;">
+                            <div class="form-group">
+                                <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+                                    <label>Internal Sport</label>
+                                    <a href="../sports/create_sport.html" class="btn-secondary" style="padding: 6px 10px; text-decoration: none; display: inline-block;">New</a>
+                                </div>
+                                <select id="internalSportSelect">
+                                    <option value="" disabled selected>Select sport</option>
+                                    <option value="Soccer">Soccer</option>
+                                    <option value="Basketball">Basketball</option>
+                                    <option value="Tennis">Tennis</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+                                    <label>Internal Category</label>
+                                    <a href="../categories/create_category.html" class="btn-secondary" style="padding: 6px 10px; text-decoration: none; display: inline-block;">New</a>
+                                </div>
+                                <select id="internalCategorySelect" disabled>
+                                    <option value="" disabled selected>Select sport first</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+                                    <label>Internal Tournament</label>
+                                    <a href="create_tournament.html" class="btn-secondary" style="padding: 6px 10px; text-decoration: none; display: inline-block;">New</a>
+                                </div>
+                                <input type="text" id="internalTournamentSearch" placeholder="Search tournaments..." style="margin-bottom: 8px;">
+                                <select id="internalTournamentSelect" disabled>
+                                    <option value="" disabled selected>Select category first</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <div class="actions-bar">
+                    <button id="saveMappingBtn" class="btn-primary">Save Mapping</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const provider = urlParams.get('provider') || 'Unknown Provider';
+            const sport = urlParams.get('sport') || 'Unknown Sport';
+            const category = urlParams.get('category') || 'Unknown Category';
+            const provId = urlParams.get('provId') || '-';
+            const provName = urlParams.get('provName') || 'Unknown Tournament';
+            const internalId = urlParams.get('internalId');
+            const internalSportSelect = document.getElementById('internalSportSelect');
+            const internalCategorySelect = document.getElementById('internalCategorySelect');
+            const internalTournamentSelect = document.getElementById('internalTournamentSelect');
+            const internalTournamentSearch = document.getElementById('internalTournamentSearch');
+            const internalTournaments = [
+                { sport: "Soccer", category: "England", id: "T-001", name: "Premier League" },
+                { sport: "Soccer", category: "England", id: "T-002", name: "Championship" },
+                { sport: "Soccer", category: "England", id: "T-003", name: "League One" },
+                { sport: "Soccer", category: "England", id: "T-004", name: "League Two" },
+                { sport: "Soccer", category: "Spain", id: "T-005", name: "LaLiga" },
+                { sport: "Soccer", category: "Spain", id: "T-006", name: "LaLiga 2" },
+                { sport: "Soccer", category: "Spain", id: "T-007", name: "Primera Federacion" },
+                { sport: "Soccer", category: "Germany", id: "T-008", name: "Bundesliga" },
+                { sport: "Soccer", category: "Italy", id: "T-009", name: "Serie A" },
+                { sport: "Soccer", category: "France", id: "T-010", name: "Ligue 1" },
+                { sport: "Soccer", category: "Serbia", id: "T-011", name: "SuperLiga" },
+                { sport: "Basketball", category: "Germany", id: "T-012", name: "BBL" },
+                { sport: "Tennis", category: "France", id: "T-013", name: "Roland Garros" }
+            ];
+
+            document.getElementById('displayProvider').textContent = provider;
+            document.getElementById('displaySport').value = sport;
+            document.getElementById('displayCategory').value = category;
+            document.getElementById('displayProvId').value = provId;
+            document.getElementById('displayProvName').value = provName;
+
+            function categoriesForSport(selectedSport) {
+                return [...new Set(internalTournaments
+                    .filter(tournament => tournament.sport === selectedSport)
+                    .map(tournament => tournament.category))];
+            }
+
+            function renderCategories() {
+                const currentValue = internalCategorySelect.value;
+                const selectedSport = internalSportSelect.value;
+                internalCategorySelect.innerHTML = '';
+                internalCategorySelect.disabled = !selectedSport;
+
+                if (!selectedSport) {
+                    internalCategorySelect.innerHTML = '<option value="" disabled selected>Select sport first</option>';
+                    renderTournaments();
+                    return;
+                }
+
+                internalCategorySelect.innerHTML = '<option value="" disabled selected>Select category</option>';
+                categoriesForSport(selectedSport).forEach(categoryName => {
+                    const option = document.createElement('option');
+                    option.value = categoryName;
+                    option.textContent = categoryName;
+                    internalCategorySelect.appendChild(option);
+                });
+
+                if (Array.from(internalCategorySelect.options).some(option => option.value === currentValue)) {
+                    internalCategorySelect.value = currentValue;
+                }
+
+                renderTournaments();
+            }
+
+            function renderTournaments(searchValue = '') {
+                const currentValue = internalTournamentSelect.value;
+                const selectedSport = internalSportSelect.value;
+                const selectedCategory = internalCategorySelect.value;
+                const normalizedSearch = searchValue.toLowerCase();
+                internalTournamentSelect.innerHTML = '';
+                internalTournamentSelect.disabled = !selectedSport || !selectedCategory;
+
+                if (!selectedSport || !selectedCategory) {
+                    internalTournamentSelect.innerHTML = '<option value="" disabled selected>Select category first</option>';
+                    return;
+                }
+
+                internalTournamentSelect.innerHTML = '<option value="" disabled selected>Select tournament</option>';
+                internalTournaments
+                    .filter(tournament => tournament.sport === selectedSport && tournament.category === selectedCategory)
+                    .filter(tournament => tournament.name.toLowerCase().includes(normalizedSearch) || tournament.id.toLowerCase().includes(normalizedSearch))
+                    .forEach(tournament => {
+                        const option = document.createElement('option');
+                        option.value = tournament.id;
+                        option.textContent = tournament.name;
+                        internalTournamentSelect.appendChild(option);
+                    });
+
+                if (Array.from(internalTournamentSelect.options).some(option => option.value === currentValue)) {
+                    internalTournamentSelect.value = currentValue;
+                }
+            }
+
+            internalSportSelect.addEventListener('change', () => {
+                internalTournamentSearch.value = '';
+                renderCategories();
+            });
+            internalCategorySelect.addEventListener('change', () => {
+                internalTournamentSearch.value = '';
+                renderTournaments();
+            });
+            internalTournamentSearch.addEventListener('input', () => {
+                renderTournaments(internalTournamentSearch.value);
+            });
+
+            if (internalId) {
+                const existingTournament = internalTournaments.find(tournament => tournament.id === internalId);
+                if (existingTournament) {
+                    internalSportSelect.value = existingTournament.sport;
+                    renderCategories();
+                    internalCategorySelect.value = existingTournament.category;
+                    renderTournaments();
+                    internalTournamentSelect.value = internalId;
+                }
+            } else if (["Soccer", "Basketball", "Tennis"].includes(sport)) {
+                internalSportSelect.value = sport;
+                renderCategories();
+                if (categoriesForSport(sport).includes(category)) {
+                    internalCategorySelect.value = category;
+                    renderTournaments();
+                }
+            } else {
+                renderCategories();
+            }
+
+            document.getElementById('saveMappingBtn').addEventListener('click', () => {
+                if(!internalSportSelect.value || !internalCategorySelect.value || !internalTournamentSelect.value) {
+                    alert('Please select an internal sport, category and tournament before saving.');
+                    return;
+                }
+                alert(`Mapping saved successfully! Provider tournament "${provName}" is now mapped to an internal tournament.`);
+                window.location.href = 'tournament_mapping.html';
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Tournament</title>
+    <link rel="stylesheet" href="../sports/style.css">
+    <link rel="stylesheet" href="../style.css">
+    <script src="../auth.js"></script>
+</head>
+<body>
+
+    <div id="sidebar-container" data-root=".." data-active="tournament-management" data-service="sportsbook"></div>
+    <script src="../sidebar.js"></script>
+
+    <div class="main-content">
+        <header class="main-header" style="background-color: #17a2b8;">
+            <h1 id="pageMainTitle">Create Tournament</h1>
+            <p class="page-subtitle">Create or update a tournament with sport and category.</p>
+        </header>
+
+        <main class="split-layout">
+            <div class="form-side">
+                <div style="margin-bottom: 20px;">
+                    <a href="tournament.html" class="btn-secondary" style="text-decoration: none; display: inline-block;">&larr; Back to list</a>
+                </div>
+
+                <div class="info-section">
+                    <h2 id="pageSubTitle">Define a new Tournament</h2>
+                </div>
+
+                <section class="section-card">
+                    <h3 class="section-title">Tournament Details</h3>
+                    <div class="form-column">
+                        <div class="form-group">
+                            <label for="sportSelect">Sport</label>
+                            <select id="sportSelect">
+                                <option value="" disabled selected>Select sport</option>
+                                <option value="Soccer">Soccer</option>
+                                <option value="Basketball">Basketball</option>
+                                <option value="Tennis">Tennis</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="categorySelect">Category</label>
+                            <select id="categorySelect">
+                                <option value="" disabled selected>Select category</option>
+                                <option value="England">England</option>
+                                <option value="Spain">Spain</option>
+                                <option value="Germany">Germany</option>
+                                <option value="Italy">Italy</option>
+                                <option value="France">France</option>
+                                <option value="Serbia">Serbia</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="tournamentName">Tournament Name</label>
+                            <input type="text" id="tournamentName" placeholder="e.g. Premier League">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="primaryFeedSelect">Primary Feed</label>
+                            <select id="primaryFeedSelect">
+                                <option value="" disabled selected>Select primary feed</option>
+                                <option value="EXE">EXE</option>
+                                <option value="SR">SR</option>
+                                <option value="BG">BG</option>
+                            </select>
+                        </div>
+                    </div>
+                </section>
+
+                <div class="actions-bar">
+                    <button id="saveTournamentBtn" class="btn-primary">Save tournament</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const isEdit = urlParams.get('edit') === 'true';
+            const editId = urlParams.get('id') || 'auto-generated';
+            const editName = urlParams.get('name');
+            const editSport = urlParams.get('sport');
+            const editCategory = urlParams.get('category');
+            const editPrimaryFeed = urlParams.get('primaryFeed');
+
+            if (isEdit) {
+                document.getElementById('pageMainTitle').textContent = 'Edit Tournament';
+                document.getElementById('pageSubTitle').textContent = 'Update existing Tournament';
+                document.getElementById('saveTournamentBtn').textContent = 'Update tournament';
+                document.title = 'Edit Tournament';
+
+                if (editName) document.getElementById('tournamentName').value = editName;
+                if (editSport) document.getElementById('sportSelect').value = editSport;
+                if (editCategory) document.getElementById('categorySelect').value = editCategory;
+                if (editPrimaryFeed) document.getElementById('primaryFeedSelect').value = editPrimaryFeed;
+            }
+
+            document.getElementById('saveTournamentBtn').addEventListener('click', () => {
+                const name = document.getElementById('tournamentName').value.trim();
+                const sport = document.getElementById('sportSelect').value;
+                const category = document.getElementById('categorySelect').value;
+                const primaryFeed = document.getElementById('primaryFeedSelect').value;
+
+                if (!name || !sport || !category || !primaryFeed) {
+                    alert("Please fill in all fields.");
+                    return;
+                }
+
+                const actionText = isEdit ? "updated" : "created";
+                const idText = isEdit ? ` (${editId})` : '';
+                alert(`Tournament "${name}"${idText} successfully ${actionText}!`);
+                window.location.href = 'tournament.html';
+            });
+        });
+    </script>
+</body>
+</html>

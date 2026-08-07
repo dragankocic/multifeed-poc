@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Category Overview</title>
+    <link rel="stylesheet" href="../sports/style.css">
+    <link rel="stylesheet" href="../style.css">
+    <script src="../auth.js"></script>
+</head>
+<body>
+
+    <div id="sidebar-container" data-root=".." data-active="category-management" data-service="sportsbook"></div>
+    <script src="../sidebar.js"></script>
+
+    <div class="main-content">
+        <header class="main-header" style="background-color: #17a2b8; color: white;">
+            <h1>Category Overview</h1>
+            <p class="page-subtitle">Inspect a category and its basic data.</p>
+        </header>
+
+        <main class="split-layout">
+            <div class="form-side">
+                <div style="margin-bottom: 20px;">
+                    <a href="category.html" class="btn-secondary" style="text-decoration: none; display: inline-block;">&larr; Back to Categories</a>
+                </div>
+
+                <section class="top-bar" style="display: block; background-color: white; padding: 25px; border-radius: 8px; border: 1px solid #e0e0e0;">
+                    <h2 style="margin-bottom: 15px; color: #2c3e50; font-size: 24px;">
+                        Category: <span id="displayCategoryName" style="color: #17a2b8;"></span>
+                    </h2>
+                    <div style="display: flex; gap: 30px; border-top: 1px dashed #ccc; padding-top: 15px;">
+                        <p style="font-size: 16px; color: #555;">Category ID: <strong id="displayCategoryId" style="color: #333;"></strong></p>
+                        <p style="font-size: 16px; color: #555;">Name: <strong id="displayCategoryNameInline" style="color: #333;"></strong></p>
+                    </div>
+                </section>
+
+                <section class="markets-section" style="margin-top: 25px; padding: 25px; background: white; border-radius: 8px; border: 1px solid #e0e0e0;">
+                    <h3 style="margin-bottom: 20px; color: #333; font-size: 18px; border-bottom: 1px solid #eee; padding-bottom: 10px;">Mapped Provider Categories</h3>
+                    <p style="margin-bottom: 15px; font-size: 14px; color: #666;">Provider category values currently connected to this internal category.</p>
+
+                    <table class="markets-table" style="margin-bottom: 25px;">
+                        <thead>
+                            <tr>
+                                <th>Provider</th>
+                                <th>Provider Category ID</th>
+                                <th>Provider Category Name</th>
+                                <th style="text-align: right;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="providerCategoriesList"></tbody>
+                    </table>
+                </section>
+
+                <div style="margin-top: 25px;">
+                    <a id="editCategoryLink" href="#" class="btn-primary" style="text-decoration: none; display: inline-block;">Edit Category</a>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="../pagination.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const categoryId = urlParams.get('id') || '-';
+            const categoryName = urlParams.get('name') || 'Unknown Category';
+
+            document.getElementById('displayCategoryId').textContent = categoryId;
+            document.getElementById('displayCategoryName').textContent = categoryName;
+            document.getElementById('displayCategoryNameInline').textContent = categoryName;
+            document.getElementById('editCategoryLink').href = `create_category.html?edit=true&id=${encodeURIComponent(categoryId)}&name=${encodeURIComponent(categoryName)}`;
+
+            const providerCategoryMappings = {
+                "England": [
+                    { provider: "ExeFeed", providerId: "cat:eng", providerName: "England" },
+                    { provider: "SportRadar", providerId: "sr:category:1", providerName: "England" },
+                    { provider: "Bet Genius", providerId: "BG-ENG", providerName: "English Competitions" }
+                ],
+                "Spain": [
+                    { provider: "ExeFeed", providerId: "cat:esp", providerName: "Spain" },
+                    { provider: "SportRadar", providerId: "sr:category:32", providerName: "Spain" },
+                    { provider: "IMG Arena", providerId: "IMG-ES", providerName: "Spanish Football" }
+                ],
+                "Germany": [
+                    { provider: "ExeFeed", providerId: "cat:deu", providerName: "Germany" },
+                    { provider: "SportRadar", providerId: "sr:category:30", providerName: "Germany" },
+                    { provider: "LSports", providerId: "LS-DE", providerName: "Deutschland" }
+                ],
+                "Italy": [
+                    { provider: "ExeFeed", providerId: "cat:ita", providerName: "Italy" },
+                    { provider: "SportRadar", providerId: "sr:category:31", providerName: "Italy" },
+                    { provider: "Bet Construct", providerId: "BC-IT", providerName: "Italia" }
+                ],
+                "France": [
+                    { provider: "ExeFeed", providerId: "cat:fra", providerName: "France" },
+                    { provider: "SportRadar", providerId: "sr:category:7", providerName: "France" },
+                    { provider: "Bet Genius", providerId: "BG-FR", providerName: "French Competitions" }
+                ],
+                "Serbia": [
+                    { provider: "ExeFeed", providerId: "cat:srb", providerName: "Serbia" },
+                    { provider: "SportRadar", providerId: "sr:category:152", providerName: "Serbia" },
+                    { provider: "LSports", providerId: "LS-RS", providerName: "Serbia" }
+                ]
+            };
+
+            const mappedList = providerCategoryMappings[categoryName] || [];
+            const listContainer = document.getElementById('providerCategoriesList');
+
+            if (mappedList.length === 0) {
+                listContainer.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #888; font-style: italic;">No provider categories mapped to this category yet.</td></tr>';
+            } else {
+                mappedList.forEach(providerCategory => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td style="font-weight: 500;">${providerCategory.provider}</td>
+                        <td style="color: #6c757d;">${providerCategory.providerId}</td>
+                        <td style="color: #007bff; font-weight: 500;">${providerCategory.providerName}</td>
+                        <td style="text-align: right;">
+                            <button type="button" class="btn-action" style="background-color: #17a2b8; border: none;">Edit Mapping</button>
+                        </td>
+                    `;
+                    listContainer.appendChild(tr);
+                });
+            }
+        });
+    </script>
+</body>
+</html>

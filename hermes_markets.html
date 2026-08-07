@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hermes Markets Dashboard</title>
+    <title>Markets</title>
     <link rel="stylesheet" href="style.css">
+    <script src="auth.js"></script>
 </head>
 <body>
 
@@ -12,8 +13,8 @@
 
     <div class="main-content">
         <header class="main-header">
-            <h1>Hermes Markets Dashboard</h1>
-            <p class="page-subtitle">Manage standardized Hermes market definitions by sport and market type.</p>
+            <h1>Markets</h1>
+            <p class="page-subtitle">Manage standardized market definitions by sport and market type.</p>
         </header>
 
         <main class="split-layout">
@@ -63,30 +64,13 @@
                                 <th style="text-align: right;">Action</th>
                             </tr>
                         </thead>
-                        <tbody id="hermesMarketsBody">
+                        <tbody id="marketsBody">
                             <!-- Dinamički se puni JS-om -->
                         </tbody>
                     </table>
                 </section>
             </div>
 
-            <aside class="info-side">
-                <div class="sticky-info">
-                    <h3 class="side-title">Business Guidelines</h3>
-                    <div class="info-block">
-                        <h4>Registar Standardnih Marketa</h4>
-                        <p>Hermes standardni marketi predstavljaju jedinstvenu specifikaciju marketa klađenja. Svi dolazni marketi sa provajdera se prevode u ovaj format.</p>
-                    </div>
-                    <div class="info-block">
-                        <h4>Kategorizacija (Market Type)</h4>
-                        <p><strong>Regular:</strong> Ishod meča, hendikep i zbrojevi.<br><strong>Statistics:</strong> Korneri, kartoni, faulovi i ostala statistika.<br><strong>Player Props:</strong> Individualni učinak igrača.<br><strong>Outright:</strong> Dugoročna tržišta.</p>
-                    </div>
-                    <div class="info-block">
-                        <h4>Kreiranje Marketa</h4>
-                        <p>Možete definisati potpuno novi Hermes market preko dugmeta <strong>Add Market</strong>, uključujući njegove ishode i specifikatore.</p>
-                    </div>
-                </div>
-            </aside>
         </main>
     </div>
 
@@ -94,13 +78,13 @@
     <script src="sidebar.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const hermesMarketsBody = document.getElementById('hermesMarketsBody');
+            const marketsBody = document.getElementById('marketsBody');
             const sportSelect = document.getElementById('sportSelect');
             const typeSelect = document.getElementById('typeSelect');
             const searchInput = document.getElementById('searchInput');
 
             // IZMENJENO: Total Goals je sada tipa Statistics
-            const hermesMarkets = [
+            const markets = [
                 { id: "HRM-001", name: "1X2", desc: "Home, Draw, Away match winner", type: "Regular", sport: "Soccer" },
                 { id: "HRM-002", name: "Asian Handicap", desc: "Handicap betting for the match", type: "Regular", sport: "Soccer" },
                 { id: "HRM-003", name: "Total Goals", desc: "Over/Under total goals", type: "Statistics", sport: "Soccer" },
@@ -108,14 +92,14 @@
                 { id: "HRM-005", name: "Total Corners", desc: "Over/Under total corners in the match", type: "Statistics", sport: "Soccer" }
             ];
 
-            function renderHermesMarkets() {
-                hermesMarketsBody.innerHTML = ''; 
+            function renderMarkets() {
+                marketsBody.innerHTML = ''; 
 
                 const searchVal = searchInput.value.toLowerCase();
                 const sportVal = sportSelect.value;
                 const typeVal = typeSelect.value;
 
-                const filteredMarkets = hermesMarkets.filter(market => {
+                const filteredMarkets = markets.filter(market => {
                     const matchesSearch = market.name.toLowerCase().includes(searchVal) || market.id.toLowerCase().includes(searchVal);
                     const matchesSport = market.sport.toLowerCase() === sportVal.toLowerCase();
                     const matchesType = typeVal === 'all' || market.type === typeVal;
@@ -124,7 +108,7 @@
                 });
 
                 if (filteredMarkets.length === 0) {
-                    hermesMarketsBody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #888; font-style: italic;">No markets found matching the filters.</td></tr>';
+                    marketsBody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #888; font-style: italic;">No markets found matching the filters.</td></tr>';
                     return;
                 }
 
@@ -138,18 +122,19 @@
                         <td style="color: #555; font-size: 14px;">${market.desc}</td>
                         <td><span style="background: #e9ecef; padding: 4px 10px; border-radius: 4px; font-size: 13px; border: 1px solid #ccc;">${market.type}</span></td>
                         <td style="text-align: right;">
-                            <a href="view_hermes_market.html?id=${encodeURIComponent(market.id)}&market=${encodeURIComponent(market.name)}&sport=${encodeURIComponent(market.sport)}&type=${encodeURIComponent(market.type)}" class="btn-action" style="background-color: #007bff; text-decoration: none; display: inline-block;">View</a>
+                            <a href="view_hermes_market.html?id=${encodeURIComponent(market.id)}&market=${encodeURIComponent(market.name)}&sport=${encodeURIComponent(market.sport)}&type=${encodeURIComponent(market.type)}" class="btn-action" style="background-color: #007bff; text-decoration: none; display: inline-block; margin-right: 5px;">View</a>
+                            <a href="create_market/create_market.html?edit=true&id=${encodeURIComponent(market.id)}&market=${encodeURIComponent(market.name)}&sport=${encodeURIComponent(market.sport)}&type=${encodeURIComponent(market.type)}" class="btn-action" style="background-color: #17a2b8; text-decoration: none; display: inline-block;">Edit</a>
                         </td>
                     `;
-                    hermesMarketsBody.appendChild(row);
+                    marketsBody.appendChild(row);
                 });
             }
 
-            sportSelect.addEventListener('change', renderHermesMarkets);
-            typeSelect.addEventListener('change', renderHermesMarkets);
-            searchInput.addEventListener('input', renderHermesMarkets);
+            sportSelect.addEventListener('change', renderMarkets);
+            typeSelect.addEventListener('change', renderMarkets);
+            searchInput.addEventListener('input', renderMarkets);
 
-            renderHermesMarkets();
+            renderMarkets();
         });
     </script>
 </body>

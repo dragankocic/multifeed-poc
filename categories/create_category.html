@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Category</title>
+    <link rel="stylesheet" href="../sports/style.css">
+    <link rel="stylesheet" href="../style.css">
+    <script src="../auth.js"></script>
+</head>
+<body>
+
+    <div id="sidebar-container" data-root=".." data-active="category-management" data-service="sportsbook"></div>
+    <script src="../sidebar.js"></script>
+
+    <div class="main-content">
+        <header class="main-header" style="background-color: #17a2b8;">
+            <h1 id="pageMainTitle">Create Category</h1>
+            <p class="page-subtitle">Create or update a category name.</p>
+        </header>
+
+        <main class="split-layout">
+            <div class="form-side">
+                <div style="margin-bottom: 20px;">
+                    <a href="category.html" class="btn-secondary" style="text-decoration: none; display: inline-block;">&larr; Back to list</a>
+                </div>
+
+                <div class="info-section">
+                    <h2 id="pageSubTitle">Define a new Category</h2>
+                </div>
+
+                <section class="section-card">
+                    <h3 class="section-title">Category Details</h3>
+                    <div class="form-column">
+                        <div class="form-group">
+                            <label for="categoryName">Category Name</label>
+                            <input type="text" id="categoryName" placeholder="e.g. England">
+                        </div>
+                    </div>
+                </section>
+
+                <div class="actions-bar">
+                    <button id="saveCategoryBtn" class="btn-primary">Save category</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const isEdit = urlParams.get('edit') === 'true';
+            const editId = urlParams.get('id') || 'auto-generated';
+            const editName = urlParams.get('name');
+
+            if (isEdit) {
+                document.getElementById('pageMainTitle').textContent = 'Edit Category';
+                document.getElementById('pageSubTitle').textContent = 'Update existing Category';
+                document.getElementById('saveCategoryBtn').textContent = 'Update category';
+                document.title = 'Edit Category';
+
+                if (editName) document.getElementById('categoryName').value = editName;
+            }
+
+            document.getElementById('saveCategoryBtn').addEventListener('click', () => {
+                const name = document.getElementById('categoryName').value.trim();
+
+                if (!name) {
+                    alert("Please enter category name.");
+                    return;
+                }
+
+                const actionText = isEdit ? "updated" : "created";
+                const idText = isEdit ? ` (${editId})` : '';
+                alert(`Category "${name}"${idText} successfully ${actionText}!`);
+                window.location.href = 'category.html';
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Competitor Mapping</title>
+    <link rel="stylesheet" href="../style.css">
+    <script src="../auth.js"></script>
+</head>
+<body>
+
+    <div id="sidebar-container" data-root=".." data-active="competitor-mapping" data-service="sportsbook"></div>
+    <script src="../sidebar.js"></script>
+
+    <div class="main-content">
+        <header class="main-header">
+            <h1>Competitor Mapping</h1>
+            <p class="page-subtitle">Track and maintain mappings between provider competitors and internal competitors.</p>
+        </header>
+
+        <main class="split-layout">
+            <div class="form-side">
+                <div class="top-bar">
+                    <div class="filters">
+                        <div class="filter-group">
+                            <label for="providerSelect">Provider</label>
+                            <select id="providerSelect">
+                                <option value="all" selected>All</option>
+                                <option value="ExeFeed">ExeFeed</option>
+                                <option value="SportRadar">SportRadar</option>
+                                <option value="SportGenius">SportGenius</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="sportSelect">Sport</label>
+                            <select id="sportSelect">
+                                <option value="all" selected>All</option>
+                                <option value="Soccer">Soccer</option>
+                                <option value="Tennis">Tennis</option>
+                                <option value="Formula 1">Formula 1</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="statusSelect">Mapping status</label>
+                            <select id="statusSelect">
+                                <option value="all" selected>All</option>
+                                <option value="mapped">Mapped</option>
+                                <option value="unmapped">Unmapped</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="searchInput">Search</label>
+                            <input type="text" id="searchInput" placeholder="Search competitor..." style="padding: 10px 15px; border: 1px solid #ccc; border-radius: 4px; font-size: 15px; min-width: 220px; background-color: #fdfdfd;">
+                        </div>
+                    </div>
+                </div>
+
+                <section class="markets-section" style="overflow-x: auto;">
+                    <table class="markets-table" style="min-width: 1150px;">
+                        <thead>
+                            <tr>
+                                <th>Provider</th>
+                                <th>Sport</th>
+                                <th>Prov. Competitor ID</th>
+                                <th>Prov. Competitor Name</th>
+                                <th>Internal Competitor ID</th>
+                                <th>Internal Competitor Name</th>
+                                <th>Status</th>
+                                <th style="text-align: right; min-width: 150px;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="competitorsTableBody"></tbody>
+                    </table>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script src="../pagination.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const tableBody = document.getElementById("competitorsTableBody");
+            const providerSelect = document.getElementById("providerSelect");
+            const sportSelect = document.getElementById("sportSelect");
+            const statusSelect = document.getElementById("statusSelect");
+            const searchInput = document.getElementById("searchInput");
+            const providerCompetitors = [
+                { provider: "ExeFeed", sport: "Soccer", provId: "cmp:arsenal", provName: "Arsenal", internalId: "CP-001", internalName: "Arsenal", status: "Mapped" },
+                { provider: "ExeFeed", sport: "Soccer", provId: "cmp:man-city", provName: "Manchester City", internalId: "CP-002", internalName: "Manchester City", status: "Mapped" },
+                { provider: "ExeFeed", sport: "Soccer", provId: "cmp:liverpool", provName: "Liverpool", internalId: "-", internalName: "-", status: "Unmapped" },
+                { provider: "SportRadar", sport: "Soccer", provId: "sr:competitor:42", provName: "Arsenal FC", internalId: "CP-001", internalName: "Arsenal", status: "Mapped" },
+                { provider: "SportRadar", sport: "Soccer", provId: "sr:competitor:17", provName: "Manchester City FC", internalId: "CP-002", internalName: "Manchester City", status: "Mapped" },
+                { provider: "SportRadar", sport: "Tennis", provId: "sr:competitor:407573", provName: "Alcaraz, Carlos", internalId: "CP-007", internalName: "Carlos Alcaraz", status: "Mapped" },
+                { provider: "SportRadar", sport: "Formula 1", provId: "sr:competitor:7135", provName: "Max Verstappen", internalId: "CP-009", internalName: "Max Verstappen", status: "Mapped" },
+                { provider: "SportGenius", sport: "Soccer", provId: "sg-cmp-rma", provName: "Real Madrid CF", internalId: "CP-004", internalName: "Real Madrid", status: "Mapped" },
+                { provider: "SportGenius", sport: "Soccer", provId: "sg-cmp-fcb", provName: "FC Barcelona", internalId: "CP-005", internalName: "Barcelona", status: "Mapped" },
+                { provider: "SportGenius", sport: "Formula 1", provId: "sg-cmp-leclerc", provName: "Charles Leclerc", internalId: "-", internalName: "-", status: "Unmapped" }
+            ];
+
+            function renderCompetitors() {
+                tableBody.innerHTML = "";
+                const providerVal = providerSelect.value;
+                const sportVal = sportSelect.value;
+                const statusVal = statusSelect.value;
+                const searchVal = searchInput.value.toLowerCase();
+                const filteredCompetitors = providerCompetitors.filter(competitor => {
+                    const matchesProvider = providerVal === 'all' || competitor.provider === providerVal;
+                    const matchesSport = sportVal === 'all' || competitor.sport === sportVal;
+                    const matchesStatus = statusVal === 'all' || competitor.status.toLowerCase() === statusVal;
+                    const matchesSearch = competitor.provId.toLowerCase().includes(searchVal) ||
+                        competitor.provName.toLowerCase().includes(searchVal) ||
+                        competitor.internalId.toLowerCase().includes(searchVal) ||
+                        competitor.internalName.toLowerCase().includes(searchVal);
+                    return matchesProvider && matchesSport && matchesStatus && matchesSearch;
+                });
+
+                if (filteredCompetitors.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: #888; font-style: italic; padding: 20px;">No competitors found matching the filters.</td></tr>';
+                    return;
+                }
+
+                filteredCompetitors.forEach(competitor => {
+                    const row = document.createElement("tr");
+                    const badgeStyle = competitor.status === "Mapped"
+                        ? "background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb;"
+                        : "background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba;";
+                    const actionButton = competitor.status === "Mapped"
+                        ? `
+                            <a href="view_competitor.html?id=${encodeURIComponent(competitor.internalId)}&name=${encodeURIComponent(competitor.internalName)}&sport=${encodeURIComponent(competitor.sport)}" class="btn-action" style="background-color: #007bff; text-decoration: none; display: inline-block; margin-right: 5px;">View</a>
+                            <a href="map_competitor.html?provider=${encodeURIComponent(competitor.provider)}&sport=${encodeURIComponent(competitor.sport)}&provId=${encodeURIComponent(competitor.provId)}&provName=${encodeURIComponent(competitor.provName)}&internalId=${encodeURIComponent(competitor.internalId)}" class="btn-action" style="background-color: #17a2b8; text-decoration: none; display: inline-block;">Edit</a>
+                        `
+                        : `<a href="map_competitor.html?provider=${encodeURIComponent(competitor.provider)}&sport=${encodeURIComponent(competitor.sport)}&provId=${encodeURIComponent(competitor.provId)}&provName=${encodeURIComponent(competitor.provName)}" class="btn-action" style="text-decoration: none; display: inline-block;">Map</a>`;
+                    row.innerHTML = `
+                        <td style="font-weight: 500;">${competitor.provider}</td>
+                        <td>${competitor.sport}</td>
+                        <td style="color: #6c757d;">${competitor.provId}</td>
+                        <td class="market-name" style="color: #007bff;">${competitor.provName}</td>
+                        <td style="color: #6c757d;">${competitor.internalId}</td>
+                        <td style="font-weight: 500;">${competitor.internalName}</td>
+                        <td><span class="status-badge" style="${badgeStyle}">${competitor.status}</span></td>
+                        <td style="text-align: right;">${actionButton}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            }
+
+            providerSelect.addEventListener('change', renderCompetitors);
+            sportSelect.addEventListener('change', renderCompetitors);
+            statusSelect.addEventListener('change', renderCompetitors);
+            searchInput.addEventListener('input', renderCompetitors);
+            renderCompetitors();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tournaments</title>
+    <link rel="stylesheet" href="../sports/style.css">
+    <link rel="stylesheet" href="../style.css">
+    <script src="../auth.js"></script>
+</head>
+<body>
+
+    <div id="sidebar-container" data-root=".." data-active="tournament-management" data-service="sportsbook"></div>
+    <script src="../sidebar.js"></script>
+
+    <div class="main-content">
+        <header class="main-header" style="background-color: #17a2b8;">
+            <h1>Tournaments</h1>
+            <p class="page-subtitle">Manage tournaments by sport and category.</p>
+        </header>
+
+        <main class="split-layout">
+            <div class="form-side">
+                <div class="top-bar">
+                    <div class="filters">
+                        <div class="filter-group">
+                            <label for="sportFilter">Sport</label>
+                            <select id="sportFilter">
+                                <option value="all" selected>All</option>
+                                <option value="Soccer">Soccer</option>
+                                <option value="Basketball">Basketball</option>
+                                <option value="Tennis">Tennis</option>
+                            </select>
+                        </div>
+
+                        <div class="filter-group">
+                            <label for="categoryFilter">Category</label>
+                            <select id="categoryFilter">
+                                <option value="all" selected>All</option>
+                                <option value="England">England</option>
+                                <option value="Spain">Spain</option>
+                                <option value="Germany">Germany</option>
+                                <option value="Italy">Italy</option>
+                                <option value="France">France</option>
+                                <option value="Serbia">Serbia</option>
+                            </select>
+                        </div>
+
+                        <div class="filter-group">
+                            <label for="searchInput">Search Tournaments</label>
+                            <input type="text" id="searchInput" placeholder="Search by name or ID..." style="padding: 10px 15px; border: 1px solid #ccc; border-radius: 4px; font-size: 15px; min-width: 250px; background-color: #fdfdfd;">
+                        </div>
+                    </div>
+
+                    <div class="actions">
+                        <a href="create_tournament.html" class="btn-primary" style="text-decoration: none; display: inline-block;">Create Tournament</a>
+                    </div>
+                </div>
+
+                <section class="markets-section">
+                    <table class="markets-table">
+                        <thead>
+                            <tr>
+                                <th>Tournament ID</th>
+                                <th>Tournament Name</th>
+                                <th>Sport</th>
+                                <th>Category</th>
+                                <th>Primary Feed</th>
+                                <th style="text-align: right;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tournamentsBody"></tbody>
+                    </table>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" id="closeDeleteModalBtn">&times;</span>
+            <h3>Delete Tournament</h3>
+            <p id="deleteModalText" style="font-size: 14px; line-height: 1.5; color: #555; margin-bottom: 20px;"></p>
+            <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                <button id="cancelDeleteBtn" class="btn-secondary">Cancel</button>
+                <button id="confirmDeleteBtn" class="btn-primary" style="background-color: #dc3545;">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../pagination.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const tableBody = document.getElementById('tournamentsBody');
+            const searchInput = document.getElementById('searchInput');
+            const sportFilter = document.getElementById('sportFilter');
+            const categoryFilter = document.getElementById('categoryFilter');
+            const deleteModal = document.getElementById('deleteModal');
+            const closeDeleteModalBtn = document.getElementById('closeDeleteModalBtn');
+            const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+            const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+            const deleteModalText = document.getElementById('deleteModalText');
+            let tournamentToDelete = null;
+
+            let tournaments = [
+                { id: "T-001", name: "Premier League", sport: "Soccer", category: "England", primaryFeed: "EXE" },
+                { id: "T-002", name: "Championship", sport: "Soccer", category: "England", primaryFeed: "SR" },
+                { id: "T-003", name: "League One", sport: "Soccer", category: "England", primaryFeed: "SR" },
+                { id: "T-004", name: "League Two", sport: "Soccer", category: "England", primaryFeed: "EXE" },
+                { id: "T-005", name: "LaLiga", sport: "Soccer", category: "Spain", primaryFeed: "SR" },
+                { id: "T-006", name: "LaLiga 2", sport: "Soccer", category: "Spain", primaryFeed: "EXE" },
+                { id: "T-007", name: "Primera Federacion", sport: "Soccer", category: "Spain", primaryFeed: "BG" },
+                { id: "T-008", name: "Bundesliga", sport: "Soccer", category: "Germany", primaryFeed: "SR" },
+                { id: "T-009", name: "Serie A", sport: "Soccer", category: "Italy", primaryFeed: "BG" },
+                { id: "T-010", name: "Ligue 1", sport: "Soccer", category: "France", primaryFeed: "EXE" },
+                { id: "T-011", name: "SuperLiga", sport: "Soccer", category: "Serbia", primaryFeed: "EXE" },
+                { id: "T-012", name: "BBL", sport: "Basketball", category: "Germany", primaryFeed: "SR" },
+                { id: "T-013", name: "Roland Garros", sport: "Tennis", category: "France", primaryFeed: "BG" }
+            ];
+
+            function openDeleteModal(tournament) {
+                tournamentToDelete = tournament;
+                deleteModalText.textContent = `Are you sure you want to delete tournament "${tournament.name}" (${tournament.id})?`;
+                deleteModal.style.display = 'flex';
+            }
+
+            function closeDeleteModal() {
+                tournamentToDelete = null;
+                deleteModal.style.display = 'none';
+            }
+
+            function renderTournaments() {
+                tableBody.innerHTML = '';
+                const searchVal = searchInput.value.toLowerCase();
+                const sportVal = sportFilter.value;
+                const categoryVal = categoryFilter.value;
+                const filteredTournaments = tournaments.filter(tournament => {
+                    const matchesSearch = tournament.id.toLowerCase().includes(searchVal) ||
+                        tournament.name.toLowerCase().includes(searchVal);
+                    const matchesSport = sportVal === 'all' || tournament.sport === sportVal;
+                    const matchesCategory = categoryVal === 'all' || tournament.category === categoryVal;
+                    return matchesSearch && matchesSport && matchesCategory;
+                });
+
+                if (filteredTournaments.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #888; font-style: italic;">No tournaments found.</td></tr>';
+                    return;
+                }
+
+                filteredTournaments.forEach(tournament => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td style="font-weight: 500; color: #6c757d;">${tournament.id}</td>
+                        <td class="market-name">${tournament.name}</td>
+                        <td>${tournament.sport}</td>
+                        <td>${tournament.category}</td>
+                        <td>${tournament.primaryFeed}</td>
+                        <td style="text-align: right;">
+                            <a href="view_tournament.html?id=${encodeURIComponent(tournament.id)}&name=${encodeURIComponent(tournament.name)}&sport=${encodeURIComponent(tournament.sport)}&category=${encodeURIComponent(tournament.category)}&primaryFeed=${encodeURIComponent(tournament.primaryFeed)}" class="btn-action" style="background-color: #007bff; text-decoration: none; display: inline-block; margin-right: 5px;">View</a>
+                            <a href="create_tournament.html?edit=true&id=${encodeURIComponent(tournament.id)}&name=${encodeURIComponent(tournament.name)}&sport=${encodeURIComponent(tournament.sport)}&category=${encodeURIComponent(tournament.category)}&primaryFeed=${encodeURIComponent(tournament.primaryFeed)}" class="btn-action" style="background-color: #17a2b8; text-decoration: none; display: inline-block; margin-right: 5px;">Edit</a>
+                            <button type="button" class="btn-action delete-tournament-btn" style="background-color: #dc3545; border: none;" data-id="${tournament.id}">Delete</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+
+                document.querySelectorAll('.delete-tournament-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const tournament = tournaments.find(item => item.id === btn.dataset.id);
+                        if (tournament) openDeleteModal(tournament);
+                    });
+                });
+            }
+
+            searchInput.addEventListener('input', renderTournaments);
+            sportFilter.addEventListener('change', renderTournaments);
+            categoryFilter.addEventListener('change', renderTournaments);
+            closeDeleteModalBtn.addEventListener('click', closeDeleteModal);
+            cancelDeleteBtn.addEventListener('click', closeDeleteModal);
+            confirmDeleteBtn.addEventListener('click', () => {
+                if (!tournamentToDelete) return;
+                tournaments = tournaments.filter(tournament => tournament.id !== tournamentToDelete.id);
+                closeDeleteModal();
+                renderTournaments();
+            });
+            window.addEventListener('click', event => {
+                if (event.target === deleteModal) closeDeleteModal();
+            });
+
+            renderTournaments();
+        });
+    </script>
+</body>
+</html>

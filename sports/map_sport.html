@@ -7,6 +7,7 @@
     <!-- Povlačimo globalni CSS -->
     <link rel="stylesheet" href="../style.css">
     <link rel="stylesheet" href="style.css">
+    <script src="../auth.js"></script>
 </head>
 <body>
 
@@ -17,7 +18,7 @@
     <div class="main-content">
         <header class="main-header">
             <h1>Map Provider Sport</h1>
-            <p class="page-subtitle">Connect a provider sport to the correct Hermes sport.</p>
+            <p class="page-subtitle">Connect a provider sport to the correct internal sport.</p>
         </header>
 
         <main class="split-layout">
@@ -28,7 +29,7 @@
                 </div>
 
                 <div class="info-section">
-                    <h2>Connect to Hermes Sport</h2>
+                    <h2>Connect to Internal Sport</h2>
                     <p class="provider-text">Provider: <strong id="displayProvider"></strong></p>
                 </div>
 
@@ -47,11 +48,14 @@
                             &rarr;
                         </div>
 
-                        <!-- Desna strana (Hermes Selection) -->
+                        <!-- Desna strana (Internal Selection) -->
                         <div class="form-group" style="flex: 1; margin-bottom: 0;">
-                            <label>Choose Hermes Sport</label>
-                            <input type="text" id="hermesSportSearch" placeholder="Search sports..." style="margin-bottom: 8px;">
-                            <select id="hermesSportSelect">
+                            <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+                                <label>Choose Internal Sport</label>
+                                <a href="create_sport.html" class="btn-secondary" style="padding: 6px 10px; text-decoration: none; display: inline-block;">New</a>
+                            </div>
+                            <input type="text" id="internalSportSearch" placeholder="Search sports..." style="margin-bottom: 8px;">
+                            <select id="internalSportSelect">
                                 <option value="" disabled selected>Search sports...</option>
                                 <option value="S-001">Soccer (SOC)</option>
                                 <option value="S-002">Basketball (BKB)</option>
@@ -70,19 +74,6 @@
             </div>
 
             <!-- Uputstvo sa desne strane -->
-            <aside class="info-side">
-                <div class="sticky-info">
-                    <h3 class="side-title">Sport Mapping Guidelines</h3>
-                    <div class="info-block">
-                        <h4>1-to-1 Mapping</h4>
-                        <p>Za razliku od marketa, mapiranje sportova je jednostavno 1-na-1 povezivanje. Izaberite Provider sport i dodelite mu odgovarajući Hermes ekvivalent. Search polje iznad liste filtrira dostupne Hermes sportove.</p>
-                    </div>
-                    <div class="info-block">
-                        <h4>Hermes Sports Missing?</h4>
-                        <p>Ukoliko ne vidite traženi Hermes sport u padajućoj listi, prvo morate da ga kreirate u sekciji <strong>Sports -> Management</strong>.</p>
-                    </div>
-                </div>
-            </aside>
         </main>
     </div>
 
@@ -92,10 +83,10 @@
             const urlParams = new URLSearchParams(window.location.search);
             const provider = urlParams.get('provider') || 'Unknown Provider';
             const provName = urlParams.get('provName') || 'Unknown Sport';
-            const hermesId = urlParams.get('hermesId');
-            const hermesSportSelect = document.getElementById('hermesSportSelect');
-            const hermesSportSearch = document.getElementById('hermesSportSearch');
-            const allHermesOptions = Array.from(hermesSportSelect.options).map(option => ({
+            const internalId = urlParams.get('internalId');
+            const internalSportSelect = document.getElementById('internalSportSelect');
+            const internalSportSearch = document.getElementById('internalSportSearch');
+            const allInternalOptions = Array.from(internalSportSelect.options).map(option => ({
                 value: option.value,
                 text: option.textContent,
                 disabled: option.disabled,
@@ -105,41 +96,41 @@
             // Prikaz na formi
             document.getElementById('displayProvider').textContent = provider;
             document.getElementById('displayProvName').value = provName;
-            if (hermesId) {
-                hermesSportSelect.value = hermesId;
+            if (internalId) {
+                internalSportSelect.value = internalId;
             }
 
-            function renderHermesOptions(searchValue = '') {
-                const currentValue = hermesSportSelect.value;
+            function renderInternalOptions(searchValue = '') {
+                const currentValue = internalSportSelect.value;
                 const normalizedSearch = searchValue.toLowerCase();
-                hermesSportSelect.innerHTML = '';
+                internalSportSelect.innerHTML = '';
 
-                allHermesOptions.forEach(optionData => {
+                allInternalOptions.forEach(optionData => {
                     if (optionData.value && !optionData.text.toLowerCase().includes(normalizedSearch)) return;
 
                     const option = document.createElement('option');
                     option.value = optionData.value;
                     option.textContent = optionData.text;
                     option.disabled = optionData.disabled;
-                    hermesSportSelect.appendChild(option);
+                    internalSportSelect.appendChild(option);
                 });
 
-                if (Array.from(hermesSportSelect.options).some(option => option.value === currentValue)) {
-                    hermesSportSelect.value = currentValue;
+                if (Array.from(internalSportSelect.options).some(option => option.value === currentValue)) {
+                    internalSportSelect.value = currentValue;
                 }
             }
 
-            hermesSportSearch.addEventListener('input', () => {
-                renderHermesOptions(hermesSportSearch.value);
+            internalSportSearch.addEventListener('input', () => {
+                renderInternalOptions(internalSportSearch.value);
             });
 
             // Čuvanje mapiranja
             document.getElementById('saveMappingBtn').addEventListener('click', () => {
-                if(!hermesSportSelect.value) {
-                    alert('Please select a Hermes sport before saving.');
+                if(!internalSportSelect.value) {
+                    alert('Please select an internal sport before saving.');
                     return;
                 }
-                alert(`Mapping saved successfully! Provider "${provName}" is now mapped to Hermes sport.`);
+                alert(`Mapping saved successfully! Provider "${provName}" is now mapped to an internal sport.`);
                 window.location.href = 'sports_mapping.html';
             });
         });

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Map Competitor</title>
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="../sports/style.css">
+    <script src="../auth.js"></script>
+</head>
+<body>
+
+    <div id="sidebar-container" data-root=".." data-active="competitor-mapping" data-service="sportsbook"></div>
+    <script src="../sidebar.js"></script>
+
+    <div class="main-content">
+        <header class="main-header">
+            <h1>Map Provider Competitor</h1>
+            <p class="page-subtitle">Connect a provider competitor to the correct internal competitor.</p>
+        </header>
+
+        <main class="split-layout">
+            <div class="form-side">
+                <div style="margin-bottom: 20px;">
+                    <a href="competitor_mapping.html" class="btn-secondary" style="text-decoration: none; display: inline-block;">&larr; Back to list</a>
+                </div>
+                <div class="info-section">
+                    <h2>Connect to Internal Competitor</h2>
+                    <p class="provider-text">Provider: <strong id="displayProvider"></strong></p>
+                </div>
+                <section class="section-card">
+                    <h3 class="section-title">Mapping Configuration</h3>
+                    <div class="form-row" style="align-items: flex-end; gap: 18px;">
+                        <div class="form-column" style="flex: 1;">
+                            <div class="form-group">
+                                <label>Provider Sport</label>
+                                <input type="text" id="displaySport" readonly style="background-color: #f9f9f9; color: #555; font-weight: 500;">
+                            </div>
+                            <div class="form-group">
+                                <label>Provider Competitor ID</label>
+                                <input type="text" id="displayProvId" readonly style="background-color: #f9f9f9; color: #555; font-weight: 500;">
+                            </div>
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label>Provider Competitor Name</label>
+                                <input type="text" id="displayProvName" readonly style="background-color: #f9f9f9; color: #555; font-weight: 500;">
+                            </div>
+                        </div>
+                        <div style="padding: 0 4px 12px; font-weight: bold; color: #888;">&rarr;</div>
+                        <div class="form-column" style="flex: 1;">
+                            <div class="form-group">
+                                <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+                                    <label>Internal Sport</label>
+                                    <a href="../sports/create_sport.html" class="btn-secondary" style="padding: 6px 10px; text-decoration: none; display: inline-block;">New</a>
+                                </div>
+                                <select id="internalSportSelect">
+                                    <option value="" disabled selected>Select sport</option>
+                                    <option value="Soccer">Soccer</option>
+                                    <option value="Tennis">Tennis</option>
+                                    <option value="Formula 1">Formula 1</option>
+                                </select>
+                            </div>
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+                                    <label>Internal Competitor</label>
+                                    <a href="create_competitor.html" class="btn-secondary" style="padding: 6px 10px; text-decoration: none; display: inline-block;">New</a>
+                                </div>
+                                <input type="text" id="internalCompetitorSearch" placeholder="Search competitors..." style="margin-bottom: 8px;">
+                                <select id="internalCompetitorSelect" disabled>
+                                    <option value="" disabled selected>Select sport first</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <div class="actions-bar">
+                    <button id="saveMappingBtn" class="btn-primary">Save Mapping</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const provider = urlParams.get('provider') || 'Unknown Provider';
+            const sport = urlParams.get('sport') || 'Unknown Sport';
+            const provId = urlParams.get('provId') || '-';
+            const provName = urlParams.get('provName') || 'Unknown Competitor';
+            const internalId = urlParams.get('internalId');
+            const internalSportSelect = document.getElementById('internalSportSelect');
+            const internalCompetitorSelect = document.getElementById('internalCompetitorSelect');
+            const internalCompetitorSearch = document.getElementById('internalCompetitorSearch');
+            const internalCompetitors = [
+                { sport: "Soccer", id: "CP-001", name: "Arsenal" },
+                { sport: "Soccer", id: "CP-002", name: "Manchester City" },
+                { sport: "Soccer", id: "CP-003", name: "Leeds United" },
+                { sport: "Soccer", id: "CP-004", name: "Real Madrid" },
+                { sport: "Soccer", id: "CP-005", name: "Barcelona" },
+                { sport: "Soccer", id: "CP-006", name: "Bayern Munich" },
+                { sport: "Tennis", id: "CP-007", name: "Carlos Alcaraz" },
+                { sport: "Tennis", id: "CP-008", name: "Novak Djokovic" },
+                { sport: "Formula 1", id: "CP-009", name: "Max Verstappen" },
+                { sport: "Formula 1", id: "CP-010", name: "Lewis Hamilton" }
+            ];
+
+            document.getElementById('displayProvider').textContent = provider;
+            document.getElementById('displaySport').value = sport;
+            document.getElementById('displayProvId').value = provId;
+            document.getElementById('displayProvName').value = provName;
+
+            function renderCompetitors(searchValue = '') {
+                const currentValue = internalCompetitorSelect.value;
+                const selectedSport = internalSportSelect.value;
+                const normalizedSearch = searchValue.toLowerCase();
+                internalCompetitorSelect.innerHTML = '';
+                internalCompetitorSelect.disabled = !selectedSport;
+                if (!selectedSport) {
+                    internalCompetitorSelect.innerHTML = '<option value="" disabled selected>Select sport first</option>';
+                    return;
+                }
+                internalCompetitorSelect.innerHTML = '<option value="" disabled selected>Select competitor</option>';
+                internalCompetitors
+                    .filter(competitor => competitor.sport === selectedSport)
+                    .filter(competitor => competitor.name.toLowerCase().includes(normalizedSearch) || competitor.id.toLowerCase().includes(normalizedSearch))
+                    .forEach(competitor => {
+                        const option = document.createElement('option');
+                        option.value = competitor.id;
+                        option.textContent = competitor.name;
+                        internalCompetitorSelect.appendChild(option);
+                    });
+                if (Array.from(internalCompetitorSelect.options).some(option => option.value === currentValue)) {
+                    internalCompetitorSelect.value = currentValue;
+                }
+            }
+
+            internalSportSelect.addEventListener('change', () => {
+                internalCompetitorSearch.value = '';
+                renderCompetitors();
+            });
+            internalCompetitorSearch.addEventListener('input', () => renderCompetitors(internalCompetitorSearch.value));
+
+            if (internalId) {
+                const existingCompetitor = internalCompetitors.find(competitor => competitor.id === internalId);
+                if (existingCompetitor) {
+                    internalSportSelect.value = existingCompetitor.sport;
+                    renderCompetitors();
+                    internalCompetitorSelect.value = internalId;
+                }
+            } else if (["Soccer", "Tennis", "Formula 1"].includes(sport)) {
+                internalSportSelect.value = sport;
+                renderCompetitors();
+            }
+
+            document.getElementById('saveMappingBtn').addEventListener('click', () => {
+                if(!internalSportSelect.value || !internalCompetitorSelect.value) {
+                    alert('Please select an internal sport and competitor before saving.');
+                    return;
+                }
+                alert(`Mapping saved successfully! Provider competitor "${provName}" is now mapped to an internal competitor.`);
+                window.location.href = 'competitor_mapping.html';
+            });
+        });
+    </script>
+</body>
+</html>
