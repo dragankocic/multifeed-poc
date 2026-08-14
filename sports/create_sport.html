@@ -16,7 +16,7 @@
     <div class="main-content">
         <header class="main-header" style="background-color: #17a2b8;">
             <h1 id="pageMainTitle">Create Sport</h1>
-            <p class="page-subtitle">Create or update a sport name and abbreviation.</p>
+            <p class="page-subtitle">Create or update a sport name, abbreviation, and leading feed provider override.</p>
         </header>
 
         <main class="split-layout">
@@ -44,6 +44,16 @@
                             <input type="text" id="sportAbbr" placeholder="e.g. VLB" maxlength="3" style="text-transform: uppercase;">
                         </div>
 
+                        <div class="form-group">
+                            <label for="leadingFeedSelect">Leading Feed Provider</label>
+                            <select id="leadingFeedSelect">
+                                <option value="Inherited from Multifeed" selected>Inherited from Multifeed</option>
+                                <option value="SportRadar">SportRadar</option>
+                                <option value="ExeFeed">ExeFeed</option>
+                                <option value="Bet Genius">Bet Genius</option>
+                            </select>
+                        </div>
+
                     </div>
                 </section>
 
@@ -61,6 +71,7 @@
             const isEdit = urlParams.get('edit') === 'true';
             const editName = urlParams.get('name');
             const editAbbr = urlParams.get('abbr');
+            const editLeadingFeed = urlParams.get('leadingFeed');
 
             // Ako je Edit mod, popuni polja i promeni naslove
             if (isEdit) {
@@ -71,15 +82,17 @@
 
                 if (editName) document.getElementById('sportName').value = editName;
                 if (editAbbr) document.getElementById('sportAbbr').value = editAbbr;
+                if (editLeadingFeed) document.getElementById('leadingFeedSelect').value = editLeadingFeed;
             }
 
             // Logika za čuvanje
             document.getElementById('saveSportBtn').addEventListener('click', () => {
                 const name = document.getElementById('sportName').value;
                 const abbr = document.getElementById('sportAbbr').value;
+                const leadingFeed = document.getElementById('leadingFeedSelect').value;
                 
-                if(!name || !abbr) {
-                    alert("Please fill in both fields.");
+                if(!name || !abbr || !leadingFeed) {
+                    alert("Please fill in all fields.");
                     return;
                 }
 

@@ -169,11 +169,11 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const internalSports = [
-                { id: "S-001", name: "Soccer", abbr: "SOC" },
-                { id: "S-002", name: "Basketball", abbr: "BKB" },
-                { id: "S-003", name: "Tennis", abbr: "TEN" },
-                { id: "S-004", name: "Ice Hockey", abbr: "IHO" },
-                { id: "S-005", name: "Baseball", abbr: "BBS" }
+                { id: "S-001", name: "Soccer", abbr: "SOC", leadingFeed: "ExeFeed" },
+                { id: "S-002", name: "Basketball", abbr: "BKB", leadingFeed: "SportRadar" },
+                { id: "S-003", name: "Tennis", abbr: "TEN", leadingFeed: "Bet Genius" },
+                { id: "S-004", name: "Ice Hockey", abbr: "IHO", leadingFeed: "Inherited from Multifeed" },
+                { id: "S-005", name: "Baseball", abbr: "BBS", leadingFeed: "Inherited from Multifeed" }
             ];
 
             const providerSports = [
@@ -203,6 +203,7 @@
                         <th>ID</th>
                         <th>Name</th>
                         <th>Abbreviation</th>
+                        <th>Leading Feed Provider</th>
                         <th style="text-align: right;">Action</th>
                     </tr>
                 `;
@@ -222,13 +223,14 @@
                 workspaceBody.innerHTML = rows.map(sport => {
                     return `
                         <tr>
-                            <td style="font-weight: 500; color: #6c757d;">${sport.id}</td>
-                            <td class="market-name">${sport.name}</td>
-                            <td><span style="background: #e9ecef; padding: 4px 10px; border-radius: 4px; font-size: 13px; font-weight: 600; border: 1px solid #ccc;">${sport.abbr}</span></td>
-                            <td style="text-align: right;">
-                                <span class="row-actions">
-                                    <a href="view_hermes_sport.html?id=${encodeURIComponent(sport.id)}&name=${encodeURIComponent(sport.name)}&abbr=${encodeURIComponent(sport.abbr)}" class="btn-action" style="background-color: #007bff; text-decoration: none; display: inline-block;">View</a>
-                                    <a href="create_sport.html?edit=true&name=${encodeURIComponent(sport.name)}&abbr=${encodeURIComponent(sport.abbr)}" class="btn-action" style="background-color: #17a2b8; text-decoration: none; display: inline-block;">Edit</a>
+                        <td style="font-weight: 500; color: #6c757d;">${sport.id}</td>
+                        <td class="market-name">${sport.name}</td>
+                        <td><span style="background: #e9ecef; padding: 4px 10px; border-radius: 4px; font-size: 13px; font-weight: 600; border: 1px solid #ccc;">${sport.abbr}</span></td>
+                        <td>${sport.leadingFeed}</td>
+                        <td style="text-align: right;">
+                            <span class="row-actions">
+                                    <a href="view_hermes_sport.html?id=${encodeURIComponent(sport.id)}&name=${encodeURIComponent(sport.name)}&abbr=${encodeURIComponent(sport.abbr)}&leadingFeed=${encodeURIComponent(sport.leadingFeed)}" class="btn-action" style="background-color: #007bff; text-decoration: none; display: inline-block;">View</a>
+                                    <a href="create_sport.html?edit=true&name=${encodeURIComponent(sport.name)}&abbr=${encodeURIComponent(sport.abbr)}&leadingFeed=${encodeURIComponent(sport.leadingFeed)}" class="btn-action" style="background-color: #17a2b8; text-decoration: none; display: inline-block;">Edit</a>
                                 </span>
                             </td>
                         </tr>
