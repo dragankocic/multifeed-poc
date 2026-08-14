@@ -4,58 +4,172 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Competitors</title>
-    <link rel="stylesheet" href="../sports/style.css">
     <link rel="stylesheet" href="../style.css">
     <script src="../auth.js"></script>
+    <style>
+        .workspace-tabs {
+            display: inline-flex;
+            gap: 4px;
+            padding: 4px;
+            background: #eef3f4;
+            border: 1px solid #d4dee1;
+            border-radius: 6px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .workspace-tab {
+            flex: 1;
+            border: 0;
+            border-radius: 4px;
+            padding: 9px 14px;
+            background: transparent;
+            color: #566;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .workspace-tab.active {
+            background: #17a2b8;
+            color: white;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+        }
+
+        .row-actions {
+            display: inline-flex;
+            justify-content: flex-end;
+            gap: 6px;
+            white-space: nowrap;
+        }
+
+        .workspace-toolbar .filters {
+            display: grid;
+            grid-template-columns: minmax(270px, 350px) minmax(170px, 210px) minmax(170px, 210px) minmax(210px, 250px) minmax(260px, 1fr);
+            align-items: flex-end;
+            gap: 16px;
+            flex: 1;
+        }
+
+        .workspace-toolbar .filter-group {
+            min-height: 66px;
+            justify-content: flex-end;
+        }
+
+        .workspace-toolbar select,
+        .workspace-toolbar input {
+            width: 100%;
+            height: 41px;
+            min-width: 0 !important;
+            box-sizing: border-box;
+        }
+
+        .workspace-toolbar .actions {
+            display: flex;
+            align-items: flex-end;
+            min-height: 66px;
+            flex-shrink: 0;
+        }
+
+        .workspace-toolbar .btn-primary {
+            height: 41px;
+            display: inline-flex !important;
+            align-items: center;
+            justify-content: center;
+            white-space: nowrap;
+        }
+
+        @media (max-width: 1450px) {
+            .workspace-toolbar {
+                align-items: stretch;
+                gap: 16px;
+            }
+
+            .workspace-toolbar .filters {
+                grid-template-columns: repeat(2, minmax(220px, 1fr));
+            }
+        }
+
+        @media (max-width: 760px) {
+            .workspace-toolbar {
+                flex-direction: column;
+            }
+
+            .workspace-toolbar .filters {
+                grid-template-columns: 1fr;
+            }
+
+            .workspace-toolbar .actions,
+            .workspace-toolbar .btn-primary {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
 <body>
-
-    <div id="sidebar-container" data-root=".." data-active="competitor-management" data-service="sportsbook"></div>
+    <div id="sidebar-container" data-root=".." data-active="competitor-management"></div>
     <script src="../sidebar.js"></script>
 
     <div class="main-content">
         <header class="main-header" style="background-color: #17a2b8;">
             <h1>Competitors</h1>
-            <p class="page-subtitle">Manage competitors by sport.</p>
+            <p class="page-subtitle">Inspect and map competitors through Sport.</p>
         </header>
 
         <main class="split-layout">
             <div class="form-side">
-                <div class="top-bar">
+                <div class="top-bar workspace-toolbar">
                     <div class="filters">
+                        <div class="filter-group">
+                            <label>View</label>
+                            <div class="workspace-tabs" aria-label="Competitor mapping perspective">
+                                <button type="button" class="workspace-tab active" data-view="internal">Internal competitors</button>
+                                <button type="button" class="workspace-tab" data-view="provider">Provider competitors</button>
+                            </div>
+                        </div>
+
+                        <div class="filter-group" id="providerFilterGroup" style="display: none;">
+                            <label for="providerSelect">Provider</label>
+                            <select id="providerSelect">
+                                <option value="all" selected>All</option>
+                                <option value="ExeFeed">ExeFeed</option>
+                                <option value="SportRadar">SportRadar</option>
+                                <option value="SportGenius">SportGenius</option>
+                            </select>
+                        </div>
+
                         <div class="filter-group">
                             <label for="sportFilter">Sport</label>
                             <select id="sportFilter">
                                 <option value="all" selected>All</option>
                                 <option value="Soccer">Soccer</option>
-                                <option value="Basketball">Basketball</option>
                                 <option value="Tennis">Tennis</option>
                                 <option value="Formula 1">Formula 1</option>
                             </select>
                         </div>
 
+                        <div class="filter-group" id="statusFilterGroup" style="display: none;">
+                            <label for="statusSelect">Mapping status</label>
+                            <select id="statusSelect">
+                                <option value="all" selected>All</option>
+                                <option value="mapped">Mapped</option>
+                                <option value="unmapped">Unmapped</option>
+                            </select>
+                        </div>
+
                         <div class="filter-group">
-                            <label for="searchInput">Search Competitors</label>
-                            <input type="text" id="searchInput" placeholder="Search by name or ID..." style="padding: 10px 15px; border: 1px solid #ccc; border-radius: 4px; font-size: 15px; min-width: 250px; background-color: #fdfdfd;">
+                            <label for="searchInput">Search</label>
+                            <input type="text" id="searchInput" placeholder="Search competitor..." style="padding: 10px 15px; border: 1px solid #ccc; border-radius: 4px; font-size: 15px; background-color: #fdfdfd;">
                         </div>
                     </div>
 
                     <div class="actions">
-                        <a href="create_competitor.html" class="btn-primary" style="text-decoration: none; display: inline-block;">Create Competitor</a>
                     </div>
                 </div>
 
-                <section class="markets-section">
-                    <table class="markets-table">
-                        <thead>
-                            <tr>
-                                <th>Competitor ID</th>
-                                <th>Competitor Name</th>
-                                <th>Sport</th>
-                                <th style="text-align: right;">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="competitorsBody"></tbody>
+                <section class="markets-section" style="overflow-x: auto;">
+                    <table class="markets-table" id="workspaceTable" style="min-width: 1080px;">
+                        <thead id="workspaceHead"></thead>
+                        <tbody id="workspaceBody"></tbody>
                     </table>
                 </section>
             </div>
@@ -77,17 +191,7 @@
     <script src="../pagination.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const tableBody = document.getElementById('competitorsBody');
-            const searchInput = document.getElementById('searchInput');
-            const sportFilter = document.getElementById('sportFilter');
-            const deleteModal = document.getElementById('deleteModal');
-            const closeDeleteModalBtn = document.getElementById('closeDeleteModalBtn');
-            const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
-            const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
-            const deleteModalText = document.getElementById('deleteModalText');
-            let competitorToDelete = null;
-
-            let competitors = [
+            let internalCompetitors = [
                 { id: "CP-001", name: "Arsenal", sport: "Soccer" },
                 { id: "CP-002", name: "Manchester City", sport: "Soccer" },
                 { id: "CP-003", name: "Leeds United", sport: "Soccer" },
@@ -100,6 +204,33 @@
                 { id: "CP-010", name: "Lewis Hamilton", sport: "Formula 1" }
             ];
 
+            const providerCompetitors = [
+                { provider: "ExeFeed", sport: "Soccer", category: "England", tournament: "Premier League", provId: "1178653", provName: "Arsenal", internalId: "CP-001", internalName: "Arsenal", status: "Mapped" },
+                { provider: "ExeFeed", sport: "Soccer", category: "England", tournament: "Premier League", provId: "1178654", provName: "Manchester City", internalId: "CP-002", internalName: "Manchester City", status: "Mapped" },
+                { provider: "ExeFeed", sport: "Soccer", category: "England", tournament: "Premier League", provId: "1178655", provName: "Liverpool", internalId: "-", internalName: "-", status: "Unmapped" },
+                { provider: "SportRadar", sport: "Soccer", category: "England", tournament: "Premier League", provId: "sr:competitor:42", provName: "Arsenal FC", internalId: "CP-001", internalName: "Arsenal", status: "Mapped" },
+                { provider: "SportRadar", sport: "Soccer", category: "England", tournament: "Premier League", provId: "sr:competitor:17", provName: "Manchester City FC", internalId: "CP-002", internalName: "Manchester City", status: "Mapped" },
+                { provider: "SportRadar", sport: "Tennis", category: "France", tournament: "Roland Garros", provId: "sr:competitor:407573", provName: "Alcaraz, Carlos", internalId: "CP-007", internalName: "Carlos Alcaraz", status: "Mapped" },
+                { provider: "SportRadar", sport: "Formula 1", category: "International", tournament: "Formula 1", provId: "sr:competitor:7135", provName: "Max Verstappen", internalId: "CP-009", internalName: "Max Verstappen", status: "Mapped" },
+                { provider: "SportGenius", sport: "Soccer", category: "Spain", tournament: "LaLiga", provId: "sg-cmp-rma", provName: "Real Madrid CF", internalId: "CP-004", internalName: "Real Madrid", status: "Mapped" },
+                { provider: "SportGenius", sport: "Soccer", category: "Spain", tournament: "LaLiga", provId: "sg-cmp-fcb", provName: "FC Barcelona", internalId: "CP-005", internalName: "Barcelona", status: "Mapped" },
+                { provider: "SportGenius", sport: "Formula 1", category: "International", tournament: "Formula 1", provId: "sg-cmp-leclerc", provName: "Charles Leclerc", internalId: "-", internalName: "-", status: "Unmapped" }
+            ];
+
+            const tabs = document.querySelectorAll('.workspace-tab');
+            const providerFilterGroup = document.getElementById('providerFilterGroup');
+            const statusFilterGroup = document.getElementById('statusFilterGroup');
+            const providerSelect = document.getElementById('providerSelect');
+            const sportFilter = document.getElementById('sportFilter');
+            const statusSelect = document.getElementById('statusSelect');
+            const searchInput = document.getElementById('searchInput');
+            const workspaceHead = document.getElementById('workspaceHead');
+            const workspaceBody = document.getElementById('workspaceBody');
+            const deleteModal = document.getElementById('deleteModal');
+            const deleteModalText = document.getElementById('deleteModalText');
+            let activeView = 'internal';
+            let competitorToDelete = null;
+
             function openDeleteModal(competitor) {
                 competitorToDelete = competitor;
                 deleteModalText.textContent = `Are you sure you want to delete competitor "${competitor.name}" (${competitor.id})?`;
@@ -111,60 +242,163 @@
                 deleteModal.style.display = 'none';
             }
 
-            function renderCompetitors() {
-                tableBody.innerHTML = '';
+            function renderInternalView() {
+                workspaceHead.innerHTML = `
+                    <tr>
+                        <th>Competitor ID</th>
+                        <th>Competitor Name</th>
+                        <th>Sport</th>
+                        <th style="text-align: right;">Action</th>
+                    </tr>
+                `;
+
                 const searchVal = searchInput.value.toLowerCase();
                 const sportVal = sportFilter.value;
-                const filteredCompetitors = competitors.filter(competitor => {
-                    const matchesSearch = competitor.id.toLowerCase().includes(searchVal) ||
-                        competitor.name.toLowerCase().includes(searchVal);
+                const rows = internalCompetitors.filter(competitor => {
                     const matchesSport = sportVal === 'all' || competitor.sport === sportVal;
-                    return matchesSearch && matchesSport;
+                    const matchesSearch = competitor.id.toLowerCase().includes(searchVal) ||
+                        competitor.name.toLowerCase().includes(searchVal) ||
+                        competitor.sport.toLowerCase().includes(searchVal);
+                    return matchesSport && matchesSearch;
                 });
 
-                if (filteredCompetitors.length === 0) {
-                    tableBody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #888; font-style: italic;">No competitors found.</td></tr>';
+                if (rows.length === 0) {
+                    workspaceBody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #888; font-style: italic; padding: 20px;">No competitors found.</td></tr>';
                     return;
                 }
 
-                filteredCompetitors.forEach(competitor => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
+                workspaceBody.innerHTML = rows.map(competitor => `
+                    <tr>
                         <td style="font-weight: 500; color: #6c757d;">${competitor.id}</td>
                         <td class="market-name">${competitor.name}</td>
                         <td>${competitor.sport}</td>
                         <td style="text-align: right;">
-                            <a href="view_competitor.html?id=${encodeURIComponent(competitor.id)}&name=${encodeURIComponent(competitor.name)}&sport=${encodeURIComponent(competitor.sport)}" class="btn-action" style="background-color: #007bff; text-decoration: none; display: inline-block; margin-right: 5px;">View</a>
-                            <a href="create_competitor.html?edit=true&id=${encodeURIComponent(competitor.id)}&name=${encodeURIComponent(competitor.name)}&sport=${encodeURIComponent(competitor.sport)}" class="btn-action" style="background-color: #17a2b8; text-decoration: none; display: inline-block; margin-right: 5px;">Edit</a>
-                            <button type="button" class="btn-action delete-competitor-btn" style="background-color: #dc3545; border: none;" data-id="${competitor.id}">Delete</button>
+                            <span class="row-actions">
+                                <a href="view_competitor.html?id=${encodeURIComponent(competitor.id)}&name=${encodeURIComponent(competitor.name)}&sport=${encodeURIComponent(competitor.sport)}" class="btn-action" style="background-color: #007bff; text-decoration: none; display: inline-block;">View</a>
+                                <button type="button" class="btn-action delete-competitor-btn" style="background-color: #dc3545; border: none;" data-id="${competitor.id}">Delete</button>
+                            </span>
                         </td>
-                    `;
-                    tableBody.appendChild(row);
-                });
+                    </tr>
+                `).join('');
 
-                document.querySelectorAll('.delete-competitor-btn').forEach(btn => {
-                    btn.addEventListener('click', () => {
-                        const competitor = competitors.find(item => item.id === btn.dataset.id);
+                document.querySelectorAll('.delete-competitor-btn').forEach(button => {
+                    button.addEventListener('click', () => {
+                        const competitor = internalCompetitors.find(item => item.id === button.dataset.id);
                         if (competitor) openDeleteModal(competitor);
                     });
                 });
             }
 
-            searchInput.addEventListener('input', renderCompetitors);
-            sportFilter.addEventListener('change', renderCompetitors);
-            closeDeleteModalBtn.addEventListener('click', closeDeleteModal);
-            cancelDeleteBtn.addEventListener('click', closeDeleteModal);
-            confirmDeleteBtn.addEventListener('click', () => {
+            function renderProviderView() {
+                workspaceHead.innerHTML = `
+                    <tr>
+                        <th>Provider</th>
+                        <th>Sport</th>
+                        <th>Category</th>
+                        <th>Tournament</th>
+                        <th>Provider Competitor ID</th>
+                        <th>Provider Competitor Name</th>
+                        <th>Internal Competitor ID</th>
+                        <th>Internal Competitor Name</th>
+                        <th>Status</th>
+                        <th style="text-align: right;">Action</th>
+                    </tr>
+                `;
+
+                const providerVal = providerSelect.value;
+                const sportVal = sportFilter.value;
+                const statusVal = statusSelect.value;
+                const searchVal = searchInput.value.toLowerCase();
+                const rows = providerCompetitors.filter(competitor => {
+                    const matchesProvider = providerVal === 'all' || competitor.provider === providerVal;
+                    const matchesSport = sportVal === 'all' || competitor.sport === sportVal;
+                    const matchesStatus = statusVal === 'all' || competitor.status.toLowerCase() === statusVal;
+                    const matchesSearch = competitor.provider.toLowerCase().includes(searchVal) ||
+                        competitor.sport.toLowerCase().includes(searchVal) ||
+                        competitor.category.toLowerCase().includes(searchVal) ||
+                        competitor.tournament.toLowerCase().includes(searchVal) ||
+                        competitor.provId.toLowerCase().includes(searchVal) ||
+                        competitor.provName.toLowerCase().includes(searchVal) ||
+                        competitor.internalId.toLowerCase().includes(searchVal) ||
+                        competitor.internalName.toLowerCase().includes(searchVal);
+                    return matchesProvider && matchesSport && matchesStatus && matchesSearch;
+                });
+
+                if (rows.length === 0) {
+                    workspaceBody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: #888; font-style: italic; padding: 20px;">No provider competitors found.</td></tr>';
+                    return;
+                }
+
+                workspaceBody.innerHTML = rows.map(competitor => {
+                    const badgeClass = competitor.status === 'Mapped' ? 'status-mapped' : 'status-unmapped';
+                    const mapUrl = competitor.status === 'Mapped'
+                        ? `map_competitor.html?provider=${encodeURIComponent(competitor.provider)}&sport=${encodeURIComponent(competitor.sport)}&provId=${encodeURIComponent(competitor.provId)}&provName=${encodeURIComponent(competitor.provName)}&internalId=${encodeURIComponent(competitor.internalId)}`
+                        : `map_competitor.html?provider=${encodeURIComponent(competitor.provider)}&sport=${encodeURIComponent(competitor.sport)}&provId=${encodeURIComponent(competitor.provId)}&provName=${encodeURIComponent(competitor.provName)}`;
+                    const mapLabel = competitor.status === 'Mapped' ? 'Edit mapping' : 'Map';
+                    const viewButton = competitor.status === 'Mapped'
+                        ? `<a href="view_competitor.html?id=${encodeURIComponent(competitor.internalId)}&name=${encodeURIComponent(competitor.internalName)}&sport=${encodeURIComponent(competitor.sport)}" class="btn-action" style="background-color: #007bff; text-decoration: none; display: inline-block;">View</a>`
+                        : '';
+
+                    return `
+                        <tr>
+                            <td style="font-weight: 500;">${competitor.provider}</td>
+                            <td>${competitor.sport}</td>
+                            <td>${competitor.category}</td>
+                            <td>${competitor.tournament}</td>
+                            <td style="color: #6c757d;">${competitor.provId}</td>
+                            <td class="market-name" style="color: #007bff;">${competitor.provName}</td>
+                            <td style="color: #6c757d;">${competitor.internalId}</td>
+                            <td style="font-weight: 500;">${competitor.internalName}</td>
+                            <td><span class="status-badge ${badgeClass}">${competitor.status}</span></td>
+                            <td style="text-align: right;">
+                                <span class="row-actions">
+                                    ${viewButton}
+                                    <a href="${mapUrl}" class="btn-action" style="text-decoration: none; display: inline-block;">${mapLabel}</a>
+                                </span>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+
+            function render() {
+                const showProviderFilters = activeView === 'provider';
+                providerFilterGroup.style.display = showProviderFilters ? 'block' : 'none';
+                statusFilterGroup.style.display = showProviderFilters ? 'block' : 'none';
+                document.getElementById('workspaceTable').style.minWidth = activeView === 'provider' ? '1080px' : '760px';
+                if (activeView === 'internal') {
+                    renderInternalView();
+                } else {
+                    renderProviderView();
+                }
+            }
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    activeView = tab.dataset.view;
+                    tabs.forEach(item => item.classList.toggle('active', item === tab));
+                    searchInput.value = '';
+                    render();
+                });
+            });
+
+            providerSelect.addEventListener('change', render);
+            sportFilter.addEventListener('change', render);
+            statusSelect.addEventListener('change', render);
+            searchInput.addEventListener('input', render);
+            document.getElementById('closeDeleteModalBtn').addEventListener('click', closeDeleteModal);
+            document.getElementById('cancelDeleteBtn').addEventListener('click', closeDeleteModal);
+            document.getElementById('confirmDeleteBtn').addEventListener('click', () => {
                 if (!competitorToDelete) return;
-                competitors = competitors.filter(competitor => competitor.id !== competitorToDelete.id);
+                internalCompetitors = internalCompetitors.filter(competitor => competitor.id !== competitorToDelete.id);
                 closeDeleteModal();
-                renderCompetitors();
+                render();
             });
             window.addEventListener('click', event => {
                 if (event.target === deleteModal) closeDeleteModal();
             });
 
-            renderCompetitors();
+            render();
         });
     </script>
 </body>

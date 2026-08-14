@@ -22,7 +22,7 @@
         <main class="split-layout">
             <div class="form-side">
                 <div style="margin-bottom: 20px;">
-                    <a href="tournament_mapping.html" class="btn-secondary" style="text-decoration: none; display: inline-block;">&larr; Back to list</a>
+                    <a href="tournament.html" class="btn-secondary" style="text-decoration: none; display: inline-block;">&larr; Back to tournaments</a>
                 </div>
 
                 <div class="info-section">
@@ -76,7 +76,6 @@
                             <div class="form-group">
                                 <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
                                     <label>Internal Category</label>
-                                    <a href="../categories/create_category.html" class="btn-secondary" style="padding: 6px 10px; text-decoration: none; display: inline-block;">New</a>
                                 </div>
                                 <select id="internalCategorySelect" disabled>
                                     <option value="" disabled selected>Select sport first</option>
@@ -239,7 +238,7 @@
                     return;
                 }
                 alert(`Mapping saved successfully! Provider tournament "${provName}" is now mapped to an internal tournament.`);
-                window.location.href = 'tournament_mapping.html';
+                window.location.href = 'tournament.html';
             });
         });
     </script>

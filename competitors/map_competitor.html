@@ -10,7 +10,7 @@
 </head>
 <body>
 
-    <div id="sidebar-container" data-root=".." data-active="competitor-mapping" data-service="sportsbook"></div>
+    <div id="sidebar-container" data-root=".." data-active="competitor-management" data-service="sportsbook"></div>
     <script src="../sidebar.js"></script>
 
     <div class="main-content">
@@ -22,7 +22,7 @@
         <main class="split-layout">
             <div class="form-side">
                 <div style="margin-bottom: 20px;">
-                    <a href="competitor_mapping.html" class="btn-secondary" style="text-decoration: none; display: inline-block;">&larr; Back to list</a>
+                    <a href="competitor.html" class="btn-secondary" style="text-decoration: none; display: inline-block;">&larr; Back to list</a>
                 </div>
                 <div class="info-section">
                     <h2>Connect to Internal Competitor</h2>
@@ -62,7 +62,6 @@
                             <div class="form-group" style="margin-bottom: 0;">
                                 <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
                                     <label>Internal Competitor</label>
-                                    <a href="create_competitor.html" class="btn-secondary" style="padding: 6px 10px; text-decoration: none; display: inline-block;">New</a>
                                 </div>
                                 <input type="text" id="internalCompetitorSearch" placeholder="Search competitors..." style="margin-bottom: 8px;">
                                 <select id="internalCompetitorSelect" disabled>
@@ -107,6 +106,12 @@
             document.getElementById('displaySport').value = sport;
             document.getElementById('displayProvId').value = provId;
             document.getElementById('displayProvName').value = provName;
+
+            function valuesFor(field, filters = {}) {
+                return [...new Set(internalCompetitors
+                    .filter(item => Object.entries(filters).every(([key, value]) => item[key] === value))
+                    .map(item => item[field]))];
+            }
 
             function renderCompetitors(searchValue = '') {
                 const currentValue = internalCompetitorSelect.value;
@@ -157,7 +162,7 @@
                     return;
                 }
                 alert(`Mapping saved successfully! Provider competitor "${provName}" is now mapped to an internal competitor.`);
-                window.location.href = 'competitor_mapping.html';
+                window.location.href = 'competitor.html';
             });
         });
     </script>

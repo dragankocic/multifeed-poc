@@ -7,6 +7,14 @@
     <link rel="stylesheet" href="../sports/style.css">
     <link rel="stylesheet" href="../style.css">
     <script src="../auth.js"></script>
+    <style>
+        .lazy-section-toggle { width: 100%; border: 0; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 0; text-align: left; }
+        .lazy-section-toggle h3 { margin: 0; color: #333; font-size: 18px; }
+        .lazy-section-icon { color: #667085; font-size: 18px; transition: transform 0.2s; }
+        .lazy-section.open .lazy-section-icon { transform: rotate(180deg); }
+        .lazy-section-body { display: none; margin-top: 15px; }
+        .lazy-section.open .lazy-section-body { display: block; }
+    </style>
 </head>
 <body>
 
@@ -16,7 +24,7 @@
     <div class="main-content">
         <header class="main-header" style="background-color: #17a2b8; color: white;">
             <h1>Tournament Overview</h1>
-            <p class="page-subtitle">Inspect a tournament and its sport/category placement.</p>
+            <p class="page-subtitle">Inspect a tournament, its provider mappings, and competitors.</p>
         </header>
 
         <main class="split-layout">
@@ -37,21 +45,52 @@
                     </div>
                 </section>
 
-                <section class="markets-section" style="margin-top: 25px; padding: 25px; background: white; border-radius: 8px; border: 1px solid #e0e0e0;">
-                    <h3 style="margin-bottom: 20px; color: #333; font-size: 18px; border-bottom: 1px solid #eee; padding-bottom: 10px;">Mapped Provider Tournaments</h3>
-                    <p style="margin-bottom: 15px; font-size: 14px; color: #666;">Provider tournament values currently connected to this internal tournament.</p>
+                <section class="markets-section lazy-section" id="mappedProviderSection" style="margin-top: 25px; padding: 25px; background: white; border-radius: 8px; border: 1px solid #e0e0e0;">
+                    <div class="section-header" style="display: flex; align-items: center; justify-content: space-between; gap: 16px; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 15px;">
+                        <button type="button" class="lazy-section-toggle" data-target="mappedProviderSection">
+                            <h3>Mapped Provider Tournaments</h3>
+                            <span class="lazy-section-icon">⌄</span>
+                        </button>
+                        <button type="button" id="addMappingBtn" class="btn-primary">Add mapping</button>
+                    </div>
+                    <div class="lazy-section-body">
+                        <p style="margin-bottom: 15px; font-size: 14px; color: #666;">Provider tournament values currently connected to this internal tournament.</p>
 
-                    <table class="markets-table" style="margin-bottom: 25px;">
-                        <thead>
-                            <tr>
-                                <th>Provider</th>
-                                <th>Provider Tournament ID</th>
-                                <th>Provider Tournament Name</th>
-                                <th style="text-align: right;">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="providerTournamentsList"></tbody>
-                    </table>
+                        <table class="markets-table" style="margin-bottom: 25px;">
+                            <thead>
+                                <tr>
+                                    <th>Provider</th>
+                                    <th>Provider Tournament ID</th>
+                                    <th>Provider Tournament Name</th>
+                                    <th style="text-align: right;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="providerTournamentsList"></tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="markets-section lazy-section" id="childEntitySection" style="margin-top: 25px; padding: 25px; background: white; border-radius: 8px; border: 1px solid #e0e0e0;">
+                    <div class="section-header" style="border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 15px;">
+                        <button type="button" class="lazy-section-toggle" data-target="childEntitySection">
+                            <h3>Competitors</h3>
+                            <span class="lazy-section-icon">⌄</span>
+                        </button>
+                    </div>
+                    <div class="lazy-section-body">
+                        <p style="margin-bottom: 15px; font-size: 14px; color: #666;">Competitors available under this tournament.</p>
+
+                        <table class="markets-table">
+                            <thead>
+                                <tr>
+                                    <th>Competitor ID</th>
+                                    <th>Competitor Name</th>
+                                    <th style="text-align: right;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="childCompetitorsList"></tbody>
+                        </table>
+                    </div>
                 </section>
 
                 <div style="margin-top: 25px;">
@@ -59,6 +98,65 @@
                 </div>
             </div>
         </main>
+    </div>
+
+    <div id="addMappingModal" class="modal">
+        <div class="modal-content" style="width: min(960px, 92vw);">
+            <span class="close-modal" id="closeAddMappingModalBtn">&times;</span>
+            <h3>Add provider tournament mapping for <span id="mappingTournamentName" style="color: #17a2b8;"></span></h3>
+            <div class="top-bar" style="box-shadow: none; margin-bottom: 15px;">
+                <div class="filters">
+                    <div class="filter-group">
+                        <label for="providerFilter">Provider</label>
+                        <select id="providerFilter">
+                            <option value="all" selected>All</option>
+                            <option value="ExeFeed">ExeFeed</option>
+                            <option value="SportRadar">SportRadar</option>
+                            <option value="SportGenius">SportGenius</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="sportFilter">Sport</label>
+                        <select id="sportFilter">
+                            <option value="all">All</option>
+                            <option value="Soccer">Soccer</option>
+                            <option value="Basketball">Basketball</option>
+                            <option value="Tennis">Tennis</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="categoryFilter">Category</label>
+                        <select id="categoryFilter">
+                            <option value="all">All</option>
+                            <option value="England">England</option>
+                            <option value="Spain">Spain</option>
+                            <option value="Germany">Germany</option>
+                            <option value="Italy">Italy</option>
+                            <option value="France">France</option>
+                            <option value="Serbia">Serbia</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="providerTournamentSearch">Search</label>
+                        <input type="text" id="providerTournamentSearch" placeholder="Search provider tournament..." style="padding: 10px 15px; border: 1px solid #ccc; border-radius: 4px; font-size: 15px; min-width: 260px; background-color: #fdfdfd;">
+                    </div>
+                </div>
+            </div>
+            <table class="markets-table">
+                <thead>
+                    <tr>
+                        <th>Provider</th>
+                        <th>Sport</th>
+                        <th>Category</th>
+                        <th>Provider Tournament ID</th>
+                        <th>Provider Tournament Name</th>
+                        <th>Status</th>
+                        <th style="text-align: right;">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="availableProviderTournamentsList" data-page-size="10"></tbody>
+            </table>
+        </div>
     </div>
 
     <script src="../pagination.js"></script>
@@ -80,78 +178,154 @@
 
             const providerTournamentMappings = {
                 "Premier League": [
-                    { provider: "ExeFeed", providerId: "trn:eng:premier-league", providerName: "Premier League" },
+                    { provider: "ExeFeed", providerId: "1019001", providerName: "Premier League" },
                     { provider: "SportRadar", providerId: "sr:tournament:17", providerName: "Premier League" },
-                    { provider: "Bet Genius", providerId: "BG-EPL", providerName: "English Premier League" }
+                    { provider: "SportGenius", providerId: "sg-trn-epl", providerName: "English Premier League" }
                 ],
                 "Championship": [
-                    { provider: "ExeFeed", providerId: "trn:eng:championship", providerName: "Championship" },
+                    { provider: "ExeFeed", providerId: "1019002", providerName: "Championship" },
                     { provider: "SportRadar", providerId: "sr:tournament:18", providerName: "Championship" },
-                    { provider: "LSports", providerId: "LS-ENG-CHA", providerName: "England Championship" }
+                    { provider: "SportGenius", providerId: "sg-trn-championship", providerName: "England Championship" }
                 ],
                 "League One": [
-                    { provider: "ExeFeed", providerId: "trn:eng:league-one", providerName: "League One" },
+                    { provider: "ExeFeed", providerId: "1019006", providerName: "League One" },
                     { provider: "SportRadar", providerId: "sr:tournament:24", providerName: "League One" },
-                    { provider: "Bet Construct", providerId: "BC-ENG-L1", providerName: "England League One" }
+                    { provider: "SportGenius", providerId: "sg-trn-league-one", providerName: "England League One" }
                 ],
                 "League Two": [
-                    { provider: "ExeFeed", providerId: "trn:eng:league-two", providerName: "League Two" },
+                    { provider: "ExeFeed", providerId: "1019007", providerName: "League Two" },
                     { provider: "SportRadar", providerId: "sr:tournament:25", providerName: "League Two" },
-                    { provider: "LSports", providerId: "LS-ENG-L2", providerName: "England League Two" }
+                    { provider: "SportGenius", providerId: "sg-trn-league-two", providerName: "England League Two" }
                 ],
                 "LaLiga": [
-                    { provider: "ExeFeed", providerId: "trn:esp:laliga", providerName: "LaLiga" },
+                    { provider: "ExeFeed", providerId: "1019003", providerName: "LaLiga" },
                     { provider: "SportRadar", providerId: "sr:tournament:8", providerName: "LaLiga" },
-                    { provider: "IMG Arena", providerId: "IMG-ES-LL", providerName: "Spanish LaLiga" }
+                    { provider: "SportGenius", providerId: "sg-trn-laliga", providerName: "Spanish LaLiga" }
                 ],
                 "LaLiga 2": [
-                    { provider: "ExeFeed", providerId: "trn:esp:laliga-2", providerName: "LaLiga 2" },
+                    { provider: "ExeFeed", providerId: "1019005", providerName: "LaLiga 2" },
                     { provider: "SportRadar", providerId: "sr:tournament:54", providerName: "LaLiga 2" },
-                    { provider: "LSports", providerId: "LS-ES-L2", providerName: "Spain Segunda Division" }
+                    { provider: "SportGenius", providerId: "sg-trn-laliga-2", providerName: "Spain Segunda Division" }
                 ],
                 "Primera Federacion": [
-                    { provider: "ExeFeed", providerId: "trn:esp:primera-federacion", providerName: "Primera Federacion" },
+                    { provider: "ExeFeed", providerId: "1019014", providerName: "Primera Federacion" },
                     { provider: "SportRadar", providerId: "sr:tournament:30617", providerName: "Primera Federacion" },
-                    { provider: "Bet Construct", providerId: "BC-ES-PF", providerName: "Spain Primera Federacion" }
+                    { provider: "SportGenius", providerId: "sg-trn-primera-federacion", providerName: "Spain Primera Federacion" }
                 ],
                 "Bundesliga": [
-                    { provider: "ExeFeed", providerId: "trn:deu:bundesliga", providerName: "Bundesliga" },
+                    { provider: "ExeFeed", providerId: "1019008", providerName: "Bundesliga" },
                     { provider: "SportRadar", providerId: "sr:tournament:35", providerName: "Bundesliga" },
-                    { provider: "LSports", providerId: "LS-DE-BUN", providerName: "Germany Bundesliga" }
+                    { provider: "SportGenius", providerId: "sg-trn-bundesliga", providerName: "Germany Bundesliga" }
                 ],
                 "Serie A": [
-                    { provider: "ExeFeed", providerId: "trn:ita:serie-a", providerName: "Serie A" },
+                    { provider: "ExeFeed", providerId: "1019009", providerName: "Serie A" },
                     { provider: "SportRadar", providerId: "sr:tournament:23", providerName: "Serie A" },
-                    { provider: "Bet Construct", providerId: "BC-IT-SA", providerName: "Italy Serie A" }
+                    { provider: "SportGenius", providerId: "sg-trn-serie-a", providerName: "Italy Serie A" }
                 ],
                 "Ligue 1": [
-                    { provider: "ExeFeed", providerId: "trn:fra:ligue-1", providerName: "Ligue 1" },
+                    { provider: "ExeFeed", providerId: "1019010", providerName: "Ligue 1" },
                     { provider: "SportRadar", providerId: "sr:tournament:34", providerName: "Ligue 1" },
-                    { provider: "Bet Genius", providerId: "BG-FR-L1", providerName: "France Ligue 1" }
+                    { provider: "SportGenius", providerId: "sg-trn-ligue-1", providerName: "France Ligue 1" }
                 ],
                 "SuperLiga": [
-                    { provider: "ExeFeed", providerId: "trn:srb:superliga", providerName: "SuperLiga" },
+                    { provider: "ExeFeed", providerId: "1019011", providerName: "SuperLiga" },
                     { provider: "SportRadar", providerId: "sr:tournament:210", providerName: "SuperLiga" },
-                    { provider: "LSports", providerId: "LS-RS-SL", providerName: "Serbia SuperLiga" }
+                    { provider: "SportGenius", providerId: "sg-trn-superliga", providerName: "Serbia SuperLiga" }
                 ],
                 "BBL": [
-                    { provider: "ExeFeed", providerId: "trn:deu:bbl", providerName: "BBL" },
+                    { provider: "ExeFeed", providerId: "1019012", providerName: "BBL" },
                     { provider: "SportRadar", providerId: "sr:tournament:1192", providerName: "BBL" },
-                    { provider: "LSports", providerId: "LS-DE-BBL", providerName: "Basketball Bundesliga" }
+                    { provider: "SportGenius", providerId: "sg-trn-bbl", providerName: "Basketball Bundesliga" }
                 ],
                 "Roland Garros": [
-                    { provider: "ExeFeed", providerId: "trn:fra:roland-garros", providerName: "Roland Garros" },
+                    { provider: "ExeFeed", providerId: "1019013", providerName: "Roland Garros" },
                     { provider: "SportRadar", providerId: "sr:tournament:2480", providerName: "Roland Garros" },
-                    { provider: "IMG Arena", providerId: "IMG-TEN-RG", providerName: "French Open" }
+                    { provider: "SportGenius", providerId: "sg-trn-roland-garros", providerName: "French Open" }
                 ]
             };
 
-            const mappedList = providerTournamentMappings[tournamentName] || [];
-            const listContainer = document.getElementById('providerTournamentsList');
+            const allProviderTournaments = [
+                { provider: "ExeFeed", sport: "Soccer", category: "England", providerId: "1019001", providerName: "Premier League" },
+                { provider: "ExeFeed", sport: "Soccer", category: "England", providerId: "1019002", providerName: "Championship" },
+                { provider: "ExeFeed", sport: "Soccer", category: "England", providerId: "1019032", providerName: "EFL Cup" },
+                { provider: "ExeFeed", sport: "Soccer", category: "Spain", providerId: "1019003", providerName: "LaLiga" },
+                { provider: "ExeFeed", sport: "Soccer", category: "Spain", providerId: "1019004", providerName: "Copa del Rey" },
+                { provider: "SportRadar", sport: "Soccer", category: "England", providerId: "sr:tournament:17", providerName: "Premier League" },
+                { provider: "SportRadar", sport: "Soccer", category: "England", providerId: "sr:tournament:24", providerName: "League One" },
+                { provider: "SportRadar", sport: "Soccer", category: "Spain", providerId: "sr:tournament:8", providerName: "LaLiga" },
+                { provider: "SportRadar", sport: "Basketball", category: "Germany", providerId: "sr:tournament:1192", providerName: "BBL" },
+                { provider: "SportRadar", sport: "Tennis", category: "France", providerId: "sr:tournament:2480", providerName: "Roland Garros" },
+                { provider: "SportGenius", sport: "Soccer", category: "Germany", providerId: "sg-trn-bundesliga", providerName: "Bundesliga" },
+                { provider: "SportGenius", sport: "Soccer", category: "Italy", providerId: "sg-trn-serie-a", providerName: "Serie A" },
+                { provider: "SportGenius", sport: "Soccer", category: "Serbia", providerId: "sg-trn-cup", providerName: "Serbian Cup" }
+            ];
 
-            if (mappedList.length === 0) {
-                listContainer.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #888; font-style: italic;">No provider tournaments mapped to this tournament yet.</td></tr>';
-            } else {
+            const childCompetitorsByTournament = {
+                "Premier League": [
+                    { id: "CP-001", name: "Arsenal", sport: "Soccer", category: "England" },
+                    { id: "CP-002", name: "Manchester City", sport: "Soccer", category: "England" },
+                    { id: "CP-011", name: "Liverpool", sport: "Soccer", category: "England" },
+                    { id: "CP-012", name: "Chelsea", sport: "Soccer", category: "England" }
+                ],
+                "Championship": [
+                    { id: "CP-003", name: "Leeds United", sport: "Soccer", category: "England" },
+                    { id: "CP-013", name: "Leicester City", sport: "Soccer", category: "England" }
+                ],
+                "LaLiga": [
+                    { id: "CP-004", name: "Real Madrid", sport: "Soccer", category: "Spain" },
+                    { id: "CP-005", name: "Barcelona", sport: "Soccer", category: "Spain" },
+                    { id: "CP-014", name: "Atletico Madrid", sport: "Soccer", category: "Spain" }
+                ],
+                "Bundesliga": [
+                    { id: "CP-006", name: "Bayern Munich", sport: "Soccer", category: "Germany" },
+                    { id: "CP-015", name: "Borussia Dortmund", sport: "Soccer", category: "Germany" }
+                ],
+                "Roland Garros": [
+                    { id: "CP-007", name: "Carlos Alcaraz", sport: "Tennis", category: "France" },
+                    { id: "CP-008", name: "Novak Djokovic", sport: "Tennis", category: "France" }
+                ],
+                "Formula 1": [
+                    { id: "CP-009", name: "Max Verstappen", sport: "Formula 1", category: "International" },
+                    { id: "CP-010", name: "Lewis Hamilton", sport: "Formula 1", category: "International" }
+                ],
+                "BBL": [
+                    { id: "CP-016", name: "ALBA Berlin", sport: "Basketball", category: "Germany" },
+                    { id: "CP-017", name: "Bayern Munich Basketball", sport: "Basketball", category: "Germany" }
+                ]
+            };
+
+            let mappedList = [...(providerTournamentMappings[tournamentName] || [])];
+            const listContainer = document.getElementById('providerTournamentsList');
+            const childCompetitorsList = document.getElementById('childCompetitorsList');
+            const addMappingModal = document.getElementById('addMappingModal');
+            const providerFilter = document.getElementById('providerFilter');
+            const sportFilter = document.getElementById('sportFilter');
+            const categoryFilter = document.getElementById('categoryFilter');
+            const providerTournamentSearch = document.getElementById('providerTournamentSearch');
+            const mappingTournamentName = document.getElementById('mappingTournamentName');
+            const availableProviderTournamentsList = document.getElementById('availableProviderTournamentsList');
+            const loadedSections = new Set();
+
+            function openLazySection(sectionId) {
+                const section = document.getElementById(sectionId);
+                section.classList.toggle('open');
+                if (loadedSections.has(sectionId)) return;
+                if (sectionId === 'mappedProviderSection') renderMappedTournaments();
+                if (sectionId === 'childEntitySection') renderChildCompetitors();
+                loadedSections.add(sectionId);
+            }
+
+            function mappingKey(item) {
+                return `${item.provider}::${item.providerId}::${item.providerName}`;
+            }
+
+            function renderMappedTournaments() {
+                listContainer.innerHTML = '';
+                if (mappedList.length === 0) {
+                    listContainer.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #888; font-style: italic;">No provider tournaments mapped to this tournament yet.</td></tr>';
+                    return;
+                }
+
                 mappedList.forEach(providerTournament => {
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
@@ -159,12 +333,102 @@
                         <td style="color: #6c757d;">${providerTournament.providerId}</td>
                         <td style="color: #007bff; font-weight: 500;">${providerTournament.providerName}</td>
                         <td style="text-align: right;">
-                            <button type="button" class="btn-action" style="background-color: #17a2b8; border: none;">Edit Mapping</button>
+                            <a href="map_tournament.html?provider=${encodeURIComponent(providerTournament.provider)}&sport=${encodeURIComponent(sportName)}&category=${encodeURIComponent(categoryName)}&provId=${encodeURIComponent(providerTournament.providerId)}&provName=${encodeURIComponent(providerTournament.providerName)}&internalId=${encodeURIComponent(tournamentId)}" class="btn-action" style="background-color: #17a2b8; text-decoration: none; display: inline-block;">Edit Mapping</a>
                         </td>
                     `;
                     listContainer.appendChild(tr);
                 });
             }
+
+            function renderAvailableProviderTournaments() {
+                const providerVal = providerFilter.value;
+                const sportVal = sportFilter.value;
+                const categoryVal = categoryFilter.value;
+                const searchVal = providerTournamentSearch.value.toLowerCase();
+                const mappedKeys = new Set(mappedList.map(mappingKey));
+                const availableTournaments = allProviderTournaments.filter(item => {
+                    const matchesProvider = providerVal === 'all' || item.provider === providerVal;
+                    const matchesSport = sportVal === 'all' || item.sport === sportVal;
+                    const matchesCategory = categoryVal === 'all' || item.category === categoryVal;
+                    const matchesSearch = item.provider.toLowerCase().includes(searchVal) ||
+                        item.providerId.toLowerCase().includes(searchVal) ||
+                        item.providerName.toLowerCase().includes(searchVal) ||
+                        item.sport.toLowerCase().includes(searchVal) ||
+                        item.category.toLowerCase().includes(searchVal);
+                    return matchesProvider && matchesSport && matchesCategory && matchesSearch && !mappedKeys.has(mappingKey(item));
+                });
+
+                if (availableTournaments.length === 0) {
+                    availableProviderTournamentsList.innerHTML = '<tr><td colspan="7" style="text-align: center; color: #888; font-style: italic;">No not mapped provider tournaments found.</td></tr>';
+                    return;
+                }
+
+                availableProviderTournamentsList.innerHTML = availableTournaments.map(item => `
+                    <tr>
+                        <td style="font-weight: 500;">${item.provider}</td>
+                        <td>${item.sport}</td>
+                        <td>${item.category}</td>
+                        <td style="color: #6c757d;">${item.providerId}</td>
+                        <td class="market-name" style="color: #007bff;">${item.providerName}</td>
+                        <td><span class="status-badge status-unmapped">Not mapped</span></td>
+                        <td style="text-align: right;">
+                            <button type="button" class="btn-action add-provider-tournament-btn" data-key="${mappingKey(item)}">Map</button>
+                        </td>
+                    </tr>
+                `).join('');
+
+                document.querySelectorAll('.add-provider-tournament-btn').forEach(button => {
+                    button.addEventListener('click', () => {
+                        const selectedTournament = allProviderTournaments.find(item => mappingKey(item) === button.dataset.key);
+                        if (!selectedTournament) return;
+                        mappedList.push(selectedTournament);
+                        addMappingModal.style.display = 'none';
+                        if (loadedSections.has('mappedProviderSection')) renderMappedTournaments();
+                        renderAvailableProviderTournaments();
+                    });
+                });
+            }
+
+            function renderChildCompetitors() {
+                const competitors = childCompetitorsByTournament[tournamentName] || [];
+                if (competitors.length === 0) {
+                    childCompetitorsList.innerHTML = '<tr><td colspan="3" style="text-align: center; color: #888; font-style: italic;">No competitors found for this tournament.</td></tr>';
+                    return;
+                }
+
+                childCompetitorsList.innerHTML = competitors.map(competitor => `
+                    <tr>
+                        <td style="font-weight: 500; color: #6c757d;">${competitor.id}</td>
+                        <td class="market-name">${competitor.name}</td>
+                        <td style="text-align: right;">
+                            <a href="../competitors/view_competitor.html?id=${encodeURIComponent(competitor.id)}&name=${encodeURIComponent(competitor.name)}&sport=${encodeURIComponent(competitor.sport)}" class="btn-action" style="background-color: #007bff; text-decoration: none; display: inline-block;">View</a>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+
+            document.getElementById('addMappingBtn').addEventListener('click', () => {
+                providerFilter.value = 'all';
+                sportFilter.value = Array.from(sportFilter.options).some(option => option.value === sportName) ? sportName : 'all';
+                categoryFilter.value = Array.from(categoryFilter.options).some(option => option.value === categoryName) ? categoryName : 'all';
+                providerTournamentSearch.value = '';
+                mappingTournamentName.textContent = tournamentName;
+                renderAvailableProviderTournaments();
+                addMappingModal.style.display = 'flex';
+            });
+            document.getElementById('closeAddMappingModalBtn').addEventListener('click', () => {
+                addMappingModal.style.display = 'none';
+            });
+            providerFilter.addEventListener('change', renderAvailableProviderTournaments);
+            sportFilter.addEventListener('change', renderAvailableProviderTournaments);
+            categoryFilter.addEventListener('change', renderAvailableProviderTournaments);
+            providerTournamentSearch.addEventListener('input', renderAvailableProviderTournaments);
+            document.querySelectorAll('.lazy-section-toggle').forEach(button => {
+                button.addEventListener('click', () => openLazySection(button.dataset.target));
+            });
+            window.addEventListener('click', event => {
+                if (event.target === addMappingModal) addMappingModal.style.display = 'none';
+            });
         });
     </script>
 </body>

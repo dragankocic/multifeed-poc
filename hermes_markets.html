@@ -6,31 +6,171 @@
     <title>Markets</title>
     <link rel="stylesheet" href="style.css">
     <script src="auth.js"></script>
+    <style>
+        .workspace-tabs {
+            display: inline-flex;
+            gap: 4px;
+            padding: 4px;
+            background: #eef3f4;
+            border: 1px solid #d4dee1;
+            border-radius: 6px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .workspace-tab {
+            flex: 1;
+            border: 0;
+            border-radius: 4px;
+            padding: 9px 14px;
+            background: transparent;
+            color: #566;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .workspace-tab.active {
+            background: #17a2b8;
+            color: white;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+        }
+
+        .row-actions {
+            display: inline-flex;
+            justify-content: flex-end;
+            gap: 8px;
+            white-space: nowrap;
+        }
+
+        .workspace-toolbar .filters {
+            display: grid;
+            grid-template-columns: minmax(220px, 280px) minmax(150px, 190px) minmax(160px, 210px) minmax(180px, 220px) minmax(220px, 1fr);
+            align-items: flex-end;
+            gap: 14px;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .workspace-toolbar .filter-group {
+            min-height: 66px;
+            justify-content: flex-end;
+        }
+
+        .workspace-toolbar select,
+        .workspace-toolbar input {
+            width: 100%;
+            height: 41px;
+            min-width: 0 !important;
+            box-sizing: border-box;
+        }
+
+        .workspace-toolbar .actions {
+            display: flex;
+            align-items: flex-end;
+            min-height: 66px;
+            flex-shrink: 0;
+            margin-left: auto;
+        }
+
+        .workspace-toolbar .btn-primary {
+            height: 41px;
+            display: inline-flex !important;
+            align-items: center;
+            justify-content: center;
+            white-space: nowrap;
+            padding-left: 18px;
+            padding-right: 18px;
+        }
+
+        .status-partial {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+        }
+
+        @media (max-width: 1500px) {
+            .workspace-toolbar {
+                align-items: stretch;
+                gap: 16px;
+                flex-wrap: wrap;
+            }
+
+            .workspace-toolbar .filters {
+                grid-template-columns: repeat(3, minmax(190px, 1fr));
+                width: 100%;
+            }
+
+            .workspace-toolbar .actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+        }
+
+        @media (max-width: 980px) {
+            .workspace-toolbar .filters {
+                grid-template-columns: repeat(2, minmax(190px, 1fr));
+            }
+        }
+
+        @media (max-width: 760px) {
+            .workspace-toolbar {
+                flex-direction: column;
+            }
+
+            .workspace-toolbar .filters {
+                grid-template-columns: 1fr;
+            }
+
+            .workspace-toolbar .actions,
+            .workspace-toolbar .btn-primary {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
 <body>
-
-    <div id="sidebar-container" data-root="." data-active="markets-management" data-service="sportsbook"></div>
+    <div id="sidebar-container" data-root="." data-active="markets-management"></div>
+    <script src="sidebar.js"></script>
 
     <div class="main-content">
         <header class="main-header">
             <h1>Markets</h1>
-            <p class="page-subtitle">Manage standardized market definitions by sport and market type.</p>
+            <p class="page-subtitle">Browse internal and provider markets, then manage their mappings.</p>
         </header>
 
         <main class="split-layout">
             <div class="form-side">
-                <div class="top-bar">
+                <div class="top-bar workspace-toolbar">
                     <div class="filters">
+                        <div class="filter-group">
+                            <label>View</label>
+                            <div class="workspace-tabs" aria-label="Market mapping perspective">
+                                <button type="button" class="workspace-tab active" data-view="internal">Internal markets</button>
+                                <button type="button" class="workspace-tab" data-view="provider">Provider markets</button>
+                            </div>
+                        </div>
+
+                        <div class="filter-group" id="providerFilterGroup" style="display: none;">
+                            <label for="providerSelect">Provider</label>
+                            <select id="providerSelect">
+                                <option value="all">All</option>
+                                <option value="ExeFeed" selected>ExeFeed</option>
+                                <option value="SportRadar">SportRadar</option>
+                                <option value="SportGenius">SportGenius</option>
+                            </select>
+                        </div>
+
                         <div class="filter-group">
                             <label for="sportSelect">Sport</label>
                             <select id="sportSelect">
+                                <option value="all">All</option>
                                 <option value="Soccer" selected>Soccer</option>
                                 <option value="Basketball">Basketball</option>
                                 <option value="Tennis">Tennis</option>
                             </select>
                         </div>
 
-                        <div class="filter-group">
+                        <div class="filter-group" id="typeFilterGroup">
                             <label for="typeSelect">Market Type</label>
                             <select id="typeSelect">
                                 <option value="all" selected>All</option>
@@ -41,100 +181,216 @@
                             </select>
                         </div>
 
+                        <div class="filter-group" id="statusFilterGroup" style="display: none;">
+                            <label for="statusSelect">Mapping status</label>
+                            <select id="statusSelect">
+                                <option value="all" selected>All</option>
+                                <option value="mapped">Mapped</option>
+                                <option value="partially mapped">Partially mapped</option>
+                                <option value="unmapped">Unmapped</option>
+                            </select>
+                        </div>
+
                         <div class="filter-group">
                             <label for="searchInput">Search</label>
-                            <input type="text" id="searchInput" placeholder="Search by name or ID..." style="padding: 10px 15px; border: 1px solid #ccc; border-radius: 4px; font-size: 15px; min-width: 250px; background-color: #fdfdfd;">
+                            <input type="text" id="searchInput" placeholder="Search by name or ID..." style="padding: 10px 15px; border: 1px solid #ccc; border-radius: 4px; font-size: 15px; background-color: #fdfdfd;">
                         </div>
                     </div>
 
                     <div class="actions">
-                        <a href="create_market/create_market.html" class="btn-primary" style="text-decoration: none; display: inline-block;">Add Market</a>
                     </div>
                 </div>
 
-                <section class="markets-section">
-                    <table class="markets-table">
-                        <thead>
-                            <tr>
-                                <th>Market ID</th>
-                                <th>Market Name</th>
-                                <th>Sport</th>
-                                <th>Market Description</th>
-                                <th>Market Type</th>
-                                <th style="text-align: right;">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="marketsBody">
-                            <!-- Dinamički se puni JS-om -->
-                        </tbody>
+                <section class="markets-section" style="overflow-x: auto;">
+                    <table class="markets-table" id="workspaceTable" style="min-width: 980px;">
+                        <thead id="workspaceHead"></thead>
+                        <tbody id="workspaceBody"></tbody>
                     </table>
                 </section>
             </div>
-
         </main>
     </div>
 
     <script src="pagination.js"></script>
-    <script src="sidebar.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const marketsBody = document.getElementById('marketsBody');
-            const sportSelect = document.getElementById('sportSelect');
-            const typeSelect = document.getElementById('typeSelect');
-            const searchInput = document.getElementById('searchInput');
-
-            // IZMENJENO: Total Goals je sada tipa Statistics
-            const markets = [
-                { id: "HRM-001", name: "1X2", desc: "Home, Draw, Away match winner", type: "Regular", sport: "Soccer" },
-                { id: "HRM-002", name: "Asian Handicap", desc: "Handicap betting for the match", type: "Regular", sport: "Soccer" },
-                { id: "HRM-003", name: "Total Goals", desc: "Over/Under total goals", type: "Statistics", sport: "Soccer" },
-                { id: "HRM-004", name: "Anytime goalscorer", desc: "Player to score at any time", type: "Player Props", sport: "Soccer" },
-                { id: "HRM-005", name: "Total Corners", desc: "Over/Under total corners in the match", type: "Statistics", sport: "Soccer" }
+            const internalMarkets = [
+                { id: "HRM-001", name: "1X2", sport: "Soccer", desc: "Home, Draw, Away match winner", type: "Regular" },
+                { id: "HRM-002", name: "Asian Handicap", sport: "Soccer", desc: "Handicap betting for the match", type: "Regular" },
+                { id: "HRM-003", name: "Total Goals", sport: "Soccer", desc: "Over/Under total goals", type: "Statistics" },
+                { id: "HRM-004", name: "Anytime goalscorer", sport: "Soccer", desc: "Player to score at any time", type: "Player Props" },
+                { id: "HRM-005", name: "Total Corners", sport: "Soccer", desc: "Over/Under total corners in the match", type: "Statistics" },
+                { id: "HRM-006", name: "Moneyline", sport: "Basketball", desc: "Match winner without draw", type: "Regular" },
+                { id: "HRM-007", name: "Set Winner", sport: "Tennis", desc: "Winner of selected set", type: "Regular" }
             ];
 
-            function renderMarkets() {
-                marketsBody.innerHTML = ''; 
+            const providerMarkets = [
+                { marketId: "-", providerMarketName: "1X2", provider: "ExeFeed", sport: "Soccer", status: "Mapped", internalId: "HRM-001", internalName: "1X2" },
+                { marketId: "-", providerMarketName: "TOTAL_GOALS", provider: "ExeFeed", sport: "Soccer", status: "Partially mapped", internalId: "HRM-003", internalName: "Total Goals" },
+                { marketId: "101", providerMarketName: "TOTAL_CORNERS", provider: "ExeFeed", sport: "Soccer", status: "Mapped", internalId: "HRM-005", internalName: "Total Corners" },
+                { marketId: "102", providerMarketName: "ANYTIME_GOALSCORER", provider: "ExeFeed", sport: "Soccer", status: "Unmapped", internalId: "-", internalName: "-" },
+                { marketId: "sr:market:1", providerMarketName: "3way", provider: "SportRadar", sport: "Soccer", status: "Mapped", internalId: "HRM-001", internalName: "1X2" },
+                { marketId: "sr:market:18", providerMarketName: "total", provider: "SportRadar", sport: "Soccer", status: "Partially mapped", internalId: "HRM-003", internalName: "Total Goals" },
+                { marketId: "sr:market:219", providerMarketName: "player_to_score", provider: "SportRadar", sport: "Soccer", status: "Unmapped", internalId: "-", internalName: "-" },
+                { marketId: "sg-mkt-moneyline", providerMarketName: "Moneyline", provider: "SportGenius", sport: "Basketball", status: "Mapped", internalId: "HRM-006", internalName: "Moneyline" },
+                { marketId: "sg-mkt-set-winner", providerMarketName: "Set Winner", provider: "SportGenius", sport: "Tennis", status: "Mapped", internalId: "HRM-007", internalName: "Set Winner" }
+            ];
+
+            const tabs = document.querySelectorAll('.workspace-tab');
+            const providerFilterGroup = document.getElementById('providerFilterGroup');
+            const typeFilterGroup = document.getElementById('typeFilterGroup');
+            const statusFilterGroup = document.getElementById('statusFilterGroup');
+            const providerSelect = document.getElementById('providerSelect');
+            const sportSelect = document.getElementById('sportSelect');
+            const typeSelect = document.getElementById('typeSelect');
+            const statusSelect = document.getElementById('statusSelect');
+            const searchInput = document.getElementById('searchInput');
+            const workspaceHead = document.getElementById('workspaceHead');
+            const workspaceBody = document.getElementById('workspaceBody');
+            let activeView = 'internal';
+
+            function statusBadgeClass(status) {
+                if (status === 'Mapped') return 'status-mapped';
+                if (status === 'Partially mapped') return 'status-partial';
+                return 'status-unmapped';
+            }
+
+            function mapUrl(market) {
+                return `mapping/mapping.html?provider=${encodeURIComponent(market.provider)}&sport=${encodeURIComponent(market.sport)}&market=${encodeURIComponent(market.providerMarketName)}&marketId=${encodeURIComponent(market.marketId)}&internalId=${encodeURIComponent(market.internalId)}`;
+            }
+
+            function renderInternalView() {
+                workspaceHead.innerHTML = `
+                    <tr>
+                        <th>Market ID</th>
+                        <th>Market Name</th>
+                        <th>Sport</th>
+                        <th>Market Description</th>
+                        <th>Market Type</th>
+                        <th style="text-align: right;">Action</th>
+                    </tr>
+                `;
 
                 const searchVal = searchInput.value.toLowerCase();
                 const sportVal = sportSelect.value;
                 const typeVal = typeSelect.value;
-
-                const filteredMarkets = markets.filter(market => {
-                    const matchesSearch = market.name.toLowerCase().includes(searchVal) || market.id.toLowerCase().includes(searchVal);
-                    const matchesSport = market.sport.toLowerCase() === sportVal.toLowerCase();
+                const rows = internalMarkets.filter(market => {
+                    const matchesSport = sportVal === 'all' || market.sport === sportVal;
                     const matchesType = typeVal === 'all' || market.type === typeVal;
-                    
-                    return matchesSearch && matchesSport && matchesType;
+                    const matchesSearch = market.id.toLowerCase().includes(searchVal) ||
+                        market.name.toLowerCase().includes(searchVal) ||
+                        market.desc.toLowerCase().includes(searchVal) ||
+                        market.type.toLowerCase().includes(searchVal);
+                    return matchesSport && matchesType && matchesSearch;
                 });
 
-                if (filteredMarkets.length === 0) {
-                    marketsBody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #888; font-style: italic;">No markets found matching the filters.</td></tr>';
+                if (rows.length === 0) {
+                    workspaceBody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #888; font-style: italic; padding: 20px;">No markets found.</td></tr>';
                     return;
                 }
 
-                filteredMarkets.forEach(market => {
-                    const row = document.createElement('tr');
-                    
-                    row.innerHTML = `
+                workspaceBody.innerHTML = rows.map(market => `
+                    <tr>
                         <td style="font-weight: 500; color: #6c757d;">${market.id}</td>
                         <td class="market-name">${market.name}</td>
                         <td>${market.sport}</td>
-                        <td style="color: #555; font-size: 14px;">${market.desc}</td>
-                        <td><span style="background: #e9ecef; padding: 4px 10px; border-radius: 4px; font-size: 13px; border: 1px solid #ccc;">${market.type}</span></td>
+                        <td style="color: #555;">${market.desc}</td>
+                        <td><span style="background: #e9ecef; padding: 4px 10px; border-radius: 4px; font-size: 12px; border: 1px solid #ccc;">${market.type}</span></td>
                         <td style="text-align: right;">
-                            <a href="view_hermes_market.html?id=${encodeURIComponent(market.id)}&market=${encodeURIComponent(market.name)}&sport=${encodeURIComponent(market.sport)}&type=${encodeURIComponent(market.type)}" class="btn-action" style="background-color: #007bff; text-decoration: none; display: inline-block; margin-right: 5px;">View</a>
-                            <a href="create_market/create_market.html?edit=true&id=${encodeURIComponent(market.id)}&market=${encodeURIComponent(market.name)}&sport=${encodeURIComponent(market.sport)}&type=${encodeURIComponent(market.type)}" class="btn-action" style="background-color: #17a2b8; text-decoration: none; display: inline-block;">Edit</a>
+                            <span class="row-actions">
+                                <a href="view_hermes_market.html?id=${encodeURIComponent(market.id)}&market=${encodeURIComponent(market.name)}&sport=${encodeURIComponent(market.sport)}&type=${encodeURIComponent(market.type)}" class="btn-action" style="background-color: #007bff; text-decoration: none; display: inline-block;">View</a>
+                                <a href="create_market/create_market.html?edit=true&id=${encodeURIComponent(market.id)}&market=${encodeURIComponent(market.name)}&sport=${encodeURIComponent(market.sport)}&type=${encodeURIComponent(market.type)}" class="btn-action" style="background-color: #17a2b8; text-decoration: none; display: inline-block;">Edit</a>
+                            </span>
                         </td>
-                    `;
-                    marketsBody.appendChild(row);
-                });
+                    </tr>
+                `).join('');
             }
 
-            sportSelect.addEventListener('change', renderMarkets);
-            typeSelect.addEventListener('change', renderMarkets);
-            searchInput.addEventListener('input', renderMarkets);
+            function renderProviderView() {
+                workspaceHead.innerHTML = `
+                    <tr>
+                        <th>Market ID</th>
+                        <th>Provider Market Name</th>
+                        <th>Provider</th>
+                        <th>Sport</th>
+                        <th>Status</th>
+                        <th style="text-align: right;">Action</th>
+                    </tr>
+                `;
 
-            renderMarkets();
+                const providerVal = providerSelect.value;
+                const sportVal = sportSelect.value;
+                const statusVal = statusSelect.value;
+                const searchVal = searchInput.value.toLowerCase();
+                const rows = providerMarkets.filter(market => {
+                    const matchesProvider = providerVal === 'all' || market.provider === providerVal;
+                    const matchesSport = sportVal === 'all' || market.sport === sportVal;
+                    const matchesStatus = statusVal === 'all' || market.status.toLowerCase() === statusVal;
+                    const matchesSearch = market.marketId.toLowerCase().includes(searchVal) ||
+                        market.providerMarketName.toLowerCase().includes(searchVal) ||
+                        market.provider.toLowerCase().includes(searchVal) ||
+                        market.sport.toLowerCase().includes(searchVal) ||
+                        market.internalId.toLowerCase().includes(searchVal) ||
+                        market.internalName.toLowerCase().includes(searchVal);
+                    return matchesProvider && matchesSport && matchesStatus && matchesSearch;
+                });
+
+                if (rows.length === 0) {
+                    workspaceBody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #888; font-style: italic; padding: 20px;">No provider markets found.</td></tr>';
+                    return;
+                }
+
+                workspaceBody.innerHTML = rows.map(market => {
+                    const viewButton = market.status !== 'Unmapped'
+                        ? `<a href="view_hermes_market.html?id=${encodeURIComponent(market.internalId)}&market=${encodeURIComponent(market.internalName)}&sport=${encodeURIComponent(market.sport)}" class="btn-action" style="background-color: #007bff; text-decoration: none; display: inline-block;">View</a>`
+                        : `<a href="view_market.html?provider=${encodeURIComponent(market.provider)}&market=${encodeURIComponent(market.providerMarketName)}&sport=${encodeURIComponent(market.sport)}" class="btn-action" style="background-color: #007bff; text-decoration: none; display: inline-block;">View</a>`;
+
+                    return `
+                        <tr>
+                            <td style="font-weight: 500; color: #6c757d;">${market.marketId}</td>
+                            <td class="market-name">${market.providerMarketName}</td>
+                            <td style="font-weight: 500;">${market.provider}</td>
+                            <td>${market.sport}</td>
+                            <td><span class="status-badge ${statusBadgeClass(market.status)}">${market.status}</span></td>
+                            <td style="text-align: right;">
+                                <span class="row-actions">
+                                    ${viewButton}
+                                    <a href="${mapUrl(market)}" class="btn-action" style="background-color: #28a745; text-decoration: none; display: inline-block;">Map</a>
+                                </span>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+
+            function render() {
+                const showProvider = activeView === 'provider';
+                providerFilterGroup.style.display = showProvider ? 'block' : 'none';
+                statusFilterGroup.style.display = showProvider ? 'block' : 'none';
+                typeFilterGroup.style.display = showProvider ? 'none' : 'block';
+                document.getElementById('workspaceTable').style.minWidth = showProvider ? '980px' : '1040px';
+                if (activeView === 'internal') {
+                    renderInternalView();
+                } else {
+                    renderProviderView();
+                }
+            }
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    activeView = tab.dataset.view;
+                    tabs.forEach(item => item.classList.toggle('active', item === tab));
+                    searchInput.value = '';
+                    render();
+                });
+            });
+
+            providerSelect.addEventListener('change', render);
+            sportSelect.addEventListener('change', render);
+            typeSelect.addEventListener('change', render);
+            statusSelect.addEventListener('change', render);
+            searchInput.addEventListener('input', render);
+            render();
         });
     </script>
 </body>

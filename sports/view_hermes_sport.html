@@ -8,6 +8,45 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="../style.css">
     <script src="../auth.js"></script>
+    <style>
+        .lazy-section-toggle {
+            width: 100%;
+            border: 0;
+            background: transparent;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 0;
+            text-align: left;
+        }
+
+        .lazy-section-toggle h3 {
+            margin: 0;
+            color: #333;
+            font-size: 18px;
+        }
+
+        .lazy-section-icon {
+            color: #667085;
+            font-size: 18px;
+            transition: transform 0.2s;
+        }
+
+        .lazy-section.open .lazy-section-icon {
+            transform: rotate(180deg);
+        }
+
+        .lazy-section-body {
+            display: none;
+            margin-top: 15px;
+        }
+
+        .lazy-section.open .lazy-section-body {
+            display: block;
+        }
+    </style>
 </head>
 <body>
 
@@ -18,7 +57,7 @@
     <div class="main-content">
         <header class="main-header" style="background-color: #17a2b8; color: white;">
             <h1>Sport Overview</h1>
-            <p class="page-subtitle">Inspect a sport and the provider sports mapped to it.</p>
+            <p class="page-subtitle">Inspect a sport, its provider mappings, and categories.</p>
         </header>
 
         <main class="split-layout">
@@ -39,26 +78,93 @@
                 </section>
 
                 <!-- Tabela mapiranih provider sportova -->
-                <section class="markets-section" style="margin-top: 25px; padding: 25px; background: white; border-radius: 8px; border: 1px solid #e0e0e0;">
-                    <h3 style="margin-bottom: 20px; color: #333; font-size: 18px; border-bottom: 1px solid #eee; padding-bottom: 10px;">Mapped Provider Sports</h3>
-                    <p style="margin-bottom: 15px; font-size: 14px; color: #666;">Lista sportova od različitih provajdera koji su izmapirani na ovaj sport.</p>
+                <section class="markets-section lazy-section" id="mappedProviderSection" style="margin-top: 25px; padding: 25px; background: white; border-radius: 8px; border: 1px solid #e0e0e0;">
+                    <div class="section-header" style="display: flex; align-items: center; justify-content: space-between; gap: 16px; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 15px;">
+                        <button type="button" class="lazy-section-toggle" data-target="mappedProviderSection">
+                            <h3>Mapped Provider Sports</h3>
+                            <span class="lazy-section-icon">⌄</span>
+                        </button>
+                        <button type="button" id="addMappingBtn" class="btn-primary">Add mapping</button>
+                    </div>
+                    <div class="lazy-section-body">
+                        <p style="margin-bottom: 15px; font-size: 14px; color: #666;">Provider sports currently mapped to this sport.</p>
                     
-                    <table class="markets-table" style="margin-bottom: 25px;">
-                        <thead>
-                            <tr>
-                                <th>Provider</th>
-                                <th>Provider Sport ID</th>
-                                <th>Provider Sport Name</th>
-                                <th style="text-align: right;">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="providerSportsList">
-                            <!-- Dinamički se puni preko JS-a -->
-                        </tbody>
-                    </table>
+                        <table class="markets-table" style="margin-bottom: 25px;">
+                            <thead>
+                                <tr>
+                                    <th>Provider</th>
+                                    <th>Provider Sport ID</th>
+                                    <th>Provider Sport Name</th>
+                                    <th style="text-align: right;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="providerSportsList">
+                                <!-- Dinamički se puni preko JS-a -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="markets-section lazy-section" id="childEntitySection" style="margin-top: 25px; padding: 25px; background: white; border-radius: 8px; border: 1px solid #e0e0e0;">
+                    <div class="section-header" style="border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 15px;">
+                        <button type="button" class="lazy-section-toggle" data-target="childEntitySection">
+                            <h3>Categories</h3>
+                            <span class="lazy-section-icon">⌄</span>
+                        </button>
+                    </div>
+                    <div class="lazy-section-body">
+                        <p style="margin-bottom: 15px; font-size: 14px; color: #666;">Categories available under this sport.</p>
+
+                        <table class="markets-table">
+                            <thead>
+                                <tr>
+                                    <th>Category ID</th>
+                                    <th>Category Name</th>
+                                    <th style="text-align: right;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="childCategoriesList"></tbody>
+                        </table>
+                    </div>
                 </section>
             </div>
         </main>
+    </div>
+
+    <div id="addMappingModal" class="modal">
+        <div class="modal-content" style="width: min(900px, 92vw);">
+            <span class="close-modal" id="closeAddMappingModalBtn">&times;</span>
+            <h3>Add provider sport mapping for <span id="mappingSportName" style="color: #17a2b8;"></span></h3>
+            <div class="top-bar" style="box-shadow: none; margin-bottom: 15px;">
+                <div class="filters">
+                    <div class="filter-group">
+                        <label for="providerFilter">Provider</label>
+                        <select id="providerFilter">
+                            <option value="all" selected>All</option>
+                            <option value="ExeFeed">ExeFeed</option>
+                            <option value="SportRadar">SportRadar</option>
+                            <option value="SportGenius">SportGenius</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="providerSportSearch">Search</label>
+                        <input type="text" id="providerSportSearch" placeholder="Search provider sport..." style="padding: 10px 15px; border: 1px solid #ccc; border-radius: 4px; font-size: 15px; min-width: 220px; background-color: #fdfdfd;">
+                    </div>
+                </div>
+            </div>
+            <table class="markets-table">
+                <thead>
+                    <tr>
+                        <th>Provider</th>
+                        <th>Provider Sport ID</th>
+                        <th>Provider Sport Name</th>
+                        <th>Status</th>
+                        <th style="text-align: right;">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="availableProviderSportsList" data-page-size="10"></tbody>
+            </table>
+        </div>
     </div>
 
     <script src="../pagination.js"></script>
@@ -78,20 +184,84 @@
             // Mock podaci: koji provajder sportovi pokazuju na ovaj sport
             const reverseMappings = {
                 "Soccer": [
-                    { provider: "ExeFeed", provId: "-", provName: "Soccer" },
+                    { provider: "ExeFeed", provId: "F", provName: "Fudbal" },
                     { provider: "SportRadar", provId: "sr:sport:1", provName: "Football" }
                 ],
                 "Basketball": [
-                    { provider: "ExeFeed", provId: "-", provName: "Basketball" }
+                    { provider: "ExeFeed", provId: "B", provName: "Košarka" }
+                ],
+                "Tennis": [
+                    { provider: "ExeFeed", provId: "T", provName: "Tenis" }
                 ]
             };
 
-            const mappedList = reverseMappings[sportName] || [];
-            const listContainer = document.getElementById('providerSportsList');
+            const allProviderSports = [
+                { provider: "ExeFeed", provId: "F", provName: "Fudbal" },
+                { provider: "SportRadar", provId: "sr:sport:1", provName: "Football" },
+                { provider: "ExeFeed", provId: "B", provName: "Košarka" },
+                { provider: "SportGenius", provId: "sg-10", provName: "Ice Hockey" },
+                { provider: "ExeFeed", provId: "T", provName: "Tenis" },
+                { provider: "SportRadar", provId: "sr:sport:3", provName: "Baseball" },
+                { provider: "SportGenius", provId: "sg-44", provName: "American Football" },
+                { provider: "ExeFeed", provId: "IH", provName: "Hokej na ledu" },
+                { provider: "ExeFeed", provId: "V", provName: "Odbojka" },
+                { provider: "ExeFeed", provId: "H", provName: "Rukomet" }
+            ];
 
-            if (mappedList.length === 0) {
-                listContainer.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #888; font-style: italic;">No provider sports mapped to this sport yet.</td></tr>';
-            } else {
+            const childCategoriesBySport = {
+                "Soccer": [
+                    { id: "C-001", name: "England" },
+                    { id: "C-002", name: "Spain" },
+                    { id: "C-003", name: "Germany" },
+                    { id: "C-004", name: "Italy" },
+                    { id: "C-005", name: "France" },
+                    { id: "C-006", name: "Serbia" }
+                ],
+                "Basketball": [
+                    { id: "C-007", name: "United States" },
+                    { id: "C-003", name: "Germany" },
+                    { id: "C-005", name: "France" }
+                ],
+                "Tennis": [
+                    { id: "C-005", name: "France" },
+                    { id: "C-002", name: "Spain" },
+                    { id: "C-001", name: "England" }
+                ],
+                "Formula 1": [
+                    { id: "C-008", name: "International" }
+                ]
+            };
+
+            let mappedList = [...(reverseMappings[sportName] || [])];
+            const listContainer = document.getElementById('providerSportsList');
+            const childCategoriesList = document.getElementById('childCategoriesList');
+            const addMappingModal = document.getElementById('addMappingModal');
+            const providerFilter = document.getElementById('providerFilter');
+            const providerSportSearch = document.getElementById('providerSportSearch');
+            const mappingSportName = document.getElementById('mappingSportName');
+            const availableProviderSportsList = document.getElementById('availableProviderSportsList');
+            const loadedSections = new Set();
+
+            function openLazySection(sectionId) {
+                const section = document.getElementById(sectionId);
+                section.classList.toggle('open');
+                if (loadedSections.has(sectionId)) return;
+                if (sectionId === 'mappedProviderSection') renderMappedSports();
+                if (sectionId === 'childEntitySection') renderChildCategories();
+                loadedSections.add(sectionId);
+            }
+
+            function mappingKey(item) {
+                return `${item.provider}::${item.provId}::${item.provName}`;
+            }
+
+            function renderMappedSports() {
+                listContainer.innerHTML = '';
+                if (mappedList.length === 0) {
+                    listContainer.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #888; font-style: italic;">No provider sports mapped to this sport yet.</td></tr>';
+                    return;
+                }
+
                 mappedList.forEach(prov => {
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
@@ -105,6 +275,84 @@
                     listContainer.appendChild(tr);
                 });
             }
+
+            function renderAvailableProviderSports() {
+                const providerVal = providerFilter.value;
+                const searchVal = providerSportSearch.value.toLowerCase();
+                const mappedKeys = new Set(mappedList.map(mappingKey));
+                const availableSports = allProviderSports.filter(item => {
+                    const matchesProvider = providerVal === 'all' || item.provider === providerVal;
+                    const matchesSearch = item.provider.toLowerCase().includes(searchVal) ||
+                        item.provId.toLowerCase().includes(searchVal) ||
+                        item.provName.toLowerCase().includes(searchVal);
+                    return matchesProvider && matchesSearch && !mappedKeys.has(mappingKey(item));
+                });
+
+                if (availableSports.length === 0) {
+                    availableProviderSportsList.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #888; font-style: italic;">No not mapped provider sports found.</td></tr>';
+                    return;
+                }
+
+                availableProviderSportsList.innerHTML = availableSports.map(item => `
+                    <tr>
+                        <td style="font-weight: 500;">${item.provider}</td>
+                        <td style="color: #6c757d;">${item.provId}</td>
+                        <td class="market-name" style="color: #007bff;">${item.provName}</td>
+                        <td><span class="status-badge status-unmapped">Not mapped</span></td>
+                        <td style="text-align: right;">
+                            <button type="button" class="btn-action add-provider-sport-btn" data-key="${mappingKey(item)}">Map</button>
+                        </td>
+                    </tr>
+                `).join('');
+
+                document.querySelectorAll('.add-provider-sport-btn').forEach(button => {
+                    button.addEventListener('click', () => {
+                        const selectedSport = allProviderSports.find(item => mappingKey(item) === button.dataset.key);
+                        if (!selectedSport) return;
+                        mappedList.push(selectedSport);
+                        addMappingModal.style.display = 'none';
+                        if (loadedSections.has('mappedProviderSection')) renderMappedSports();
+                        renderAvailableProviderSports();
+                    });
+                });
+            }
+
+            function renderChildCategories() {
+                const categories = childCategoriesBySport[sportName] || [];
+                if (categories.length === 0) {
+                    childCategoriesList.innerHTML = '<tr><td colspan="3" style="text-align: center; color: #888; font-style: italic;">No categories found for this sport.</td></tr>';
+                    return;
+                }
+
+                childCategoriesList.innerHTML = categories.map(category => `
+                    <tr>
+                        <td style="font-weight: 500; color: #6c757d;">${category.id}</td>
+                        <td class="market-name">${category.name}</td>
+                        <td style="text-align: right;">
+                            <a href="../categories/view_category.html?id=${encodeURIComponent(category.id)}&name=${encodeURIComponent(category.name)}" class="btn-action" style="background-color: #007bff; text-decoration: none; display: inline-block;">View</a>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+
+            document.getElementById('addMappingBtn').addEventListener('click', () => {
+                providerFilter.value = 'all';
+                providerSportSearch.value = '';
+                mappingSportName.textContent = sportName;
+                renderAvailableProviderSports();
+                addMappingModal.style.display = 'flex';
+            });
+            document.getElementById('closeAddMappingModalBtn').addEventListener('click', () => {
+                addMappingModal.style.display = 'none';
+            });
+            providerFilter.addEventListener('change', renderAvailableProviderSports);
+            providerSportSearch.addEventListener('input', renderAvailableProviderSports);
+            document.querySelectorAll('.lazy-section-toggle').forEach(button => {
+                button.addEventListener('click', () => openLazySection(button.dataset.target));
+            });
+            window.addEventListener('click', event => {
+                if (event.target === addMappingModal) addMappingModal.style.display = 'none';
+            });
         });
     </script>
 </body>

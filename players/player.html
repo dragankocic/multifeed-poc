@@ -4,25 +4,139 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Players</title>
-    <link rel="stylesheet" href="../sports/style.css">
     <link rel="stylesheet" href="../style.css">
     <script src="../auth.js"></script>
+    <style>
+        .workspace-tabs {
+            display: inline-flex;
+            gap: 4px;
+            padding: 4px;
+            background: #eef3f4;
+            border: 1px solid #d4dee1;
+            border-radius: 6px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .workspace-tab {
+            flex: 1;
+            border: 0;
+            border-radius: 4px;
+            padding: 9px 14px;
+            background: transparent;
+            color: #566;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .workspace-tab.active {
+            background: #17a2b8;
+            color: white;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+        }
+
+        .row-actions {
+            display: inline-flex;
+            justify-content: flex-end;
+            gap: 6px;
+            white-space: nowrap;
+        }
+
+        .workspace-toolbar .filters {
+            display: grid;
+            grid-template-columns: minmax(250px, 330px) minmax(170px, 210px) minmax(190px, 240px) minmax(190px, 230px) minmax(210px, 250px) minmax(260px, 1fr);
+            align-items: flex-end;
+            gap: 16px;
+            flex: 1;
+        }
+
+        .workspace-toolbar .filter-group {
+            min-height: 66px;
+            justify-content: flex-end;
+        }
+
+        .workspace-toolbar select,
+        .workspace-toolbar input {
+            width: 100%;
+            height: 41px;
+            min-width: 0 !important;
+            box-sizing: border-box;
+        }
+
+        .workspace-toolbar .actions {
+            display: flex;
+            align-items: flex-end;
+            min-height: 66px;
+            flex-shrink: 0;
+        }
+
+        .workspace-toolbar .btn-primary {
+            height: 41px;
+            display: inline-flex !important;
+            align-items: center;
+            justify-content: center;
+            white-space: nowrap;
+        }
+
+        @media (max-width: 1450px) {
+            .workspace-toolbar {
+                align-items: stretch;
+                gap: 16px;
+            }
+
+            .workspace-toolbar .filters {
+                grid-template-columns: repeat(2, minmax(220px, 1fr));
+            }
+        }
+
+        @media (max-width: 760px) {
+            .workspace-toolbar {
+                flex-direction: column;
+            }
+
+            .workspace-toolbar .filters {
+                grid-template-columns: 1fr;
+            }
+
+            .workspace-toolbar .actions,
+            .workspace-toolbar .btn-primary {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
 <body>
-
-    <div id="sidebar-container" data-root=".." data-active="player-management" data-service="sportsbook"></div>
+    <div id="sidebar-container" data-root=".." data-active="player-management"></div>
     <script src="../sidebar.js"></script>
 
     <div class="main-content">
         <header class="main-header" style="background-color: #17a2b8;">
             <h1>Players</h1>
-            <p class="page-subtitle">Manage players for team-based competitors and Player Props markets.</p>
+            <p class="page-subtitle">Create, inspect, and map players under team-based competitors.</p>
         </header>
 
         <main class="split-layout">
             <div class="form-side">
-                <div class="top-bar">
+                <div class="top-bar workspace-toolbar">
                     <div class="filters">
+                        <div class="filter-group">
+                            <label>View</label>
+                            <div class="workspace-tabs" aria-label="Player mapping perspective">
+                                <button type="button" class="workspace-tab active" data-view="internal">Internal players</button>
+                                <button type="button" class="workspace-tab" data-view="provider">Provider players</button>
+                            </div>
+                        </div>
+
+                        <div class="filter-group" id="providerFilterGroup" style="display: none;">
+                            <label for="providerSelect">Provider</label>
+                            <select id="providerSelect">
+                                <option value="all" selected>All</option>
+                                <option value="ExeFeed">ExeFeed</option>
+                                <option value="SportRadar">SportRadar</option>
+                                <option value="SportGenius">SportGenius</option>
+                            </select>
+                        </div>
+
                         <div class="filter-group">
                             <label for="sportFilter">Sport</label>
                             <select id="sportFilter">
@@ -33,28 +147,40 @@
                         </div>
 
                         <div class="filter-group">
-                            <label for="searchInput">Search Players</label>
-                            <input type="text" id="searchInput" placeholder="Search by player, competitor or ID..." style="padding: 10px 15px; border: 1px solid #ccc; border-radius: 4px; font-size: 15px; min-width: 250px; background-color: #fdfdfd;">
+                            <label for="competitorFilter">Competitor</label>
+                            <select id="competitorFilter">
+                                <option value="all" selected>All</option>
+                                <option value="Liverpool">Liverpool</option>
+                                <option value="Arsenal">Arsenal</option>
+                                <option value="Manchester City">Manchester City</option>
+                                <option value="Real Madrid">Real Madrid</option>
+                                <option value="Boston Celtics">Boston Celtics</option>
+                            </select>
+                        </div>
+
+                        <div class="filter-group" id="statusFilterGroup" style="display: none;">
+                            <label for="statusSelect">Mapping status</label>
+                            <select id="statusSelect">
+                                <option value="all" selected>All</option>
+                                <option value="mapped">Mapped</option>
+                                <option value="unmapped">Unmapped</option>
+                            </select>
+                        </div>
+
+                        <div class="filter-group">
+                            <label for="searchInput">Search</label>
+                            <input type="text" id="searchInput" placeholder="Search player or competitor..." style="padding: 10px 15px; border: 1px solid #ccc; border-radius: 4px; font-size: 15px; background-color: #fdfdfd;">
                         </div>
                     </div>
 
                     <div class="actions">
-                        <a href="create_player.html" class="btn-primary" style="text-decoration: none; display: inline-block;">Create Player</a>
                     </div>
                 </div>
 
-                <section class="markets-section">
-                    <table class="markets-table">
-                        <thead>
-                            <tr>
-                                <th>Player ID</th>
-                                <th>Player Name</th>
-                                <th>Sport</th>
-                                <th>Competitor</th>
-                                <th style="text-align: right;">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="playersBody"></tbody>
+                <section class="markets-section" style="overflow-x: auto;">
+                    <table class="markets-table" id="workspaceTable" style="min-width: 980px;">
+                        <thead id="workspaceHead"></thead>
+                        <tbody id="workspaceBody"></tbody>
                     </table>
                 </section>
             </div>
@@ -76,17 +202,7 @@
     <script src="../pagination.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const tableBody = document.getElementById('playersBody');
-            const searchInput = document.getElementById('searchInput');
-            const sportFilter = document.getElementById('sportFilter');
-            const deleteModal = document.getElementById('deleteModal');
-            const closeDeleteModalBtn = document.getElementById('closeDeleteModalBtn');
-            const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
-            const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
-            const deleteModalText = document.getElementById('deleteModalText');
-            let playerToDelete = null;
-
-            let players = [
+            let internalPlayers = [
                 { id: "P-001", name: "Mohamed Salah", sport: "Soccer", competitor: "Liverpool" },
                 { id: "P-002", name: "Virgil van Dijk", sport: "Soccer", competitor: "Liverpool" },
                 { id: "P-003", name: "Darwin Nunez", sport: "Soccer", competitor: "Liverpool" },
@@ -100,6 +216,35 @@
                 { id: "P-011", name: "Jaylen Brown", sport: "Basketball", competitor: "Boston Celtics" }
             ];
 
+            const providerPlayers = [
+                { provider: "ExeFeed", sport: "Soccer", competitor: "Liverpool", provId: "2199001", provName: "Mohamed Salah", internalId: "P-001", internalName: "Mohamed Salah", status: "Mapped" },
+                { provider: "ExeFeed", sport: "Soccer", competitor: "Liverpool", provId: "2199002", provName: "Virgil van Dijk", internalId: "P-002", internalName: "Virgil van Dijk", status: "Mapped" },
+                { provider: "ExeFeed", sport: "Soccer", competitor: "Liverpool", provId: "2199003", provName: "Darwin Nunez", internalId: "P-003", internalName: "Darwin Nunez", status: "Mapped" },
+                { provider: "ExeFeed", sport: "Soccer", competitor: "Arsenal", provId: "2199004", provName: "Bukayo Saka", internalId: "P-004", internalName: "Bukayo Saka", status: "Mapped" },
+                { provider: "SportRadar", sport: "Soccer", competitor: "Liverpool", provId: "sr:player:99090", provName: "Salah, Mohamed", internalId: "P-001", internalName: "Mohamed Salah", status: "Mapped" },
+                { provider: "SportRadar", sport: "Soccer", competitor: "Manchester City", provId: "sr:player:839956", provName: "Haaland, Erling", internalId: "P-006", internalName: "Erling Haaland", status: "Mapped" },
+                { provider: "SportRadar", sport: "Soccer", competitor: "Real Madrid", provId: "sr:player:991921", provName: "Bellingham, Jude", internalId: "P-008", internalName: "Jude Bellingham", status: "Mapped" },
+                { provider: "SportRadar", sport: "Basketball", competitor: "Boston Celtics", provId: "sr:player:1141190", provName: "Tatum, Jayson", internalId: "P-010", internalName: "Jayson Tatum", status: "Mapped" },
+                { provider: "SportGenius", sport: "Soccer", competitor: "Real Madrid", provId: "sg-ply-vini", provName: "Vini Jr.", internalId: "P-009", internalName: "Vinicius Junior", status: "Mapped" },
+                { provider: "SportGenius", sport: "Soccer", competitor: "Arsenal", provId: "sg-ply-rice", provName: "Declan Rice", internalId: "-", internalName: "-", status: "Unmapped" },
+                { provider: "SportGenius", sport: "Basketball", competitor: "Boston Celtics", provId: "sg-ply-white", provName: "Derrick White", internalId: "-", internalName: "-", status: "Unmapped" }
+            ];
+
+            const tabs = document.querySelectorAll('.workspace-tab');
+            const providerFilterGroup = document.getElementById('providerFilterGroup');
+            const statusFilterGroup = document.getElementById('statusFilterGroup');
+            const providerSelect = document.getElementById('providerSelect');
+            const sportFilter = document.getElementById('sportFilter');
+            const competitorFilter = document.getElementById('competitorFilter');
+            const statusSelect = document.getElementById('statusSelect');
+            const searchInput = document.getElementById('searchInput');
+            const workspaceHead = document.getElementById('workspaceHead');
+            const workspaceBody = document.getElementById('workspaceBody');
+            const deleteModal = document.getElementById('deleteModal');
+            const deleteModalText = document.getElementById('deleteModalText');
+            let activeView = 'internal';
+            let playerToDelete = null;
+
             function openDeleteModal(player) {
                 playerToDelete = player;
                 deleteModalText.textContent = `Are you sure you want to delete player "${player.name}" (${player.id})?`;
@@ -111,62 +256,172 @@
                 deleteModal.style.display = 'none';
             }
 
-            function renderPlayers() {
-                tableBody.innerHTML = '';
+            function commonMatch(item, searchVal) {
+                return item.id?.toLowerCase().includes(searchVal) ||
+                    item.name?.toLowerCase().includes(searchVal) ||
+                    item.sport.toLowerCase().includes(searchVal) ||
+                    item.competitor.toLowerCase().includes(searchVal);
+            }
+
+            function renderInternalView() {
+                workspaceHead.innerHTML = `
+                    <tr>
+                        <th>Player ID</th>
+                        <th>Player Name</th>
+                        <th>Sport</th>
+                        <th>Competitor</th>
+                        <th style="text-align: right;">Action</th>
+                    </tr>
+                `;
+
                 const searchVal = searchInput.value.toLowerCase();
                 const sportVal = sportFilter.value;
-                const filteredPlayers = players.filter(player => {
-                    const matchesSearch = player.id.toLowerCase().includes(searchVal) ||
-                        player.name.toLowerCase().includes(searchVal) ||
-                        player.competitor.toLowerCase().includes(searchVal);
+                const competitorVal = competitorFilter.value;
+                const rows = internalPlayers.filter(player => {
                     const matchesSport = sportVal === 'all' || player.sport === sportVal;
-                    return matchesSearch && matchesSport;
+                    const matchesCompetitor = competitorVal === 'all' || player.competitor === competitorVal;
+                    return matchesSport && matchesCompetitor && commonMatch(player, searchVal);
                 });
 
-                if (filteredPlayers.length === 0) {
-                    tableBody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #888; font-style: italic;">No players found.</td></tr>';
+                if (rows.length === 0) {
+                    workspaceBody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #888; font-style: italic; padding: 20px;">No players found.</td></tr>';
                     return;
                 }
 
-                filteredPlayers.forEach(player => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
+                workspaceBody.innerHTML = rows.map(player => `
+                    <tr>
                         <td style="font-weight: 500; color: #6c757d;">${player.id}</td>
                         <td class="market-name">${player.name}</td>
                         <td>${player.sport}</td>
                         <td>${player.competitor}</td>
                         <td style="text-align: right;">
-                            <a href="view_player.html?id=${encodeURIComponent(player.id)}&name=${encodeURIComponent(player.name)}&sport=${encodeURIComponent(player.sport)}&competitor=${encodeURIComponent(player.competitor)}" class="btn-action" style="background-color: #007bff; text-decoration: none; display: inline-block; margin-right: 5px;">View</a>
-                            <a href="create_player.html?edit=true&id=${encodeURIComponent(player.id)}&name=${encodeURIComponent(player.name)}&sport=${encodeURIComponent(player.sport)}&competitor=${encodeURIComponent(player.competitor)}" class="btn-action" style="background-color: #17a2b8; text-decoration: none; display: inline-block; margin-right: 5px;">Edit</a>
-                            <button type="button" class="btn-action delete-player-btn" style="background-color: #dc3545; border: none;" data-id="${player.id}">Delete</button>
+                            <span class="row-actions">
+                                <a href="view_player.html?id=${encodeURIComponent(player.id)}&name=${encodeURIComponent(player.name)}&sport=${encodeURIComponent(player.sport)}&competitor=${encodeURIComponent(player.competitor)}" class="btn-action" style="background-color: #007bff; text-decoration: none; display: inline-block;">View</a>
+                                <a href="create_player.html?edit=true&id=${encodeURIComponent(player.id)}&name=${encodeURIComponent(player.name)}&sport=${encodeURIComponent(player.sport)}&competitor=${encodeURIComponent(player.competitor)}" class="btn-action" style="background-color: #17a2b8; text-decoration: none; display: inline-block;">Edit</a>
+                                <button type="button" class="btn-action delete-player-btn" style="background-color: #dc3545; border: none;" data-id="${player.id}">Delete</button>
+                            </span>
                         </td>
-                    `;
-                    tableBody.appendChild(row);
-                });
+                    </tr>
+                `).join('');
 
-                document.querySelectorAll('.delete-player-btn').forEach(btn => {
-                    btn.addEventListener('click', () => {
-                        const player = players.find(item => item.id === btn.dataset.id);
+                document.querySelectorAll('.delete-player-btn').forEach(button => {
+                    button.addEventListener('click', () => {
+                        const player = internalPlayers.find(item => item.id === button.dataset.id);
                         if (player) openDeleteModal(player);
                     });
                 });
             }
 
-            searchInput.addEventListener('input', renderPlayers);
-            sportFilter.addEventListener('change', renderPlayers);
-            closeDeleteModalBtn.addEventListener('click', closeDeleteModal);
-            cancelDeleteBtn.addEventListener('click', closeDeleteModal);
-            confirmDeleteBtn.addEventListener('click', () => {
+            function renderProviderView() {
+                workspaceHead.innerHTML = `
+                    <tr>
+                        <th>Provider</th>
+                        <th>Sport</th>
+                        <th>Competitor</th>
+                        <th>Provider Player ID</th>
+                        <th>Provider Player Name</th>
+                        <th>Internal Player ID</th>
+                        <th>Internal Player Name</th>
+                        <th>Status</th>
+                        <th style="text-align: right;">Action</th>
+                    </tr>
+                `;
+
+                const providerVal = providerSelect.value;
+                const sportVal = sportFilter.value;
+                const competitorVal = competitorFilter.value;
+                const statusVal = statusSelect.value;
+                const searchVal = searchInput.value.toLowerCase();
+                const rows = providerPlayers.filter(player => {
+                    const matchesProvider = providerVal === 'all' || player.provider === providerVal;
+                    const matchesSport = sportVal === 'all' || player.sport === sportVal;
+                    const matchesCompetitor = competitorVal === 'all' || player.competitor === competitorVal;
+                    const matchesStatus = statusVal === 'all' || player.status.toLowerCase() === statusVal;
+                    const matchesSearch = player.provider.toLowerCase().includes(searchVal) ||
+                        player.sport.toLowerCase().includes(searchVal) ||
+                        player.competitor.toLowerCase().includes(searchVal) ||
+                        player.provId.toLowerCase().includes(searchVal) ||
+                        player.provName.toLowerCase().includes(searchVal) ||
+                        player.internalId.toLowerCase().includes(searchVal) ||
+                        player.internalName.toLowerCase().includes(searchVal);
+                    return matchesProvider && matchesSport && matchesCompetitor && matchesStatus && matchesSearch;
+                });
+
+                if (rows.length === 0) {
+                    workspaceBody.innerHTML = '<tr><td colspan="9" style="text-align: center; color: #888; font-style: italic; padding: 20px;">No provider players found.</td></tr>';
+                    return;
+                }
+
+                workspaceBody.innerHTML = rows.map(player => {
+                    const badgeClass = player.status === 'Mapped' ? 'status-mapped' : 'status-unmapped';
+                    const mapUrl = player.status === 'Mapped'
+                        ? `map_player.html?provider=${encodeURIComponent(player.provider)}&sport=${encodeURIComponent(player.sport)}&competitor=${encodeURIComponent(player.competitor)}&provId=${encodeURIComponent(player.provId)}&provName=${encodeURIComponent(player.provName)}&internalId=${encodeURIComponent(player.internalId)}`
+                        : `map_player.html?provider=${encodeURIComponent(player.provider)}&sport=${encodeURIComponent(player.sport)}&competitor=${encodeURIComponent(player.competitor)}&provId=${encodeURIComponent(player.provId)}&provName=${encodeURIComponent(player.provName)}`;
+                    const mapLabel = player.status === 'Mapped' ? 'Edit mapping' : 'Map';
+                    const viewButton = player.status === 'Mapped'
+                        ? `<a href="view_player.html?id=${encodeURIComponent(player.internalId)}&name=${encodeURIComponent(player.internalName)}&sport=${encodeURIComponent(player.sport)}&competitor=${encodeURIComponent(player.competitor)}" class="btn-action" style="background-color: #007bff; text-decoration: none; display: inline-block;">View</a>`
+                        : '';
+
+                    return `
+                        <tr>
+                            <td style="font-weight: 500;">${player.provider}</td>
+                            <td>${player.sport}</td>
+                            <td>${player.competitor}</td>
+                            <td style="color: #6c757d;">${player.provId}</td>
+                            <td class="market-name" style="color: #007bff;">${player.provName}</td>
+                            <td style="color: #6c757d;">${player.internalId}</td>
+                            <td style="font-weight: 500;">${player.internalName}</td>
+                            <td><span class="status-badge ${badgeClass}">${player.status}</span></td>
+                            <td style="text-align: right;">
+                                <span class="row-actions">
+                                    ${viewButton}
+                                    <a href="${mapUrl}" class="btn-action" style="text-decoration: none; display: inline-block;">${mapLabel}</a>
+                                </span>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+
+            function render() {
+                const showProviderFilters = activeView === 'provider';
+                providerFilterGroup.style.display = showProviderFilters ? 'block' : 'none';
+                statusFilterGroup.style.display = showProviderFilters ? 'block' : 'none';
+                document.getElementById('workspaceTable').style.minWidth = activeView === 'provider' ? '1080px' : '760px';
+                if (activeView === 'internal') {
+                    renderInternalView();
+                } else {
+                    renderProviderView();
+                }
+            }
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    activeView = tab.dataset.view;
+                    tabs.forEach(item => item.classList.toggle('active', item === tab));
+                    searchInput.value = '';
+                    render();
+                });
+            });
+
+            providerSelect.addEventListener('change', render);
+            sportFilter.addEventListener('change', render);
+            competitorFilter.addEventListener('change', render);
+            statusSelect.addEventListener('change', render);
+            searchInput.addEventListener('input', render);
+            document.getElementById('closeDeleteModalBtn').addEventListener('click', closeDeleteModal);
+            document.getElementById('cancelDeleteBtn').addEventListener('click', closeDeleteModal);
+            document.getElementById('confirmDeleteBtn').addEventListener('click', () => {
                 if (!playerToDelete) return;
-                players = players.filter(player => player.id !== playerToDelete.id);
+                internalPlayers = internalPlayers.filter(player => player.id !== playerToDelete.id);
                 closeDeleteModal();
-                renderPlayers();
+                render();
             });
             window.addEventListener('click', event => {
                 if (event.target === deleteModal) closeDeleteModal();
             });
 
-            renderPlayers();
+            render();
         });
     </script>
 </body>

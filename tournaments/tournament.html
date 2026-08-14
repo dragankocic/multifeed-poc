@@ -4,25 +4,145 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tournaments</title>
-    <link rel="stylesheet" href="../sports/style.css">
     <link rel="stylesheet" href="../style.css">
     <script src="../auth.js"></script>
+    <style>
+        .workspace-tabs {
+            display: inline-flex;
+            gap: 4px;
+            padding: 4px;
+            background: #eef3f4;
+            border: 1px solid #d4dee1;
+            border-radius: 6px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .workspace-tab {
+            flex: 1;
+            border: 0;
+            border-radius: 4px;
+            padding: 9px 14px;
+            background: transparent;
+            color: #566;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .workspace-tab.active {
+            background: #17a2b8;
+            color: white;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+        }
+
+        .row-actions {
+            display: inline-flex;
+            justify-content: flex-end;
+            gap: 6px;
+            white-space: nowrap;
+        }
+
+        .workspace-toolbar .filters {
+            display: grid;
+            grid-template-columns: minmax(270px, 350px) minmax(170px, 210px) minmax(170px, 210px) minmax(180px, 220px) minmax(210px, 250px) minmax(260px, 1fr);
+            align-items: flex-end;
+            gap: 16px;
+            flex: 1;
+        }
+
+        .workspace-toolbar .filter-group {
+            min-height: 66px;
+            justify-content: flex-end;
+        }
+
+        .workspace-toolbar select,
+        .workspace-toolbar input {
+            width: 100%;
+            height: 41px;
+            min-width: 0 !important;
+            box-sizing: border-box;
+        }
+
+        .workspace-toolbar .actions {
+            display: flex;
+            align-items: flex-end;
+            min-height: 66px;
+            flex-shrink: 0;
+        }
+
+        .workspace-toolbar .btn-primary {
+            height: 41px;
+            display: inline-flex !important;
+            align-items: center;
+            justify-content: center;
+            white-space: nowrap;
+        }
+
+        @media (max-width: 1650px) {
+            .workspace-toolbar {
+                align-items: stretch;
+                gap: 16px;
+            }
+
+            .workspace-toolbar .filters {
+                grid-template-columns: repeat(3, minmax(210px, 1fr));
+            }
+        }
+
+        @media (max-width: 960px) {
+            .workspace-toolbar .filters {
+                grid-template-columns: repeat(2, minmax(210px, 1fr));
+            }
+        }
+
+        @media (max-width: 760px) {
+            .workspace-toolbar {
+                flex-direction: column;
+            }
+
+            .workspace-toolbar .filters {
+                grid-template-columns: 1fr;
+            }
+
+            .workspace-toolbar .actions,
+            .workspace-toolbar .btn-primary {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
 <body>
-
-    <div id="sidebar-container" data-root=".." data-active="tournament-management" data-service="sportsbook"></div>
+    <div id="sidebar-container" data-root=".." data-active="tournament-management"></div>
     <script src="../sidebar.js"></script>
 
     <div class="main-content">
         <header class="main-header" style="background-color: #17a2b8;">
             <h1>Tournaments</h1>
-            <p class="page-subtitle">Manage tournaments by sport and category.</p>
+            <p class="page-subtitle">Create, inspect, and map tournaments by sport and category.</p>
         </header>
 
         <main class="split-layout">
             <div class="form-side">
-                <div class="top-bar">
+                <div class="top-bar workspace-toolbar">
                     <div class="filters">
+                        <div class="filter-group">
+                            <label>View</label>
+                            <div class="workspace-tabs" aria-label="Tournament mapping perspective">
+                                <button type="button" class="workspace-tab active" data-view="internal">Internal tournaments</button>
+                                <button type="button" class="workspace-tab" data-view="provider">Provider tournaments</button>
+                            </div>
+                        </div>
+
+                        <div class="filter-group" id="providerFilterGroup" style="display: none;">
+                            <label for="providerSelect">Provider</label>
+                            <select id="providerSelect">
+                                <option value="all" selected>All</option>
+                                <option value="ExeFeed">ExeFeed</option>
+                                <option value="SportRadar">SportRadar</option>
+                                <option value="SportGenius">SportGenius</option>
+                            </select>
+                        </div>
+
                         <div class="filter-group">
                             <label for="sportFilter">Sport</label>
                             <select id="sportFilter">
@@ -46,9 +166,18 @@
                             </select>
                         </div>
 
+                        <div class="filter-group" id="statusFilterGroup" style="display: none;">
+                            <label for="statusSelect">Mapping status</label>
+                            <select id="statusSelect">
+                                <option value="all" selected>All</option>
+                                <option value="mapped">Mapped</option>
+                                <option value="unmapped">Unmapped</option>
+                            </select>
+                        </div>
+
                         <div class="filter-group">
-                            <label for="searchInput">Search Tournaments</label>
-                            <input type="text" id="searchInput" placeholder="Search by name or ID..." style="padding: 10px 15px; border: 1px solid #ccc; border-radius: 4px; font-size: 15px; min-width: 250px; background-color: #fdfdfd;">
+                            <label for="searchInput">Search</label>
+                            <input type="text" id="searchInput" placeholder="Search tournament..." style="padding: 10px 15px; border: 1px solid #ccc; border-radius: 4px; font-size: 15px; background-color: #fdfdfd;">
                         </div>
                     </div>
 
@@ -57,19 +186,10 @@
                     </div>
                 </div>
 
-                <section class="markets-section">
-                    <table class="markets-table">
-                        <thead>
-                            <tr>
-                                <th>Tournament ID</th>
-                                <th>Tournament Name</th>
-                                <th>Sport</th>
-                                <th>Category</th>
-                                <th>Primary Feed</th>
-                                <th style="text-align: right;">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tournamentsBody"></tbody>
+                <section class="markets-section" style="overflow-x: auto;">
+                    <table class="markets-table" id="workspaceTable" style="min-width: 1220px;">
+                        <thead id="workspaceHead"></thead>
+                        <tbody id="workspaceBody"></tbody>
                     </table>
                 </section>
             </div>
@@ -91,18 +211,7 @@
     <script src="../pagination.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const tableBody = document.getElementById('tournamentsBody');
-            const searchInput = document.getElementById('searchInput');
-            const sportFilter = document.getElementById('sportFilter');
-            const categoryFilter = document.getElementById('categoryFilter');
-            const deleteModal = document.getElementById('deleteModal');
-            const closeDeleteModalBtn = document.getElementById('closeDeleteModalBtn');
-            const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
-            const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
-            const deleteModalText = document.getElementById('deleteModalText');
-            let tournamentToDelete = null;
-
-            let tournaments = [
+            let internalTournaments = [
                 { id: "T-001", name: "Premier League", sport: "Soccer", category: "England", primaryFeed: "EXE" },
                 { id: "T-002", name: "Championship", sport: "Soccer", category: "England", primaryFeed: "SR" },
                 { id: "T-003", name: "League One", sport: "Soccer", category: "England", primaryFeed: "SR" },
@@ -118,6 +227,37 @@
                 { id: "T-013", name: "Roland Garros", sport: "Tennis", category: "France", primaryFeed: "BG" }
             ];
 
+            const providerTournaments = [
+                { provider: "ExeFeed", sport: "Soccer", category: "England", provId: "1019001", provName: "Premier League", internalId: "T-001", internalName: "Premier League", primaryFeed: "EXE", status: "Mapped" },
+                { provider: "ExeFeed", sport: "Soccer", category: "England", provId: "1019002", provName: "Championship", internalId: "T-002", internalName: "Championship", primaryFeed: "SR", status: "Mapped" },
+                { provider: "ExeFeed", sport: "Soccer", category: "England", provId: "1019032", provName: "EFL Cup", internalId: "-", internalName: "-", primaryFeed: "-", status: "Unmapped" },
+                { provider: "ExeFeed", sport: "Soccer", category: "Spain", provId: "1019003", provName: "LaLiga", internalId: "T-005", internalName: "LaLiga", primaryFeed: "SR", status: "Mapped" },
+                { provider: "ExeFeed", sport: "Soccer", category: "Spain", provId: "1019004", provName: "Copa del Rey", internalId: "-", internalName: "-", primaryFeed: "-", status: "Unmapped" },
+                { provider: "SportRadar", sport: "Soccer", category: "England", provId: "sr:tournament:17", provName: "Premier League", internalId: "T-001", internalName: "Premier League", primaryFeed: "EXE", status: "Mapped" },
+                { provider: "SportRadar", sport: "Soccer", category: "England", provId: "sr:tournament:24", provName: "League One", internalId: "T-003", internalName: "League One", primaryFeed: "SR", status: "Mapped" },
+                { provider: "SportRadar", sport: "Soccer", category: "Spain", provId: "sr:tournament:8", provName: "LaLiga", internalId: "T-005", internalName: "LaLiga", primaryFeed: "SR", status: "Mapped" },
+                { provider: "SportRadar", sport: "Basketball", category: "Germany", provId: "sr:tournament:1192", provName: "BBL", internalId: "T-012", internalName: "BBL", primaryFeed: "SR", status: "Mapped" },
+                { provider: "SportRadar", sport: "Tennis", category: "France", provId: "sr:tournament:2480", provName: "Roland Garros", internalId: "T-013", internalName: "Roland Garros", primaryFeed: "BG", status: "Mapped" },
+                { provider: "SportGenius", sport: "Soccer", category: "Germany", provId: "sg-trn-bundesliga", provName: "Bundesliga", internalId: "T-008", internalName: "Bundesliga", primaryFeed: "SR", status: "Mapped" },
+                { provider: "SportGenius", sport: "Soccer", category: "Italy", provId: "sg-trn-serie-a", provName: "Serie A", internalId: "T-009", internalName: "Serie A", primaryFeed: "BG", status: "Mapped" },
+                { provider: "SportGenius", sport: "Soccer", category: "Serbia", provId: "sg-trn-cup", provName: "Serbian Cup", internalId: "-", internalName: "-", primaryFeed: "-", status: "Unmapped" }
+            ];
+
+            const tabs = document.querySelectorAll('.workspace-tab');
+            const providerFilterGroup = document.getElementById('providerFilterGroup');
+            const statusFilterGroup = document.getElementById('statusFilterGroup');
+            const providerSelect = document.getElementById('providerSelect');
+            const sportFilter = document.getElementById('sportFilter');
+            const categoryFilter = document.getElementById('categoryFilter');
+            const statusSelect = document.getElementById('statusSelect');
+            const searchInput = document.getElementById('searchInput');
+            const workspaceHead = document.getElementById('workspaceHead');
+            const workspaceBody = document.getElementById('workspaceBody');
+            const deleteModal = document.getElementById('deleteModal');
+            const deleteModalText = document.getElementById('deleteModalText');
+            let activeView = 'internal';
+            let tournamentToDelete = null;
+
             function openDeleteModal(tournament) {
                 tournamentToDelete = tournament;
                 deleteModalText.textContent = `Are you sure you want to delete tournament "${tournament.name}" (${tournament.id})?`;
@@ -129,65 +269,168 @@
                 deleteModal.style.display = 'none';
             }
 
-            function renderTournaments() {
-                tableBody.innerHTML = '';
-                const searchVal = searchInput.value.toLowerCase();
+            function matchesCommonFilters(tournament, searchVal) {
                 const sportVal = sportFilter.value;
                 const categoryVal = categoryFilter.value;
-                const filteredTournaments = tournaments.filter(tournament => {
-                    const matchesSearch = tournament.id.toLowerCase().includes(searchVal) ||
-                        tournament.name.toLowerCase().includes(searchVal);
-                    const matchesSport = sportVal === 'all' || tournament.sport === sportVal;
-                    const matchesCategory = categoryVal === 'all' || tournament.category === categoryVal;
-                    return matchesSearch && matchesSport && matchesCategory;
-                });
+                const matchesSport = sportVal === 'all' || tournament.sport === sportVal;
+                const matchesCategory = categoryVal === 'all' || tournament.category === categoryVal;
+                const matchesSearch = tournament.id?.toLowerCase().includes(searchVal) ||
+                    tournament.name?.toLowerCase().includes(searchVal) ||
+                    tournament.provId?.toLowerCase().includes(searchVal) ||
+                    tournament.provName?.toLowerCase().includes(searchVal) ||
+                    tournament.internalId?.toLowerCase().includes(searchVal) ||
+                    tournament.internalName?.toLowerCase().includes(searchVal) ||
+                    tournament.sport.toLowerCase().includes(searchVal) ||
+                    tournament.category.toLowerCase().includes(searchVal);
+                return matchesSport && matchesCategory && matchesSearch;
+            }
 
-                if (filteredTournaments.length === 0) {
-                    tableBody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #888; font-style: italic;">No tournaments found.</td></tr>';
+            function renderInternalView() {
+                workspaceHead.innerHTML = `
+                    <tr>
+                        <th>Tournament ID</th>
+                        <th>Tournament Name</th>
+                        <th>Sport</th>
+                        <th>Category</th>
+                        <th>Primary Feed</th>
+                        <th style="text-align: right;">Action</th>
+                    </tr>
+                `;
+
+                const searchVal = searchInput.value.toLowerCase();
+                const rows = internalTournaments.filter(tournament => matchesCommonFilters(tournament, searchVal));
+
+                if (rows.length === 0) {
+                    workspaceBody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #888; font-style: italic; padding: 20px;">No tournaments found.</td></tr>';
                     return;
                 }
 
-                filteredTournaments.forEach(tournament => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
+                workspaceBody.innerHTML = rows.map(tournament => `
+                    <tr>
                         <td style="font-weight: 500; color: #6c757d;">${tournament.id}</td>
                         <td class="market-name">${tournament.name}</td>
                         <td>${tournament.sport}</td>
                         <td>${tournament.category}</td>
                         <td>${tournament.primaryFeed}</td>
                         <td style="text-align: right;">
-                            <a href="view_tournament.html?id=${encodeURIComponent(tournament.id)}&name=${encodeURIComponent(tournament.name)}&sport=${encodeURIComponent(tournament.sport)}&category=${encodeURIComponent(tournament.category)}&primaryFeed=${encodeURIComponent(tournament.primaryFeed)}" class="btn-action" style="background-color: #007bff; text-decoration: none; display: inline-block; margin-right: 5px;">View</a>
-                            <a href="create_tournament.html?edit=true&id=${encodeURIComponent(tournament.id)}&name=${encodeURIComponent(tournament.name)}&sport=${encodeURIComponent(tournament.sport)}&category=${encodeURIComponent(tournament.category)}&primaryFeed=${encodeURIComponent(tournament.primaryFeed)}" class="btn-action" style="background-color: #17a2b8; text-decoration: none; display: inline-block; margin-right: 5px;">Edit</a>
-                            <button type="button" class="btn-action delete-tournament-btn" style="background-color: #dc3545; border: none;" data-id="${tournament.id}">Delete</button>
+                            <span class="row-actions">
+                                <a href="view_tournament.html?id=${encodeURIComponent(tournament.id)}&name=${encodeURIComponent(tournament.name)}&sport=${encodeURIComponent(tournament.sport)}&category=${encodeURIComponent(tournament.category)}&primaryFeed=${encodeURIComponent(tournament.primaryFeed)}" class="btn-action" style="background-color: #007bff; text-decoration: none; display: inline-block;">View</a>
+                                <a href="create_tournament.html?edit=true&id=${encodeURIComponent(tournament.id)}&name=${encodeURIComponent(tournament.name)}&sport=${encodeURIComponent(tournament.sport)}&category=${encodeURIComponent(tournament.category)}&primaryFeed=${encodeURIComponent(tournament.primaryFeed)}" class="btn-action" style="background-color: #17a2b8; text-decoration: none; display: inline-block;">Edit</a>
+                                <button type="button" class="btn-action delete-tournament-btn" style="background-color: #dc3545; border: none;" data-id="${tournament.id}">Delete</button>
+                            </span>
                         </td>
-                    `;
-                    tableBody.appendChild(row);
-                });
+                    </tr>
+                `).join('');
 
-                document.querySelectorAll('.delete-tournament-btn').forEach(btn => {
-                    btn.addEventListener('click', () => {
-                        const tournament = tournaments.find(item => item.id === btn.dataset.id);
+                document.querySelectorAll('.delete-tournament-btn').forEach(button => {
+                    button.addEventListener('click', () => {
+                        const tournament = internalTournaments.find(item => item.id === button.dataset.id);
                         if (tournament) openDeleteModal(tournament);
                     });
                 });
             }
 
-            searchInput.addEventListener('input', renderTournaments);
-            sportFilter.addEventListener('change', renderTournaments);
-            categoryFilter.addEventListener('change', renderTournaments);
-            closeDeleteModalBtn.addEventListener('click', closeDeleteModal);
-            cancelDeleteBtn.addEventListener('click', closeDeleteModal);
-            confirmDeleteBtn.addEventListener('click', () => {
+            function renderProviderView() {
+                workspaceHead.innerHTML = `
+                    <tr>
+                        <th>Provider</th>
+                        <th>Sport</th>
+                        <th>Category</th>
+                        <th>Provider Tournament ID</th>
+                        <th>Provider Tournament Name</th>
+                        <th>Internal Tournament ID</th>
+                        <th>Internal Tournament Name</th>
+                        <th>Primary Feed</th>
+                        <th>Status</th>
+                        <th style="text-align: right;">Action</th>
+                    </tr>
+                `;
+
+                const providerVal = providerSelect.value;
+                const statusVal = statusSelect.value;
+                const searchVal = searchInput.value.toLowerCase();
+                const rows = providerTournaments.filter(tournament => {
+                    const matchesProvider = providerVal === 'all' || tournament.provider === providerVal;
+                    const matchesStatus = statusVal === 'all' || tournament.status.toLowerCase() === statusVal;
+                    return matchesProvider && matchesStatus && matchesCommonFilters(tournament, searchVal);
+                });
+
+                if (rows.length === 0) {
+                    workspaceBody.innerHTML = '<tr><td colspan="10" style="text-align: center; color: #888; font-style: italic; padding: 20px;">No provider tournaments found.</td></tr>';
+                    return;
+                }
+
+                workspaceBody.innerHTML = rows.map(tournament => {
+                    const badgeClass = tournament.status === 'Mapped' ? 'status-mapped' : 'status-unmapped';
+                    const mapUrl = tournament.status === 'Mapped'
+                        ? `map_tournament.html?provider=${encodeURIComponent(tournament.provider)}&sport=${encodeURIComponent(tournament.sport)}&category=${encodeURIComponent(tournament.category)}&provId=${encodeURIComponent(tournament.provId)}&provName=${encodeURIComponent(tournament.provName)}&internalId=${encodeURIComponent(tournament.internalId)}`
+                        : `map_tournament.html?provider=${encodeURIComponent(tournament.provider)}&sport=${encodeURIComponent(tournament.sport)}&category=${encodeURIComponent(tournament.category)}&provId=${encodeURIComponent(tournament.provId)}&provName=${encodeURIComponent(tournament.provName)}`;
+                    const mapLabel = tournament.status === 'Mapped' ? 'Edit mapping' : 'Map';
+                    const viewButton = tournament.status === 'Mapped'
+                        ? `<a href="view_tournament.html?id=${encodeURIComponent(tournament.internalId)}&name=${encodeURIComponent(tournament.internalName)}&sport=${encodeURIComponent(tournament.sport)}&category=${encodeURIComponent(tournament.category)}&primaryFeed=${encodeURIComponent(tournament.primaryFeed)}" class="btn-action" style="background-color: #007bff; text-decoration: none; display: inline-block;">View</a>`
+                        : '';
+
+                    return `
+                        <tr>
+                            <td style="font-weight: 500;">${tournament.provider}</td>
+                            <td>${tournament.sport}</td>
+                            <td>${tournament.category}</td>
+                            <td style="color: #6c757d;">${tournament.provId}</td>
+                            <td class="market-name" style="color: #007bff;">${tournament.provName}</td>
+                            <td style="color: #6c757d;">${tournament.internalId}</td>
+                            <td style="font-weight: 500;">${tournament.internalName}</td>
+                            <td>${tournament.primaryFeed}</td>
+                            <td><span class="status-badge ${badgeClass}">${tournament.status}</span></td>
+                            <td style="text-align: right;">
+                                <span class="row-actions">
+                                    ${viewButton}
+                                    <a href="${mapUrl}" class="btn-action" style="text-decoration: none; display: inline-block;">${mapLabel}</a>
+                                </span>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+
+            function render() {
+                const showProviderFilters = activeView === 'provider';
+                providerFilterGroup.style.display = showProviderFilters ? 'block' : 'none';
+                statusFilterGroup.style.display = showProviderFilters ? 'block' : 'none';
+                document.getElementById('workspaceTable').style.minWidth = activeView === 'provider' ? '1320px' : '1080px';
+                if (activeView === 'internal') {
+                    renderInternalView();
+                } else {
+                    renderProviderView();
+                }
+            }
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    activeView = tab.dataset.view;
+                    tabs.forEach(item => item.classList.toggle('active', item === tab));
+                    searchInput.value = '';
+                    render();
+                });
+            });
+
+            providerSelect.addEventListener('change', render);
+            sportFilter.addEventListener('change', render);
+            categoryFilter.addEventListener('change', render);
+            statusSelect.addEventListener('change', render);
+            searchInput.addEventListener('input', render);
+            document.getElementById('closeDeleteModalBtn').addEventListener('click', closeDeleteModal);
+            document.getElementById('cancelDeleteBtn').addEventListener('click', closeDeleteModal);
+            document.getElementById('confirmDeleteBtn').addEventListener('click', () => {
                 if (!tournamentToDelete) return;
-                tournaments = tournaments.filter(tournament => tournament.id !== tournamentToDelete.id);
+                internalTournaments = internalTournaments.filter(tournament => tournament.id !== tournamentToDelete.id);
                 closeDeleteModal();
-                renderTournaments();
+                render();
             });
             window.addEventListener('click', event => {
                 if (event.target === deleteModal) closeDeleteModal();
             });
 
-            renderTournaments();
+            render();
         });
     </script>
 </body>

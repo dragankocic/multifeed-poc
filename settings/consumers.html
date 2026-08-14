@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consumers</title>
+    <link rel="stylesheet" href="../style.css">
+    <script src="../auth.js"></script>
+    <style>
+        .page-title-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .consumer-feeds {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .feed-chip {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 8px;
+            border-radius: 999px;
+            background: #eef9fb;
+            color: #0c5460;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .consumer-modal {
+            width: min(760px, 92vw);
+        }
+
+        .consumer-form {
+            display: grid;
+            gap: 18px;
+        }
+
+        .consumer-form input {
+            width: 100%;
+            min-width: 0 !important;
+            height: 42px;
+            box-sizing: border-box;
+        }
+
+        .feed-selection-grid {
+            display: grid;
+            gap: 10px;
+            max-height: 360px;
+            overflow: auto;
+            padding-right: 4px;
+        }
+
+        .feed-option {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border: 1px solid #e1e5ea;
+            border-radius: 8px;
+            background: #f8f9fa;
+        }
+
+        .feed-option input {
+            width: auto;
+            height: auto;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 18px;
+        }
+
+        @media (max-width: 760px) {
+            .page-title-row {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="sidebar-container" data-root=".." data-active="consumers"></div>
+    <script src="../sidebar.js"></script>
+
+    <div class="main-content">
+        <header class="main-header">
+            <div class="page-title-row">
+                <div>
+                    <h1>Consumers</h1>
+                    <p class="page-subtitle">Configure outgoing multifeed consumers and assign one or more provider feeds to each consumer.</p>
+                </div>
+                <button type="button" id="openCreateConsumerBtn" class="btn-primary">Create</button>
+            </div>
+        </header>
+
+        <main class="split-layout">
+            <div class="form-side">
+                <section class="markets-section">
+                    <table class="markets-table">
+                        <thead>
+                            <tr>
+                                <th>Consumer Name</th>
+                                <th>Type</th>
+                                <th>Feeds</th>
+                                <th>Number of Feeds</th>
+                                <th style="text-align: right;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="consumersTableBody"></tbody>
+                    </table>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <div id="consumerModal" class="modal">
+        <div class="modal-content consumer-modal">
+            <span class="close-modal" id="closeConsumerModalBtn">&times;</span>
+            <h3 id="consumerModalTitle">Create Consumer</h3>
+            <div class="consumer-form">
+                <div class="form-group">
+                    <label for="consumerNameInput">Consumer Name</label>
+                    <input id="consumerNameInput" type="text" placeholder="Consumer name">
+                </div>
+                <div>
+                    <label>Feeds</label>
+                    <div class="feed-selection-grid" id="feedSelectionGrid">
+                        <label class="feed-option">
+                            <input type="checkbox" value="SportRadar - Feed 1" checked>
+                            <span><strong>SportRadar - Feed 1</strong><br><span style="color: #666;">12 groups</span></span>
+                            <span class="status-badge status-mapped">Up</span>
+                        </label>
+                        <label class="feed-option">
+                            <input type="checkbox" value="SportRadar - Feed 2">
+                            <span><strong>SportRadar - Feed 2</strong><br><span style="color: #666;">4 groups</span></span>
+                            <span class="status-badge status-unmapped">Error</span>
+                        </label>
+                        <label class="feed-option">
+                            <input type="checkbox" value="ExeFeed - Feed 1" checked>
+                            <span><strong>ExeFeed - Feed 1</strong><br><span style="color: #666;">8 groups</span></span>
+                            <span class="status-badge status-mapped">Up</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button type="button" id="cancelConsumerBtn" class="btn-secondary">Cancel</button>
+                <button type="button" id="saveConsumerBtn" class="btn-primary">Create consumer</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const consumerModal = document.getElementById('consumerModal');
+            const consumerModalTitle = document.getElementById('consumerModalTitle');
+            const consumerNameInput = document.getElementById('consumerNameInput');
+            const saveConsumerBtn = document.getElementById('saveConsumerBtn');
+            const consumersTableBody = document.getElementById('consumersTableBody');
+            const feedCheckboxes = [...document.querySelectorAll('#feedSelectionGrid input[type="checkbox"]')];
+            const consumers = [
+                { id: 'consumer-1', name: 'Consumer 1', type: 'Kafka', feeds: ['SportRadar - Feed 1', 'ExeFeed - Feed 1'] },
+                { id: 'consumer-2', name: 'Consumer 2', type: 'Kafka', feeds: ['SportRadar - Feed 2'] }
+            ];
+            let currentMode = 'create';
+            let editingConsumerId = null;
+
+            function renderConsumers() {
+                consumersTableBody.innerHTML = consumers.map(consumer => `
+                    <tr>
+                        <td class="market-name">${consumer.name}</td>
+                        <td>${consumer.type}</td>
+                        <td>
+                            <div class="consumer-feeds">
+                                ${consumer.feeds.map(feed => `<span class="feed-chip">${feed}</span>`).join('')}
+                            </div>
+                        </td>
+                        <td>${consumer.feeds.length}</td>
+                        <td style="text-align: right;"><button type="button" class="btn-action edit-consumer-btn" data-id="${consumer.id}">Edit</button></td>
+                    </tr>
+                `).join('');
+                document.querySelectorAll('.edit-consumer-btn').forEach(button => {
+                    button.addEventListener('click', () => {
+                        const consumer = consumers.find(item => item.id === button.dataset.id);
+                        if (consumer) openConsumerModal('edit', consumer);
+                    });
+                });
+            }
+
+            function selectedFeeds() {
+                return feedCheckboxes
+                    .filter(checkbox => checkbox.checked)
+                    .map(checkbox => checkbox.value);
+            }
+
+            function setSelectedFeeds(feeds) {
+                feedCheckboxes.forEach(checkbox => {
+                    checkbox.checked = feeds.includes(checkbox.value);
+                });
+            }
+
+            function openConsumerModal(mode, consumer = null) {
+                currentMode = mode;
+                editingConsumerId = consumer?.id || null;
+                consumerModalTitle.textContent = mode === 'edit' ? 'Edit Consumer' : 'Create Consumer';
+                consumerNameInput.value = consumer?.name || '';
+                setSelectedFeeds(consumer?.feeds || ['SportRadar - Feed 1', 'ExeFeed - Feed 1']);
+                saveConsumerBtn.textContent = mode === 'edit' ? 'Save changes' : 'Create consumer';
+                consumerModal.style.display = 'flex';
+            }
+
+            document.getElementById('openCreateConsumerBtn').addEventListener('click', () => openConsumerModal('create'));
+            saveConsumerBtn.addEventListener('click', () => {
+                const name = consumerNameInput.value.trim();
+                if (!name) return;
+                const feeds = selectedFeeds();
+                if (currentMode === 'edit') {
+                    const consumer = consumers.find(item => item.id === editingConsumerId);
+                    if (consumer) {
+                        consumer.name = name;
+                        consumer.feeds = feeds;
+                    }
+                } else {
+                    consumers.push({
+                        id: `consumer-${Date.now()}`,
+                        name,
+                        type: 'Kafka',
+                        feeds
+                    });
+                }
+                consumerModal.style.display = 'none';
+                renderConsumers();
+            });
+            document.getElementById('closeConsumerModalBtn').addEventListener('click', () => {
+                consumerModal.style.display = 'none';
+            });
+            document.getElementById('cancelConsumerBtn').addEventListener('click', () => {
+                consumerModal.style.display = 'none';
+            });
+            window.addEventListener('click', event => {
+                if (event.target === consumerModal) {
+                    consumerModal.style.display = 'none';
+                }
+            });
+
+            renderConsumers();
+        });
+    </script>
+</body>
+</html>

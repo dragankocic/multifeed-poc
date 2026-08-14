@@ -7,6 +7,14 @@
     <link rel="stylesheet" href="../sports/style.css">
     <link rel="stylesheet" href="../style.css">
     <script src="../auth.js"></script>
+    <style>
+        .lazy-section-toggle { width: 100%; border: 0; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 0; text-align: left; }
+        .lazy-section-toggle h3 { margin: 0; color: #333; font-size: 18px; }
+        .lazy-section-icon { color: #667085; font-size: 18px; transition: transform 0.2s; }
+        .lazy-section.open .lazy-section-icon { transform: rotate(180deg); }
+        .lazy-section-body { display: none; margin-top: 15px; }
+        .lazy-section.open .lazy-section-body { display: block; }
+    </style>
 </head>
 <body>
 
@@ -16,7 +24,7 @@
     <div class="main-content">
         <header class="main-header" style="background-color: #17a2b8; color: white;">
             <h1>Category Overview</h1>
-            <p class="page-subtitle">Inspect a category and its basic data.</p>
+            <p class="page-subtitle">Inspect a category, its provider mappings, and tournaments.</p>
         </header>
 
         <main class="split-layout">
@@ -35,21 +43,54 @@
                     </div>
                 </section>
 
-                <section class="markets-section" style="margin-top: 25px; padding: 25px; background: white; border-radius: 8px; border: 1px solid #e0e0e0;">
-                    <h3 style="margin-bottom: 20px; color: #333; font-size: 18px; border-bottom: 1px solid #eee; padding-bottom: 10px;">Mapped Provider Categories</h3>
-                    <p style="margin-bottom: 15px; font-size: 14px; color: #666;">Provider category values currently connected to this internal category.</p>
+                <section class="markets-section lazy-section" id="mappedProviderSection" style="margin-top: 25px; padding: 25px; background: white; border-radius: 8px; border: 1px solid #e0e0e0;">
+                    <div class="section-header" style="display: flex; align-items: center; justify-content: space-between; gap: 16px; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 15px;">
+                        <button type="button" class="lazy-section-toggle" data-target="mappedProviderSection">
+                            <h3>Mapped Provider Categories</h3>
+                            <span class="lazy-section-icon">⌄</span>
+                        </button>
+                        <button type="button" id="addMappingBtn" class="btn-primary">Add mapping</button>
+                    </div>
+                    <div class="lazy-section-body">
+                        <p style="margin-bottom: 15px; font-size: 14px; color: #666;">Provider category values currently connected to this internal category.</p>
 
-                    <table class="markets-table" style="margin-bottom: 25px;">
-                        <thead>
-                            <tr>
-                                <th>Provider</th>
-                                <th>Provider Category ID</th>
-                                <th>Provider Category Name</th>
-                                <th style="text-align: right;">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="providerCategoriesList"></tbody>
-                    </table>
+                        <table class="markets-table" style="margin-bottom: 25px;">
+                            <thead>
+                                <tr>
+                                    <th>Provider</th>
+                                    <th>Provider Category ID</th>
+                                    <th>Provider Category Name</th>
+                                    <th style="text-align: right;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="providerCategoriesList"></tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="markets-section lazy-section" id="childEntitySection" style="margin-top: 25px; padding: 25px; background: white; border-radius: 8px; border: 1px solid #e0e0e0;">
+                    <div class="section-header" style="border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 15px;">
+                        <button type="button" class="lazy-section-toggle" data-target="childEntitySection">
+                            <h3>Tournaments</h3>
+                            <span class="lazy-section-icon">⌄</span>
+                        </button>
+                    </div>
+                    <div class="lazy-section-body">
+                        <p style="margin-bottom: 15px; font-size: 14px; color: #666;">Tournaments available under this category.</p>
+
+                        <table class="markets-table">
+                            <thead>
+                                <tr>
+                                    <th>Tournament ID</th>
+                                    <th>Tournament Name</th>
+                                    <th>Sport</th>
+                                    <th>Primary Feed</th>
+                                    <th style="text-align: right;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="childTournamentsList"></tbody>
+                        </table>
+                    </div>
                 </section>
 
                 <div style="margin-top: 25px;">
@@ -57,6 +98,42 @@
                 </div>
             </div>
         </main>
+    </div>
+
+    <div id="addMappingModal" class="modal">
+        <div class="modal-content" style="width: min(900px, 92vw);">
+            <span class="close-modal" id="closeAddMappingModalBtn">&times;</span>
+            <h3>Add provider category mapping for <span id="mappingCategoryName" style="color: #17a2b8;"></span></h3>
+            <div class="top-bar" style="box-shadow: none; margin-bottom: 15px;">
+                <div class="filters">
+                    <div class="filter-group">
+                        <label for="providerFilter">Provider</label>
+                        <select id="providerFilter">
+                            <option value="all" selected>All</option>
+                            <option value="ExeFeed">ExeFeed</option>
+                            <option value="SportRadar">SportRadar</option>
+                            <option value="SportGenius">SportGenius</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="providerCategorySearch">Search</label>
+                        <input type="text" id="providerCategorySearch" placeholder="Search provider category..." style="padding: 10px 15px; border: 1px solid #ccc; border-radius: 4px; font-size: 15px; min-width: 240px; background-color: #fdfdfd;">
+                    </div>
+                </div>
+            </div>
+            <table class="markets-table">
+                <thead>
+                    <tr>
+                        <th>Provider</th>
+                        <th>Provider Category ID</th>
+                        <th>Provider Category Name</th>
+                        <th>Status</th>
+                        <th style="text-align: right;">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="availableProviderCategoriesList" data-page-size="10"></tbody>
+            </table>
+        </div>
     </div>
 
     <script src="../pagination.js"></script>
@@ -73,43 +150,115 @@
 
             const providerCategoryMappings = {
                 "England": [
-                    { provider: "ExeFeed", providerId: "cat:eng", providerName: "England" },
+                    { provider: "ExeFeed", providerId: "1126", providerName: "England" },
                     { provider: "SportRadar", providerId: "sr:category:1", providerName: "England" },
-                    { provider: "Bet Genius", providerId: "BG-ENG", providerName: "English Competitions" }
+                    { provider: "SportGenius", providerId: "sg-cat-eng", providerName: "English Competitions" }
                 ],
                 "Spain": [
-                    { provider: "ExeFeed", providerId: "cat:esp", providerName: "Spain" },
+                    { provider: "ExeFeed", providerId: "1127", providerName: "Spain" },
                     { provider: "SportRadar", providerId: "sr:category:32", providerName: "Spain" },
-                    { provider: "IMG Arena", providerId: "IMG-ES", providerName: "Spanish Football" }
+                    { provider: "SportGenius", providerId: "sg-cat-es", providerName: "Spanish Competitions" }
                 ],
                 "Germany": [
-                    { provider: "ExeFeed", providerId: "cat:deu", providerName: "Germany" },
+                    { provider: "ExeFeed", providerId: "1128", providerName: "Germany" },
                     { provider: "SportRadar", providerId: "sr:category:30", providerName: "Germany" },
-                    { provider: "LSports", providerId: "LS-DE", providerName: "Deutschland" }
+                    { provider: "SportGenius", providerId: "sg-cat-de", providerName: "Deutschland" }
                 ],
                 "Italy": [
-                    { provider: "ExeFeed", providerId: "cat:ita", providerName: "Italy" },
+                    { provider: "ExeFeed", providerId: "1131", providerName: "Italy" },
                     { provider: "SportRadar", providerId: "sr:category:31", providerName: "Italy" },
-                    { provider: "Bet Construct", providerId: "BC-IT", providerName: "Italia" }
+                    { provider: "SportGenius", providerId: "sg-cat-it", providerName: "Italy" }
                 ],
                 "France": [
-                    { provider: "ExeFeed", providerId: "cat:fra", providerName: "France" },
+                    { provider: "ExeFeed", providerId: "1130", providerName: "France" },
                     { provider: "SportRadar", providerId: "sr:category:7", providerName: "France" },
-                    { provider: "Bet Genius", providerId: "BG-FR", providerName: "French Competitions" }
+                    { provider: "SportGenius", providerId: "sg-cat-fr", providerName: "French Competitions" }
                 ],
                 "Serbia": [
-                    { provider: "ExeFeed", providerId: "cat:srb", providerName: "Serbia" },
+                    { provider: "ExeFeed", providerId: "1132", providerName: "Serbia" },
                     { provider: "SportRadar", providerId: "sr:category:152", providerName: "Serbia" },
-                    { provider: "LSports", providerId: "LS-RS", providerName: "Serbia" }
+                    { provider: "SportGenius", providerId: "sg-cat-rs", providerName: "Serbia" }
                 ]
             };
 
-            const mappedList = providerCategoryMappings[categoryName] || [];
-            const listContainer = document.getElementById('providerCategoriesList');
+            const allProviderCategories = [
+                { provider: "ExeFeed", providerId: "1126", providerName: "England" },
+                { provider: "ExeFeed", providerId: "1127", providerName: "Spain" },
+                { provider: "ExeFeed", providerId: "1128", providerName: "Germany" },
+                { provider: "ExeFeed", providerId: "1129", providerName: "United States" },
+                { provider: "ExeFeed", providerId: "1130", providerName: "France" },
+                { provider: "SportRadar", providerId: "sr:category:1", providerName: "England" },
+                { provider: "SportRadar", providerId: "sr:category:32", providerName: "Spain" },
+                { provider: "SportRadar", providerId: "sr:category:39", providerName: "International" },
+                { provider: "SportRadar", providerId: "sr:category:15", providerName: "Europe" },
+                { provider: "SportGenius", providerId: "sg-cat-uk", providerName: "UK" },
+                { provider: "SportGenius", providerId: "sg-cat-it", providerName: "Italy" },
+                { provider: "SportGenius", providerId: "sg-cat-rs", providerName: "Serbia" }
+            ];
 
-            if (mappedList.length === 0) {
-                listContainer.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #888; font-style: italic;">No provider categories mapped to this category yet.</td></tr>';
-            } else {
+            const childTournamentsByCategory = {
+                "England": [
+                    { id: "T-001", name: "Premier League", sport: "Soccer", primaryFeed: "EXE" },
+                    { id: "T-002", name: "Championship", sport: "Soccer", primaryFeed: "SR" },
+                    { id: "T-003", name: "League One", sport: "Soccer", primaryFeed: "BG" },
+                    { id: "T-004", name: "League Two", sport: "Soccer", primaryFeed: "SR" },
+                    { id: "T-014", name: "EFL Cup", sport: "Soccer", primaryFeed: "EXE" }
+                ],
+                "Spain": [
+                    { id: "T-005", name: "LaLiga", sport: "Soccer", primaryFeed: "SR" },
+                    { id: "T-006", name: "LaLiga 2", sport: "Soccer", primaryFeed: "EXE" },
+                    { id: "T-007", name: "Copa del Rey", sport: "Soccer", primaryFeed: "BG" },
+                    { id: "T-008", name: "Primera Federacion", sport: "Soccer", primaryFeed: "SR" }
+                ],
+                "Germany": [
+                    { id: "T-009", name: "Bundesliga", sport: "Soccer", primaryFeed: "EXE" },
+                    { id: "T-010", name: "BBL", sport: "Basketball", primaryFeed: "SR" }
+                ],
+                "Italy": [
+                    { id: "T-011", name: "Serie A", sport: "Soccer", primaryFeed: "BG" }
+                ],
+                "France": [
+                    { id: "T-012", name: "Ligue 1", sport: "Soccer", primaryFeed: "EXE" },
+                    { id: "T-013", name: "Roland Garros", sport: "Tennis", primaryFeed: "SR" }
+                ],
+                "Serbia": [
+                    { id: "T-015", name: "SuperLiga", sport: "Soccer", primaryFeed: "EXE" }
+                ],
+                "United States": [
+                    { id: "T-016", name: "NBA", sport: "Basketball", primaryFeed: "SR" }
+                ]
+            };
+
+            let mappedList = [...(providerCategoryMappings[categoryName] || [])];
+            const listContainer = document.getElementById('providerCategoriesList');
+            const childTournamentsList = document.getElementById('childTournamentsList');
+            const addMappingModal = document.getElementById('addMappingModal');
+            const providerFilter = document.getElementById('providerFilter');
+            const providerCategorySearch = document.getElementById('providerCategorySearch');
+            const mappingCategoryName = document.getElementById('mappingCategoryName');
+            const availableProviderCategoriesList = document.getElementById('availableProviderCategoriesList');
+            const loadedSections = new Set();
+
+            function openLazySection(sectionId) {
+                const section = document.getElementById(sectionId);
+                section.classList.toggle('open');
+                if (loadedSections.has(sectionId)) return;
+                if (sectionId === 'mappedProviderSection') renderMappedCategories();
+                if (sectionId === 'childEntitySection') renderChildTournaments();
+                loadedSections.add(sectionId);
+            }
+
+            function mappingKey(item) {
+                return `${item.provider}::${item.providerId}::${item.providerName}`;
+            }
+
+            function renderMappedCategories() {
+                listContainer.innerHTML = '';
+                if (mappedList.length === 0) {
+                    listContainer.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #888; font-style: italic;">No provider categories mapped to this category yet.</td></tr>';
+                    return;
+                }
+
                 mappedList.forEach(providerCategory => {
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
@@ -117,12 +266,92 @@
                         <td style="color: #6c757d;">${providerCategory.providerId}</td>
                         <td style="color: #007bff; font-weight: 500;">${providerCategory.providerName}</td>
                         <td style="text-align: right;">
-                            <button type="button" class="btn-action" style="background-color: #17a2b8; border: none;">Edit Mapping</button>
+                            <a href="map_category.html?provider=${encodeURIComponent(providerCategory.provider)}&provId=${encodeURIComponent(providerCategory.providerId)}&provName=${encodeURIComponent(providerCategory.providerName)}&internalId=${encodeURIComponent(categoryId)}" class="btn-action" style="background-color: #17a2b8; text-decoration: none; display: inline-block;">Edit Mapping</a>
                         </td>
                     `;
                     listContainer.appendChild(tr);
                 });
             }
+
+            function renderAvailableProviderCategories() {
+                const providerVal = providerFilter.value;
+                const searchVal = providerCategorySearch.value.toLowerCase();
+                const mappedKeys = new Set(mappedList.map(mappingKey));
+                const availableCategories = allProviderCategories.filter(item => {
+                    const matchesProvider = providerVal === 'all' || item.provider === providerVal;
+                    const matchesSearch = item.provider.toLowerCase().includes(searchVal) ||
+                        item.providerId.toLowerCase().includes(searchVal) ||
+                        item.providerName.toLowerCase().includes(searchVal);
+                    return matchesProvider && matchesSearch && !mappedKeys.has(mappingKey(item));
+                });
+
+                if (availableCategories.length === 0) {
+                    availableProviderCategoriesList.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #888; font-style: italic;">No not mapped provider categories found.</td></tr>';
+                    return;
+                }
+
+                availableProviderCategoriesList.innerHTML = availableCategories.map(item => `
+                    <tr>
+                        <td style="font-weight: 500;">${item.provider}</td>
+                        <td style="color: #6c757d;">${item.providerId}</td>
+                        <td class="market-name" style="color: #007bff;">${item.providerName}</td>
+                        <td><span class="status-badge status-unmapped">Not mapped</span></td>
+                        <td style="text-align: right;">
+                            <button type="button" class="btn-action add-provider-category-btn" data-key="${mappingKey(item)}">Map</button>
+                        </td>
+                    </tr>
+                `).join('');
+
+                document.querySelectorAll('.add-provider-category-btn').forEach(button => {
+                    button.addEventListener('click', () => {
+                        const selectedCategory = allProviderCategories.find(item => mappingKey(item) === button.dataset.key);
+                        if (!selectedCategory) return;
+                        mappedList.push(selectedCategory);
+                        addMappingModal.style.display = 'none';
+                        if (loadedSections.has('mappedProviderSection')) renderMappedCategories();
+                        renderAvailableProviderCategories();
+                    });
+                });
+            }
+
+            function renderChildTournaments() {
+                const tournaments = childTournamentsByCategory[categoryName] || [];
+                if (tournaments.length === 0) {
+                    childTournamentsList.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #888; font-style: italic;">No tournaments found for this category.</td></tr>';
+                    return;
+                }
+
+                childTournamentsList.innerHTML = tournaments.map(tournament => `
+                    <tr>
+                        <td style="font-weight: 500; color: #6c757d;">${tournament.id}</td>
+                        <td class="market-name">${tournament.name}</td>
+                        <td>${tournament.sport}</td>
+                        <td><span class="status-badge status-mapped">${tournament.primaryFeed}</span></td>
+                        <td style="text-align: right;">
+                            <a href="../tournaments/view_tournament.html?id=${encodeURIComponent(tournament.id)}&name=${encodeURIComponent(tournament.name)}&sport=${encodeURIComponent(tournament.sport)}&category=${encodeURIComponent(categoryName)}&primaryFeed=${encodeURIComponent(tournament.primaryFeed)}" class="btn-action" style="background-color: #007bff; text-decoration: none; display: inline-block;">View</a>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+
+            document.getElementById('addMappingBtn').addEventListener('click', () => {
+                providerFilter.value = 'all';
+                providerCategorySearch.value = '';
+                mappingCategoryName.textContent = categoryName;
+                renderAvailableProviderCategories();
+                addMappingModal.style.display = 'flex';
+            });
+            document.getElementById('closeAddMappingModalBtn').addEventListener('click', () => {
+                addMappingModal.style.display = 'none';
+            });
+            providerFilter.addEventListener('change', renderAvailableProviderCategories);
+            providerCategorySearch.addEventListener('input', renderAvailableProviderCategories);
+            document.querySelectorAll('.lazy-section-toggle').forEach(button => {
+                button.addEventListener('click', () => openLazySection(button.dataset.target));
+            });
+            window.addEventListener('click', event => {
+                if (event.target === addMappingModal) addMappingModal.style.display = 'none';
+            });
         });
     </script>
 </body>

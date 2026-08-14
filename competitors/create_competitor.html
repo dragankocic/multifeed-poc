@@ -16,7 +16,7 @@
     <div class="main-content">
         <header class="main-header" style="background-color: #17a2b8;">
             <h1 id="pageMainTitle">Create Competitor</h1>
-            <p class="page-subtitle">Create or update a competitor with sport.</p>
+            <p class="page-subtitle">Create or update a competitor within Sport, Category and Tournament.</p>
         </header>
 
         <main class="split-layout">
@@ -44,6 +44,20 @@
                         </div>
 
                         <div class="form-group">
+                            <label for="categorySelect">Category</label>
+                            <select id="categorySelect" disabled>
+                                <option value="" disabled selected>Select sport first</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="tournamentSelect">Tournament</label>
+                            <select id="tournamentSelect" disabled>
+                                <option value="" disabled selected>Select category first</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
                             <label for="competitorName">Competitor Name</label>
                             <input type="text" id="competitorName" placeholder="e.g. Arsenal">
                         </div>
@@ -64,6 +78,65 @@
             const editId = urlParams.get('id') || 'auto-generated';
             const editName = urlParams.get('name');
             const editSport = urlParams.get('sport');
+            const editCategory = urlParams.get('category');
+            const editTournament = urlParams.get('tournament');
+            const sportSelect = document.getElementById('sportSelect');
+            const categorySelect = document.getElementById('categorySelect');
+            const tournamentSelect = document.getElementById('tournamentSelect');
+            const hierarchy = {
+                "Soccer": {
+                    "England": ["Premier League", "Championship"],
+                    "Spain": ["LaLiga"],
+                    "Germany": ["Bundesliga"]
+                },
+                "Tennis": {
+                    "France": ["Roland Garros"]
+                },
+                "Formula 1": {
+                    "International": ["Formula 1"]
+                }
+            };
+
+            function renderCategories() {
+                const selectedSport = sportSelect.value;
+                categorySelect.innerHTML = '';
+                tournamentSelect.innerHTML = '<option value="" disabled selected>Select category first</option>';
+                tournamentSelect.disabled = true;
+                categorySelect.disabled = !selectedSport;
+
+                if (!selectedSport || !hierarchy[selectedSport]) {
+                    categorySelect.innerHTML = '<option value="" disabled selected>Select sport first</option>';
+                    return;
+                }
+
+                categorySelect.innerHTML = '<option value="" disabled selected>Select category</option>';
+                Object.keys(hierarchy[selectedSport]).forEach(category => {
+                    const option = document.createElement('option');
+                    option.value = category;
+                    option.textContent = category;
+                    categorySelect.appendChild(option);
+                });
+            }
+
+            function renderTournaments() {
+                const selectedSport = sportSelect.value;
+                const selectedCategory = categorySelect.value;
+                tournamentSelect.innerHTML = '';
+                tournamentSelect.disabled = !selectedSport || !selectedCategory;
+
+                if (!selectedSport || !selectedCategory || !hierarchy[selectedSport]?.[selectedCategory]) {
+                    tournamentSelect.innerHTML = '<option value="" disabled selected>Select category first</option>';
+                    return;
+                }
+
+                tournamentSelect.innerHTML = '<option value="" disabled selected>Select tournament</option>';
+                hierarchy[selectedSport][selectedCategory].forEach(tournament => {
+                    const option = document.createElement('option');
+                    option.value = tournament;
+                    option.textContent = tournament;
+                    tournamentSelect.appendChild(option);
+                });
+            }
 
             if (isEdit) {
                 document.getElementById('pageMainTitle').textContent = 'Edit Competitor';
@@ -71,15 +144,28 @@
                 document.getElementById('saveCompetitorBtn').textContent = 'Update competitor';
                 document.title = 'Edit Competitor';
 
-                if (editSport) document.getElementById('sportSelect').value = editSport;
+                if (editSport) {
+                    sportSelect.value = editSport;
+                    renderCategories();
+                }
+                if (editCategory) {
+                    categorySelect.value = editCategory;
+                    renderTournaments();
+                }
+                if (editTournament) tournamentSelect.value = editTournament;
                 if (editName) document.getElementById('competitorName').value = editName;
             }
 
+            sportSelect.addEventListener('change', renderCategories);
+            categorySelect.addEventListener('change', renderTournaments);
+
             document.getElementById('saveCompetitorBtn').addEventListener('click', () => {
-                const sport = document.getElementById('sportSelect').value;
+                const sport = sportSelect.value;
+                const category = categorySelect.value;
+                const tournament = tournamentSelect.value;
                 const name = document.getElementById('competitorName').value.trim();
 
-                if (!sport || !name) {
+                if (!sport || !category || !tournament || !name) {
                     alert("Please fill in all fields.");
                     return;
                 }

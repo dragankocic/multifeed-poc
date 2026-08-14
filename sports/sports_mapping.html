@@ -79,11 +79,14 @@
 
             // Mock podaci za provider sportove
             const providerSports = [
-                { provider: "ExeFeed", provId: "-", provName: "Soccer", internalId: "S-001", internalName: "Soccer", internalAbbr: "SOC", status: "Mapped" },
+                { provider: "ExeFeed", provId: "F", provName: "Fudbal", internalId: "S-001", internalName: "Soccer", internalAbbr: "SOC", status: "Mapped" },
                 { provider: "SportRadar", provId: "sr:sport:1", provName: "Football", internalId: "S-001", internalName: "Soccer", internalAbbr: "SOC", status: "Mapped" },
-                { provider: "ExeFeed", provId: "-", provName: "Basketball", internalId: "S-002", internalName: "Basketball", internalAbbr: "BKB", status: "Mapped" },
+                { provider: "ExeFeed", provId: "B", provName: "Košarka", internalId: "S-002", internalName: "Basketball", internalAbbr: "BKB", status: "Mapped" },
                 { provider: "SportGenius", provId: "sg-10", provName: "Ice Hockey", internalId: "-", internalName: "-", internalAbbr: "-", status: "Unmapped" },
-                { provider: "ExeFeed", provId: "-", provName: "Tennis", internalId: "-", internalName: "-", internalAbbr: "-", status: "Unmapped" }
+                { provider: "ExeFeed", provId: "T", provName: "Tenis", internalId: "S-003", internalName: "Tennis", internalAbbr: "TEN", status: "Mapped" },
+                { provider: "ExeFeed", provId: "IH", provName: "Hokej na ledu", internalId: "-", internalName: "-", internalAbbr: "-", status: "Unmapped" },
+                { provider: "ExeFeed", provId: "V", provName: "Odbojka", internalId: "-", internalName: "-", internalAbbr: "-", status: "Unmapped" },
+                { provider: "ExeFeed", provId: "H", provName: "Rukomet", internalId: "-", internalName: "-", internalAbbr: "-", status: "Unmapped" }
             ];
 
             function renderSports() {
@@ -99,7 +102,8 @@
                     const matchesStatus = statusVal === 'all' || sport.status.toLowerCase() === statusVal;
                     
                     // Pretraga po nazivu provider sporta ili internog sporta
-                    const matchesSearch = sport.provName.toLowerCase().includes(searchVal) || 
+                    const matchesSearch = sport.provId.toLowerCase().includes(searchVal) ||
+                                          sport.provName.toLowerCase().includes(searchVal) || 
                                           sport.internalName.toLowerCase().includes(searchVal);
 
                     return matchesProvider && matchesStatus && matchesSearch;

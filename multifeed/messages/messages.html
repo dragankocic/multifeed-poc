@@ -5,358 +5,979 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>View Events</title>
     <link rel="stylesheet" href="../../style.css">
-    <link rel="stylesheet" href="messages_style.css">
     <script src="../../auth.js"></script>
+    <style>
+        .event-toolbar .filters {
+            display: flex;
+            align-items: flex-end;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .event-toolbar .filter-group {
+            flex: 0 0 170px;
+        }
+
+        .event-toolbar .filter-group.search-filter {
+            flex-basis: 240px;
+        }
+
+        .event-toolbar select,
+        .event-toolbar input {
+            width: 100%;
+            height: 41px;
+            min-width: 0 !important;
+            box-sizing: border-box;
+        }
+
+        .mapping-status-line {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .mapping-status-line a {
+            font-size: 12px;
+            padding: 5px 8px;
+        }
+
+        .event-detail-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(220px, 1fr));
+            gap: 28px;
+        }
+
+        .detail-row {
+            display: grid;
+            grid-template-columns: 140px 1fr;
+            gap: 12px;
+            padding: 8px 0;
+            border-bottom: 1px solid #e3e3e3;
+        }
+
+        .detail-row strong {
+            color: #111;
+        }
+
+        .detail-row span {
+            color: #666;
+        }
+
+        .event-message-filters {
+            display: grid;
+            grid-template-columns: minmax(280px, 1.2fr) minmax(220px, 1fr) minmax(220px, 1fr);
+            gap: 14px;
+            align-items: end;
+        }
+
+        .date-range-fields {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .merge-modal-content {
+            width: min(960px, 94vw);
+            padding: 30px;
+        }
+
+        .merge-form {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+            margin-top: 18px;
+        }
+
+        .merge-filter-grid {
+            display: grid;
+            grid-template-columns: minmax(160px, 0.8fr) minmax(220px, 1.2fr);
+            gap: 12px;
+        }
+
+        .merge-form .form-group {
+            margin-bottom: 0;
+        }
+
+        .merge-form input,
+        .merge-form select {
+            width: 100%;
+            min-width: 0 !important;
+            height: 42px;
+            box-sizing: border-box;
+        }
+
+        .merge-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 22px;
+        }
+
+        .merge-actions .btn-secondary {
+            min-height: 42px;
+            padding: 10px 18px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            background: #fff;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        .merge-candidate-list {
+            max-height: 330px;
+            overflow: auto;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+        }
+
+        .merge-candidate-list .markets-table {
+            border-radius: 0;
+        }
+
+        .merge-candidate-row {
+            cursor: pointer;
+        }
+
+        .merge-candidate-row.selected td {
+            background-color: #eef9fb !important;
+            border-top: 1px solid #b8e3ea;
+            border-bottom: 1px solid #b8e3ea;
+        }
+
+        .row-actions {
+            display: inline-flex;
+            gap: 8px;
+            justify-content: flex-end;
+            white-space: nowrap;
+        }
+
+        .selected-event-row td {
+            background-color: #eef9fb !important;
+            border-top: 1px solid #b8e3ea;
+            border-bottom: 1px solid #b8e3ea;
+        }
+
+        .pin-indicator {
+            display: inline-block;
+            margin-left: 6px;
+            padding: 2px 6px;
+            border-radius: 999px;
+            background: #d1ecf1;
+            color: #0c5460;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .connection-summary {
+            display: grid;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .event-markets-table th,
+        .event-markets-table td {
+            padding: 10px 12px;
+        }
+
+        .message-modal-content {
+            width: min(1120px, 94vw);
+            padding: 24px;
+        }
+
+        .message-payload-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .payload-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            min-width: 0;
+        }
+
+        .payload-box {
+            min-height: 420px;
+            max-height: 56vh;
+            overflow: auto;
+            padding: 18px;
+            border: 1px solid #dcdfe3;
+            border-radius: 8px;
+            background: #fff;
+            color: #666;
+            font: 14px/1.45 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+            white-space: pre-wrap;
+        }
+
+        .message-filter-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 1100px) {
+            .event-detail-grid,
+            .event-message-filters,
+            .message-payload-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 680px) {
+            .date-range-fields {
+                grid-template-columns: 1fr;
+            }
+
+            .merge-actions {
+                flex-direction: column-reverse;
+            }
+
+            .merge-actions button {
+                width: 100%;
+            }
+
+            .merge-filter-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
-
-    <div id="sidebar-container" data-root="../.." data-active="view-events" data-service="sportsbook"></div>
+    <div id="sidebar-container" data-root="../.." data-active="view-events"></div>
+    <script src="../../sidebar.js"></script>
 
     <div class="main-content">
         <header class="main-header">
             <h1>View Events</h1>
-            <p class="page-subtitle">Search, filter and inspect incoming event messages.</p>
+            <p class="page-subtitle">Browse provider events, inspect event messages, and connect matching events manually.</p>
         </header>
 
         <main class="split-layout">
             <div class="form-side">
-                <div class="top-bar" style="flex-direction: column; align-items: stretch; gap: 20px;">
-                    
-                    <div class="switch-container">
-                        <span>Group by event</span>
-                        <label class="switch">
-                            <input type="checkbox" id="groupByEventToggle">
-                            <span class="slider"></span>
-                        </label>
-                    </div>
-
-                    <div class="filters" style="flex-wrap: wrap; gap: 15px;">
-                        
-                        <div class="filter-group">
-                            <label for="providerSelect">Provider</label>
-                            <select id="providerSelect" style="padding: 10px; border-radius: 4px; border: 1px solid #ccc; min-width: 150px;">
-                                <option value="ExeFeed" selected>ExeFeed</option>
-                                <option value="SportRadar">SportRadar</option>
-                                <option value="Bet Genius">Bet Genius</option>
-                                <option value="IMG Arena">IMG Arena</option>
-                                <option value="Bet Construct">Bet Construct</option>
-                                <option value="LSports">LSports</option>
-                            </select>
-                        </div>
-
-                        <div class="filter-group">
-                            <label for="feedSelect">Feed</label>
-                            <select id="feedSelect" style="padding: 10px; border-radius: 4px; border: 1px solid #ccc; min-width: 150px;">
+                <div id="eventsListView">
+                    <div class="top-bar event-toolbar">
+                        <div class="filters">
+                            <div class="filter-group">
+                                <label for="providerSelect">Feed Provider</label>
+                                <select id="providerSelect">
+                                    <option value="all" selected>All</option>
+                                    <option value="ExeFeed">ExeFeed</option>
+                                    <option value="SportRadar">SportRadar</option>
+                                    <option value="Bet Genius">Bet Genius</option>
+                                    <option value="IMG Arena">IMG Arena</option>
+                                    <option value="Bet Construct">Bet Construct</option>
+                                    <option value="LSports">LSports</option>
                                 </select>
-                        </div>
+                            </div>
 
-                        <div class="filter-group">
-                            <label>Received between</label>
-                            <div class="date-range-container">
-                                <input type="datetime-local" id="dateFrom" style="padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
-                                <span>-</span>
-                                <input type="datetime-local" id="dateTo" style="padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                            <div class="filter-group">
+                                <label for="sportSelect">Sport</label>
+                                <select id="sportSelect">
+                                    <option value="all" selected>All</option>
+                                    <option value="Soccer">Soccer</option>
+                                    <option value="Basketball">Basketball</option>
+                                    <option value="Tennis">Tennis</option>
+                                    <option value="Motorsport">Motorsport</option>
+                                </select>
+                            </div>
+
+                            <div class="filter-group">
+                                <label for="statusSelect">Status</label>
+                                <select id="statusSelect">
+                                    <option value="all" selected>All</option>
+                                    <option value="Not started">Not started</option>
+                                    <option value="Live">Live</option>
+                                    <option value="Ended">Ended</option>
+                                    <option value="Cancelled">Cancelled</option>
+                                    <option value="Delayed">Delayed</option>
+                                    <option value="Suspended">Suspended</option>
+                                </select>
+                            </div>
+
+                            <div class="filter-group">
+                                <label for="mappingStatusSelect">Mapping</label>
+                                <select id="mappingStatusSelect">
+                                    <option value="all" selected>All</option>
+                                    <option value="mapped">Mapped</option>
+                                    <option value="partially mapped">Partially mapped</option>
+                                    <option value="unmapped">Unmapped</option>
+                                </select>
+                            </div>
+
+                            <div class="filter-group search-filter">
+                                <label for="searchInput">Search</label>
+                                <input type="text" id="searchInput" placeholder="Search ID or event...">
                             </div>
                         </div>
-
-                        <div class="filter-group">
-                            <label for="sportSelect">Sport</label>
-                            <select id="sportSelect" style="padding: 10px; border-radius: 4px; border: 1px solid #ccc;">
-                                <option value="all" selected>All</option>
-                                <option value="Soccer">Soccer</option>
-                                <option value="Basketball">Basketball</option>
-                                <option value="Tennis">Tennis</option>
-                                <option value="Motorsport">Motorsport</option>
-                            </select>
-                        </div>
-
-                        <div class="filter-group">
-                            <label for="statusSelect">Status</label>
-                            <select id="statusSelect" style="padding: 10px; border-radius: 4px; border: 1px solid #ccc;">
-                                <option value="all" selected>All Statuses</option>
-                                <option value="Not started">Not started</option>
-                                <option value="Live">Live</option>
-                                <option value="Ended">Ended</option>
-                                <option value="Closed">Closed</option>
-                                <option value="Cancelled">Cancelled</option>
-                                <option value="Delayed">Delayed</option>
-                                <option value="Interrupted">Interrupted</option>
-                                <option value="Suspended">Suspended</option>
-                                <option value="Postponed">Postponed</option>
-                                <option value="Abandoned">Abandoned</option>
-                            </select>
-                        </div>
-
-                        <div class="filter-group">
-                            <label for="searchInput">Search</label>
-                            <input type="text" id="searchInput" placeholder="Search ID or description..." style="padding: 10px 15px; border: 1px solid #ccc; border-radius: 4px; font-size: 15px; min-width: 200px; background-color: #fdfdfd;">
+                        <div class="actions">
+                            <button type="button" id="connectSelectedBtn" class="btn-primary" disabled>Connect selected</button>
                         </div>
                     </div>
+
+                    <section class="markets-section">
+                        <table class="markets-table">
+                            <thead id="eventsTableHead"></thead>
+                            <tbody id="eventsTableBody"></tbody>
+                        </table>
+                    </section>
                 </div>
 
-                <section class="markets-section">
-                    <table class="markets-table">
-                        <thead id="tableHeader">
-                            </thead>
-                        <tbody id="messagesTableBody">
-                            </tbody>
-                    </table>
-                    
-                    <div class="pagination-container">
-                        <div class="rows-per-page">
-                            <label style="font-size: 14px; color: #555; margin-right: 10px;">Rows per page:</label>
-                            <select id="rowsPerPage" style="padding: 5px 10px; border-radius: 4px; border: 1px solid #ccc;">
-                                <option value="5">5</option>
-                                <option value="10" selected>10</option>
-                                <option value="20">20</option>
-                                <option value="50">50</option>
-                            </select>
+                <div id="eventDetailView" style="display: none;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 20px;">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <button type="button" id="backToEventsBtn" class="btn-secondary" style="padding: 10px 14px;">&larr;</button>
+                            <div>
+                                <h2 id="detailTitle" style="font-size: 28px; color: #111; margin: 0;"></h2>
+                                <p id="detailUpdatedAt" style="font-size: 15px; color: #777; margin-top: 6px;"></p>
+                            </div>
                         </div>
-                        
-                        <div class="pagination-controls">
-                            <span id="pageInfo" style="font-size: 14px; color: #555;">Page 1 of 1</span>
-                            <button class="page-btn" id="prevPageBtn">Previous</button>
-                            <button class="page-btn" id="nextPageBtn">Next</button>
+                        <div class="actions" style="display: flex; gap: 10px; justify-content: flex-end;">
+                            <button type="button" id="openMessageFiltersBtn" class="btn-secondary">Messages</button>
+                            <button type="button" id="mergeFromDetailBtn" class="btn-primary">Connect event</button>
                         </div>
                     </div>
-                </section>
-            </div>
 
+                    <section class="markets-section" style="padding: 20px; margin-bottom: 20px;">
+                        <div class="event-detail-grid" id="eventDetailGrid"></div>
+                    </section>
+
+                    <section class="markets-section" style="margin-bottom: 20px;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 20px; border-bottom: 1px solid #e9ecef;">
+                            <h3 style="margin: 0;">Markets</h3>
+                            <span id="eventMarketsSummary" style="color: #666; font-size: 14px;"></span>
+                        </div>
+                        <table class="markets-table event-markets-table">
+                            <thead>
+                                <tr>
+                                    <th>Market ID</th>
+                                    <th>Provider Market</th>
+                                    <th>Internal Market</th>
+                                    <th>Status</th>
+                                    <th style="text-align: right;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="eventMarketsBody"></tbody>
+                        </table>
+                    </section>
+                </div>
+
+                <div id="messageFilterView" style="display: none;">
+                    <div class="message-filter-header">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <button type="button" id="backToEventDetailBtn" class="btn-secondary" style="padding: 10px 14px;">&larr;</button>
+                            <div>
+                                <h2 id="messageFilterTitle" style="font-size: 28px; color: #111; margin: 0;">Filter Messages</h2>
+                                <p id="messageFilterSubtitle" style="font-size: 15px; color: #777; margin-top: 6px;"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <section class="markets-section" style="padding: 20px; margin-bottom: 20px;">
+                        <div class="event-message-filters">
+                            <div class="filter-group">
+                                <label>Received Between</label>
+                                <div class="date-range-fields">
+                                    <input type="date" id="messageDateFrom" aria-label="Received from date">
+                                    <input type="date" id="messageDateTo" aria-label="Received to date">
+                                </div>
+                            </div>
+                            <div class="filter-group">
+                                <label for="messageTypeFilter">Event Type</label>
+                                <select id="messageTypeFilter">
+                                    <option value="all" selected>All</option>
+                                    <option value="Fixture">Fixture</option>
+                                    <option value="Market Update">Market Update</option>
+                                    <option value="Status Update">Status Update</option>
+                                    <option value="Incident">Incident</option>
+                                    <option value="Odds Change">Odds Change</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label for="messageSearchInput">Search</label>
+                                <input type="text" id="messageSearchInput" placeholder="Search here...">
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="markets-section">
+                        <table class="markets-table">
+                            <thead>
+                                <tr>
+                                    <th>Message ID</th>
+                                    <th>Timestamp</th>
+                                    <th>Type</th>
+                                    <th style="text-align: right;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="filteredEventMessagesBody"></tbody>
+                        </table>
+                    </section>
+                </div>
+            </div>
         </main>
     </div>
 
-    <script src="../../sidebar.js"></script>
+    <div id="mergeModal" class="modal">
+        <div class="modal-content merge-modal-content">
+            <span class="close-modal" id="closeMergeModalBtn">&times;</span>
+            <h3 style="font-size: 24px; margin-bottom: 12px; padding-bottom: 14px; border-bottom: 1px solid #e5e5e5;">Connect matching events</h3>
+            <p style="margin: 0; color: #666; line-height: 1.45;">Select another provider event that represents the same real event. This creates one grouped event across providers.</p>
+            <div class="merge-form">
+                <div class="form-group">
+                    <label>Selected event</label>
+                    <input type="text" id="mergeSourceEvent" readonly>
+                </div>
+                <div class="merge-filter-grid">
+                    <div class="form-group">
+                        <label for="mergeProviderFilter">Provider</label>
+                        <select id="mergeProviderFilter">
+                            <option value="all" selected>All</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="mergeSearchInput">Search</label>
+                        <input type="text" id="mergeSearchInput" placeholder="Search event, ID, sport...">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Connect with</label>
+                    <div class="merge-candidate-list">
+                        <table class="markets-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 44px;">Select</th>
+                                    <th>Event</th>
+                                    <th>Provider</th>
+                                    <th>Provider ID</th>
+                                    <th>Start Time</th>
+                                    <th>Competition</th>
+                                </tr>
+                            </thead>
+                            <tbody id="mergeTargetEventList"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="merge-actions">
+                <button type="button" id="cancelMergeBtn" class="btn-secondary">Cancel</button>
+                <button type="button" id="confirmMergeBtn" class="btn-primary">Connect events</button>
+            </div>
+        </div>
+    </div>
 
+    <div id="messageDetailsModal" class="modal">
+        <div class="modal-content message-modal-content">
+            <span class="close-modal" id="closeMessageDetailsBtn">&times;</span>
+            <h3 style="font-size: 22px; margin: 0 0 8px;">Feed message details</h3>
+            <p id="messageDetailsSubtitle" style="margin: 0; color: #666;"></p>
+            <div class="message-payload-grid">
+                <div class="payload-panel">
+                    <pre id="internalMessagePayload" class="payload-box"></pre>
+                    <button type="button" id="copyInternalMessageBtn" class="btn-secondary">Copy Internal Message</button>
+                </div>
+                <div class="payload-panel">
+                    <pre id="sourceMessagePayload" class="payload-box"></pre>
+                    <button type="button" id="copySourceMessageBtn" class="btn-secondary">Copy Source Message</button>
+                </div>
+            </div>
+            <div class="merge-actions">
+                <button type="button" id="closeMessageDetailsFooterBtn" class="btn-primary">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../pagination.js"></script>
     <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const tableHeader = document.getElementById("tableHeader");
-            const tableBody = document.getElementById("messagesTableBody");
-            
-            const providerSelect = document.getElementById("providerSelect");
-            const feedSelect = document.getElementById("feedSelect");
-            const sportSelect = document.getElementById("sportSelect");
-            const statusSelect = document.getElementById("statusSelect");
-            const searchInput = document.getElementById("searchInput");
-            const groupByEventToggle = document.getElementById("groupByEventToggle");
-            
-            // Paginacija elementi
-            const rowsPerPageSelect = document.getElementById("rowsPerPage");
-            const prevPageBtn = document.getElementById("prevPageBtn");
-            const nextPageBtn = document.getElementById("nextPageBtn");
-            const pageInfo = document.getElementById("pageInfo");
-
-            // Baza feed-ova za dinamičko punjenje
-            const providerFeedsDatabase = {
-                "ExeFeed": ["Exe-Live", "Exe-Prematch"],
-                "SportRadar": ["SR-LiveOdds", "SR-MTS", "SR-PreMatch", "SR-Resulting"],
-                "Bet Genius": ["BG-GeniusOdds"],
-                "IMG Arena": ["IMG-TennisLive", "IMG-GolfTrack", "IMG-PreOdds"],
-                "Bet Construct": ["BC-MainLive", "BC-PrematchData", "BC-Scouting", "BC-Virtuals", "BC-CryptoFeed"],
-                "LSports": ["LS-STM", "LS-PreMatch"]
-            };
-
-            // Mock podaci - INDIVIDUALNE PORUKE
-            const allMessages = [
-                { eventId: "EV-001", provId: "sr:match:11", provider: "SportRadar", feed: "SR-LiveOdds", time: "2026-06-09 12:30:05", sport: "Soccer", status: "Live", desc: "Real Madrid - Barcelona", type: "Match Update" },
-                { eventId: "EV-002", provId: "sr:match:22", provider: "ExeFeed", feed: "Exe-Live", time: "2026-06-09 12:28:10", sport: "Basketball", status: "Live", desc: "New York Knicks - San Antonio Spurs", type: "Period Update" },
-                { eventId: "EV-001", provId: "sr:match:11", provider: "SportRadar", feed: "SR-LiveOdds", time: "2026-06-09 12:25:00", sport: "Soccer", status: "Live", desc: "Real Madrid - Barcelona", type: "Incident" },
-                { eventId: "EV-003", provId: "sr:match:33", provider: "Bet Genius", feed: "BG-GeniusOdds", time: "2026-06-09 11:00:00", sport: "Tennis", status: "Ended", desc: "Novak Djokovic - Carlos Alcaraz", type: "Status Update" },
-                { eventId: "EV-004", provId: "sr:match:44", provider: "SportRadar", feed: "SR-PreMatch", time: "2026-06-10 15:00:00", sport: "Soccer", status: "Not started", desc: "Manchester City - Arsenal", type: "Market Update" },
-                { eventId: "EV-005", provId: "sr:match:55", provider: "ExeFeed", feed: "Exe-Prematch", time: "2026-06-09 10:15:00", sport: "Soccer", status: "Cancelled", desc: "Bayern Munich - BVB", type: "Status Update" },
-                { eventId: "EV-001", provId: "sr:match:11", provider: "SportRadar", feed: "SR-LiveOdds", time: "2026-06-09 12:10:00", sport: "Soccer", status: "Live", desc: "Real Madrid - Barcelona", type: "Status Update" },
-                { eventId: "EV-006", provId: "sr:match:66", provider: "Bet Construct", feed: "BC-MainLive", time: "2026-06-09 12:31:00", sport: "Basketball", status: "Suspended", desc: "LA Lakers - Boston Celtics", type: "Status Update" },
-                { eventId: "EV-007", provId: "sr:match:77", provider: "LSports", feed: "LS-STM", time: "2026-06-09 09:00:00", sport: "Tennis", status: "Closed", desc: "Rafael Nadal - Andy Murray", type: "Market Update" },
-                { eventId: "EV-002", provId: "sr:match:22", provider: "ExeFeed", feed: "Exe-Live", time: "2026-06-09 12:20:00", sport: "Basketball", status: "Live", desc: "New York Knicks - San Antonio Spurs", type: "Incident" },
-                { eventId: "EV-008", provId: "sr:race:1", provider: "IMG Arena", feed: "IMG-PreOdds", time: "2026-06-09 14:00:00", sport: "Motorsport", status: "Delayed", desc: "Monaco GP", type: "Status Update" },
-                { eventId: "EV-001", provId: "sr:match:11", provider: "SportRadar", feed: "SR-PreMatch", time: "2026-06-09 11:55:00", sport: "Soccer", status: "Not started", desc: "Real Madrid - Barcelona", type: "Pre-match Update" }
+        document.addEventListener('DOMContentLoaded', () => {
+            const events = [
+                { id: "EV-001", internalId: "event:56418719", providerId: "sr:match:61300621", provider: "SportRadar", sport: "Soccer", category: "England", competition: "Premier League", season: "2025/26", stage: "-", startTime: "17.03.2026. 16:00", venue: "Old Trafford", status: "Not started", desc: "Manchester United vs Liverpool", updatedAt: "04:46:32 PM", group: "G-001", mappingStatus: "Mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Mapped" },
+                { id: "EV-011", internalId: "event:56418719", providerId: "6569588", provider: "ExeFeed", sport: "Soccer", category: "England", competition: "Premier League", season: "2025/26", stage: "-", startTime: "17.03.2026. 16:00", venue: "Old Trafford", status: "Not started", desc: "Manchester United - Liverpool", updatedAt: "04:45:10 PM", group: "G-001", mappingStatus: "Mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Mapped" },
+                { id: "EV-002", internalId: "event:56418720", providerId: "61310022", provider: "ExeFeed", sport: "Basketball", category: "United States", competition: "NBA", season: "2025/26", stage: "Regular season", startTime: "09.06.2026. 12:28", venue: "Madison Square Garden", status: "Live", desc: "New York Knicks - San Antonio Spurs", updatedAt: "12:28:10 PM", group: "G-002", mappingStatus: "Partially mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Unmapped" },
+                { id: "EV-003", internalId: "event:56418721", providerId: "bg:match:33000033", provider: "Bet Genius", sport: "Tennis", category: "France", competition: "Roland Garros", season: "2026", stage: "Final", startTime: "09.06.2026. 11:00", venue: "Court Philippe-Chatrier", status: "Ended", desc: "Novak Djokovic - Carlos Alcaraz", updatedAt: "11:00:00 AM", group: "G-003", mappingStatus: "Mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Mapped" },
+                { id: "EV-004", internalId: "event:56418722", providerId: "sr:match:61300622", provider: "SportRadar", sport: "Soccer", category: "England", competition: "Premier League", season: "2025/26", stage: "-", startTime: "10.06.2026. 20:45", venue: "Etihad Stadium", status: "Not started", desc: "Manchester City - Arsenal", updatedAt: "03:00:00 PM", group: "G-004", mappingStatus: "Partially mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Unmapped" },
+                { id: "EV-012", internalId: "event:56418725", providerId: "61310622", provider: "ExeFeed", sport: "Soccer", category: "England", competition: "Premier League", season: "2025/26", stage: "-", startTime: "10.06.2026. 20:45", venue: "Etihad Stadium", status: "Not started", desc: "Manchester City - Arsenal", updatedAt: "03:02:14 PM", group: "G-012", mappingStatus: "Partially mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Unmapped" },
+                { id: "EV-005", internalId: "event:56418723", providerId: "61310055", provider: "ExeFeed", sport: "Soccer", category: "Germany", competition: "Bundesliga", season: "2025/26", stage: "-", startTime: "09.06.2026. 10:15", venue: "Allianz Arena", status: "Cancelled", desc: "Bayern Munich - BVB", updatedAt: "10:15:00 AM", group: "G-005", mappingStatus: "Unmapped", sportMapping: "Mapped", categoryMapping: "Unmapped", tournamentMapping: "Unmapped" },
+                { id: "EV-008", internalId: "event:56418724", providerId: "sr:race:1", provider: "IMG Arena", sport: "Motorsport", category: "International", competition: "Formula 1", season: "2026", stage: "Race", startTime: "14.06.2026. 15:00", venue: "Monaco", status: "Delayed", desc: "Monaco GP", updatedAt: "02:00:00 PM", group: "G-008", mappingStatus: "Unmapped", sportMapping: "Unmapped", categoryMapping: "Unmapped", tournamentMapping: "Unmapped" }
             ];
 
-            // Mock podaci - JEDINSTVENI DOGAĐAJI
-            const allEvents = [
-                { eventId: "EV-001", provId: "sr:match:11", provider: "SportRadar", feed: "SR-LiveOdds", startTime: "2026-06-09 12:10:00", sport: "Soccer", desc: "Real Madrid - Barcelona", status: "Live" },
-                { eventId: "EV-002", provId: "sr:match:22", provider: "ExeFeed", feed: "Exe-Live", startTime: "2026-06-09 11:45:00", sport: "Basketball", desc: "New York Knicks - San Antonio Spurs", status: "Live" },
-                { eventId: "EV-003", provId: "sr:match:33", provider: "Bet Genius", feed: "BG-GeniusOdds", startTime: "2026-06-09 09:00:00", sport: "Tennis", desc: "Novak Djokovic - Carlos Alcaraz", status: "Ended" },
-                { eventId: "EV-004", provId: "sr:match:44", provider: "SportRadar", feed: "SR-PreMatch", startTime: "2026-06-10 20:45:00", sport: "Soccer", desc: "Manchester City - Arsenal", status: "Not started" },
-                { eventId: "EV-008", provId: "sr:race:1", provider: "IMG Arena", feed: "IMG-PreOdds", startTime: "2026-06-14 15:00:00", sport: "Motorsport", desc: "Monaco GP", status: "Delayed" },
-                { eventId: "EV-009", provId: "sr:match:99", provider: "LSports", feed: "LS-PreMatch", startTime: "2026-06-11 18:00:00", sport: "Soccer", desc: "AC Milan - Inter", status: "Not started" },
-                { eventId: "EV-010", provId: "sr:match:101", provider: "ExeFeed", feed: "Exe-Prematch", startTime: "2026-06-11 18:00:00", sport: "Soccer", desc: "Bayern Munich - BVB", status: "Not started" }
+            const messages = [
+                { eventId: "EV-001", messageId: "event:56418719", time: "07/10/2025 10:45:00 PM", type: "score changed", provider: "SportRadar", sourceRef: "sr:message:61300621:score" },
+                { eventId: "EV-001", messageId: "event:56418720", time: "07/10/2025 10:45:00 PM", type: "match started", provider: "SportRadar", sourceRef: "sr:message:61300621:start" },
+                { eventId: "EV-001", messageId: "event:56418721", time: "07/10/2025 10:45:00 PM", type: "odds changed", provider: "SportRadar", sourceRef: "sr:message:61300621:odds" },
+                { eventId: "EV-001", messageId: "event:56418722", time: "07/10/2025 10:45:00 PM", type: "match paused", provider: "SportRadar", sourceRef: "sr:message:61300621:pause" },
+                { eventId: "EV-001", messageId: "event:56418723", time: "07/10/2025 10:45:00 PM", type: "fixture", provider: "SportRadar", sourceRef: "sr:message:61300621:fixture" },
+                { eventId: "EV-001", messageId: "event:56418724", time: "07/10/2025 10:45:00 PM", type: "odds change", provider: "SportRadar", sourceRef: "sr:message:61300621:market" },
+                { eventId: "EV-002", messageId: "event:56418801", time: "06/09/2026 12:28:10 PM", type: "period update", provider: "ExeFeed", sourceRef: "61310022:period" },
+                { eventId: "EV-003", messageId: "event:56418802", time: "06/09/2026 11:00:00 AM", type: "status update", provider: "Bet Genius", sourceRef: "bg:message:33000033:status" }
             ];
 
-            let currentPage = 1;
-            let rowsPerPage = parseInt(rowsPerPageSelect.value);
-            let filteredData = [];
+            const eventMarkets = [
+                { eventId: "EV-001", marketId: "sr:market:1", providerMarket: "1x2", internalId: "HRM-001", internalMarket: "1x2", status: "Mapped" },
+                { eventId: "EV-001", marketId: "sr:market:18", providerMarket: "Total Goals", internalId: "HRM-002", internalMarket: "TOTAL_GOALS", status: "Mapped" },
+                { eventId: "EV-001", marketId: "sr:market:29", providerMarket: "Both Teams To Score", internalId: "HRM-003", internalMarket: "BTTS", status: "Mapped" },
+                { eventId: "EV-011", marketId: "101", providerMarket: "1X2", internalId: "HRM-001", internalMarket: "1x2", status: "Mapped" },
+                { eventId: "EV-011", marketId: "102", providerMarket: "TOTAL_GOALS", internalId: "HRM-002", internalMarket: "TOTAL_GOALS", status: "Mapped" },
+                { eventId: "EV-002", marketId: "201", providerMarket: "Match Winner", internalId: "HRM-004", internalMarket: "Moneyline", status: "Mapped" },
+                { eventId: "EV-002", marketId: "202", providerMarket: "Total Points", internalId: "-", internalMarket: "-", status: "Unmapped" },
+                { eventId: "EV-003", marketId: "bg:market:3301", providerMarket: "Match Winner", internalId: "HRM-005", internalMarket: "Winner", status: "Mapped" },
+                { eventId: "EV-003", marketId: "bg:market:3302", providerMarket: "Set Handicap", internalId: "HRM-006", internalMarket: "Set Handicap", status: "Mapped" },
+                { eventId: "EV-004", marketId: "sr:market:1", providerMarket: "1x2", internalId: "HRM-001", internalMarket: "1x2", status: "Mapped" },
+                { eventId: "EV-004", marketId: "sr:market:18", providerMarket: "Total Goals", internalId: "-", internalMarket: "-", status: "Unmapped" },
+                { eventId: "EV-012", marketId: "101", providerMarket: "1X2", internalId: "HRM-001", internalMarket: "1x2", status: "Mapped" },
+                { eventId: "EV-012", marketId: "102", providerMarket: "TOTAL_GOALS", internalId: "-", internalMarket: "-", status: "Unmapped" },
+                { eventId: "EV-005", marketId: "301", providerMarket: "1X2", internalId: "-", internalMarket: "-", status: "Unmapped" },
+                { eventId: "EV-008", marketId: "img:market:race-winner", providerMarket: "Race Winner", internalId: "-", internalMarket: "-", status: "Unmapped" }
+            ];
 
-            const statusColors = {
-                "Live": { bg: "#d4edda", col: "#155724", border: "#c3e6cb" },
-                "Not started": { bg: "#e2e3e5", col: "#383d41", border: "#d6d8db" },
-                "Ended": { bg: "#cce5ff", col: "#004085", border: "#b8daff" },
-                "Closed": { bg: "#d1ecf1", col: "#0c5460", border: "#bee5eb" },
-                "Cancelled": { bg: "#f8d7da", col: "#721c24", border: "#f5c6cb" },
-                "Delayed": { bg: "#fff3cd", col: "#856404", border: "#ffeeba" },
-                "Suspended": { bg: "#fff3cd", col: "#856404", border: "#ffeeba" },
-                "Interrupted": { bg: "#fff3cd", col: "#856404", border: "#ffeeba" },
-                "Postponed": { bg: "#f8d7da", col: "#721c24", border: "#f5c6cb" },
-                "Abandoned": { bg: "#f8d7da", col: "#721c24", border: "#f5c6cb" }
-            };
+            const eventsListView = document.getElementById('eventsListView');
+            const eventDetailView = document.getElementById('eventDetailView');
+            const messageFilterView = document.getElementById('messageFilterView');
+            const tableHead = document.getElementById('eventsTableHead');
+            const tableBody = document.getElementById('eventsTableBody');
+            const providerSelect = document.getElementById('providerSelect');
+            const sportSelect = document.getElementById('sportSelect');
+            const statusSelect = document.getElementById('statusSelect');
+            const mappingStatusSelect = document.getElementById('mappingStatusSelect');
+            const searchInput = document.getElementById('searchInput');
+            const mergeModal = document.getElementById('mergeModal');
+            const mergeSourceEvent = document.getElementById('mergeSourceEvent');
+            const mergeTargetEventList = document.getElementById('mergeTargetEventList');
+            const mergeProviderFilter = document.getElementById('mergeProviderFilter');
+            const mergeSearchInput = document.getElementById('mergeSearchInput');
+            const messageDetailsModal = document.getElementById('messageDetailsModal');
+            const internalMessagePayload = document.getElementById('internalMessagePayload');
+            const sourceMessagePayload = document.getElementById('sourceMessagePayload');
+            const connectSelectedBtn = document.getElementById('connectSelectedBtn');
+            const selectedEventIds = new Set();
+            let currentEvent = events[0];
+            let selectedMergeTargetId = '';
 
-            // IZMENJENO: Punjenje feed dropdowna, prvo opcija je automatski izabrana
-            function updateFeedDropdown() {
-                const selectedProvider = providerSelect.value;
-                feedSelect.innerHTML = ''; // Potpuno brisanje starog sadržaja
-                
-                if (selectedProvider && providerFeedsDatabase[selectedProvider]) {
-                    providerFeedsDatabase[selectedProvider].forEach((feedName, index) => {
-                        const option = document.createElement('option');
-                        option.value = feedName;
-                        option.textContent = feedName;
-                        if(index === 0) option.selected = true; // Selektuj prvi feed
-                        feedSelect.appendChild(option);
-                    });
-                }
+            function statusClass(status) {
+                if (status === 'Live') return 'status-mapped';
+                if (status === 'Cancelled' || status === 'Suspended') return 'status-unmapped';
+                return 'status-partial';
             }
 
-            function filterAndRender() {
+            function mappingStatusClass(status) {
+                if (status === 'Mapped') return 'status-mapped';
+                if (status === 'Partially mapped') return 'status-partial';
+                return 'status-unmapped';
+            }
+
+            function marketsForEvent(event) {
+                return eventMarkets.filter(market => market.eventId === event.id);
+            }
+
+            function calculatedMappingStatus(event) {
+                const entityStatuses = [
+                    event.sportMapping,
+                    event.categoryMapping,
+                    event.tournamentMapping,
+                    ...marketsForEvent(event).map(market => market.status)
+                ];
+                if (entityStatuses.every(status => status === 'Mapped')) return 'Mapped';
+                if (entityStatuses.some(status => status === 'Mapped')) return 'Partially mapped';
+                return 'Unmapped';
+            }
+
+            function connectedEvents(event) {
+                return events.filter(item => item.id !== event.id && item.group === event.group);
+            }
+
+            function connectionStatus(event) {
+                return connectedEvents(event).length > 0 ? 'Connected' : 'Not connected';
+            }
+
+            function connectionStatusClass(event) {
+                return connectedEvents(event).length > 0 ? 'status-mapped' : 'status-unmapped';
+            }
+
+            function mapLink(type, event, market = null) {
+                if (type === 'sport') {
+                    return `../../sports/map_sport.html?provider=${encodeURIComponent(event.provider)}&provName=${encodeURIComponent(event.sport)}`;
+                }
+                if (type === 'category') {
+                    return `../../categories/map_category.html?provider=${encodeURIComponent(event.provider)}&provId=${encodeURIComponent(event.category)}&provName=${encodeURIComponent(event.category)}`;
+                }
+                if (type === 'market') {
+                    const params = new URLSearchParams({
+                        provider: event.provider,
+                        sport: event.sport,
+                        market: market.providerMarket,
+                        marketId: market.marketId,
+                        internalId: market.internalId
+                    });
+                    return `../../mapping/mapping.html?${params.toString()}`;
+                }
+                return `../../tournaments/map_tournament.html?provider=${encodeURIComponent(event.provider)}&sport=${encodeURIComponent(event.sport)}&category=${encodeURIComponent(event.category)}&provId=${encodeURIComponent(event.competition)}&provName=${encodeURIComponent(event.competition)}`;
+            }
+
+            function payloadFor(message, event, direction) {
+                if (direction === 'internal') {
+                    return {
+                        header: {
+                            msgId: message.messageId,
+                            eventMsgSeq: 1,
+                            sourceMsgId: message.sourceRef,
+                            provider: message.provider,
+                            generatedAt: message.time,
+                            messageType: message.type.toUpperCase().replaceAll(' ', '_')
+                        },
+                        payload: {
+                            urn: event.internalId,
+                            sourceUrn: event.providerId,
+                            extEventRefs: [{ providerUrn: message.provider, ref: event.providerId }],
+                            startTime: event.startTime,
+                            eventType: "MATCH",
+                            status: event.status,
+                            sport: event.sport,
+                            category: event.category,
+                            tournament: event.competition,
+                            competitors: event.desc.split(/ vs | - /)
+                        }
+                    };
+                }
+                return {
+                    H: {
+                        V: 3,
+                        MT: "E",
+                        EID: event.providerId,
+                        S: event.sport.slice(0, 1).toUpperCase(),
+                        MON: 114,
+                        TS: message.time,
+                        TYPE: message.type
+                    },
+                    E: {
+                        N: event.desc,
+                        C: event.category,
+                        GN: event.competition,
+                        KT: event.startTime,
+                        ES: event.status,
+                        VENUE: event.venue,
+                        MARKETS: marketsForEvent(event).map(market => ({
+                            ID: market.marketId,
+                            N: market.providerMarket,
+                            MAPPED_TO: market.internalId
+                        }))
+                    }
+                };
+            }
+
+            function mappingRow(label, status, type, event) {
+                return `
+                    <div class="detail-row">
+                        <strong>${label}:</strong>
+                        <span class="mapping-status-line">
+                            <span>${event[type === 'sport' ? 'sport' : type === 'category' ? 'category' : 'competition']} <span class="status-badge ${mappingStatusClass(status)}">${status}</span></span>
+                            <a href="${mapLink(type, event)}" class="btn-action" style="text-decoration: none;">Map</a>
+                        </span>
+                    </div>
+                `;
+            }
+
+            function filteredRows() {
                 const providerVal = providerSelect.value;
-                const feedVal = feedSelect.value;
                 const sportVal = sportSelect.value;
                 const statusVal = statusSelect.value;
+                const mappingStatusVal = mappingStatusSelect.value;
                 const searchVal = searchInput.value.toLowerCase();
-                const isGrouped = groupByEventToggle.checked;
 
-                if (isGrouped) {
-                    tableHeader.innerHTML = `
-                        <tr>
-                            <th>Event ID</th>
-                            <th>Provider event ID</th>
-                            <th>Start time</th>
-                            <th>Sport</th>
-                            <th>Description</th>
-                            <th>Status</th>
-                            <th style="text-align: right;">Action</th>
-                        </tr>
-                    `;
-                } else {
-                    tableHeader.innerHTML = `
-                        <tr>
-                            <th>Event ID</th>
-                            <th>Prov. Event ID</th>
-                            <th>Timestamp</th>
-                            <th>Sport</th>
-                            <th>Status</th>
-                            <th>Description</th>
-                            <th>Message Type</th>
-                            <th style="text-align: right;">Action</th>
-                        </tr>
-                    `;
-                }
-
-                const dataSource = isGrouped ? allEvents : allMessages;
-
-                // IZMENJENO: Striktno proveravanje providera i feed-a bez 'all'
-                filteredData = dataSource.filter(item => {
-                    const matchesProvider = item.provider === providerVal;
-                    const matchesFeed = item.feed === feedVal;
-                    const matchesSport = sportVal === 'all' || item.sport === sportVal;
-                    const matchesStatus = statusVal === 'all' || item.status === statusVal;
-                    const matchesSearch = item.eventId.toLowerCase().includes(searchVal) || 
-                                          item.desc.toLowerCase().includes(searchVal) || 
-                                          item.provId.toLowerCase().includes(searchVal);
-                    
-                    return matchesProvider && matchesFeed && matchesSport && matchesStatus && matchesSearch;
+                const rows = events.filter(event => {
+                    const providerMatch = providerVal === 'all' || event.provider === providerVal;
+                    const sportMatch = sportVal === 'all' || event.sport === sportVal;
+                    const statusMatch = statusVal === 'all' || event.status === statusVal;
+                    const mappingStatusMatch = mappingStatusVal === 'all' || calculatedMappingStatus(event).toLowerCase() === mappingStatusVal;
+                    const searchMatch = event.id.toLowerCase().includes(searchVal) ||
+                        event.providerId.toLowerCase().includes(searchVal) ||
+                        event.desc.toLowerCase().includes(searchVal) ||
+                        event.competition.toLowerCase().includes(searchVal);
+                    return providerMatch && sportMatch && statusMatch && mappingStatusMatch && searchMatch;
                 });
+                return rows.sort((a, b) => {
+                    const aSelected = selectedEventIds.has(a.id) ? 0 : 1;
+                    const bSelected = selectedEventIds.has(b.id) ? 0 : 1;
+                    if (aSelected !== bSelected) return aSelected - bSelected;
+                    return a.startTime.localeCompare(b.startTime);
+                });
+            }
 
-                if (isGrouped) {
-                    filteredData.sort((a, b) => b.startTime.localeCompare(a.startTime)); 
-                } else {
-                    filteredData.sort((a, b) => b.time.localeCompare(a.time));
+            function openMerge(eventId) {
+                const source = events.find(event => event.id === eventId) || currentEvent;
+                mergeSourceEvent.value = `${source.desc} (${source.provider})`;
+                mergeModal.dataset.sourceId = source.id;
+                mergeSearchInput.value = '';
+                selectedMergeTargetId = '';
+                renderMergeProviders(source);
+                renderMergeTargets(source);
+                mergeModal.style.display = 'flex';
+            }
+
+            function mergeCandidates(source) {
+                return events.filter(event => event.id !== source.id && event.group !== source.group);
+            }
+
+            function renderMergeProviders(source) {
+                const providers = [...new Set(mergeCandidates(source).map(event => event.provider))].sort();
+                mergeProviderFilter.innerHTML = '<option value="all" selected>All</option>' +
+                    providers.map(provider => `<option value="${provider}">${provider}</option>`).join('');
+            }
+
+            function renderMergeTargets(source = events.find(event => event.id === mergeModal.dataset.sourceId)) {
+                if (!source) return;
+                const providerVal = mergeProviderFilter.value;
+                const searchVal = mergeSearchInput.value.trim().toLowerCase();
+                const candidates = mergeCandidates(source).filter(event => {
+                    const providerMatch = providerVal === 'all' || event.provider === providerVal;
+                    const searchMatch = !searchVal ||
+                        event.desc.toLowerCase().includes(searchVal) ||
+                        event.providerId.toLowerCase().includes(searchVal) ||
+                        event.sport.toLowerCase().includes(searchVal) ||
+                        event.category.toLowerCase().includes(searchVal) ||
+                        event.competition.toLowerCase().includes(searchVal);
+                    return providerMatch && searchMatch;
+                });
+                if (!candidates.some(event => event.id === selectedMergeTargetId)) {
+                    selectedMergeTargetId = candidates[0]?.id || '';
                 }
+                mergeTargetEventList.innerHTML = candidates.length ? candidates.map(event => `
+                    <tr class="merge-candidate-row ${event.id === selectedMergeTargetId ? 'selected' : ''}" data-id="${event.id}">
+                        <td><input type="radio" name="mergeTargetEvent" ${event.id === selectedMergeTargetId ? 'checked' : ''} aria-label="Select matching event"></td>
+                        <td class="market-name">${event.desc}</td>
+                        <td>${event.provider}</td>
+                        <td style="color: #6c757d;">${event.providerId}</td>
+                        <td>${event.startTime}</td>
+                        <td>${event.competition}</td>
+                    </tr>
+                `).join('') : '<tr><td colspan="6" style="text-align: center; color: #888; font-style: italic; padding: 18px;">No matching events found.</td></tr>';
+                document.getElementById('confirmMergeBtn').disabled = !selectedMergeTargetId;
+                document.querySelectorAll('.merge-candidate-row').forEach(row => {
+                    row.addEventListener('click', () => {
+                        selectedMergeTargetId = row.dataset.id;
+                        renderMergeTargets(source);
+                    });
+                });
+            }
 
-                const totalPages = Math.ceil(filteredData.length / rowsPerPage) || 1;
-                if (currentPage > totalPages) currentPage = totalPages;
-                
-                pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
-                prevPageBtn.disabled = currentPage === 1;
-                nextPageBtn.disabled = currentPage === totalPages;
+            function renderTable() {
+                tableHead.innerHTML = `
+                    <tr>
+                        <th style="width: 48px;">Select</th>
+                        <th>Event ID</th>
+                        <th>Provider Event ID</th>
+                        <th>Feed Provider</th>
+                        <th>Start Time</th>
+                        <th>Sport</th>
+                        <th>Description</th>
+                        <th>Status</th>
+                        <th>Mapping</th>
+                        <th>Connection</th>
+                        <th style="text-align: right;">Action</th>
+                    </tr>
+                `;
 
-                const startIndex = (currentPage - 1) * rowsPerPage;
-                const paginatedItems = filteredData.slice(startIndex, startIndex + rowsPerPage);
-
-                tableBody.innerHTML = "";
-                
-                if (paginatedItems.length === 0) {
-                    const cols = isGrouped ? 7 : 8;
-                    tableBody.innerHTML = `<tr><td colspan="${cols}" style="text-align: center; padding: 20px; color: #888;">No data found matching criteria.</td></tr>`;
+                const rows = filteredRows();
+                if (rows.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="11" style="text-align: center; color: #888; font-style: italic; padding: 20px;">No events found.</td></tr>';
                     return;
                 }
 
-                paginatedItems.forEach(item => {
-                    const row = document.createElement("tr");
-                    const colors = statusColors[item.status] || { bg: "#eee", col: "#333", border: "#ccc" };
-                    
-                    if (isGrouped) {
-                        row.innerHTML = `
-                            <td style="font-weight: 600; color: #007bff;">${item.eventId}</td>
-                            <td style="color: #6c757d; font-size: 13px;">${item.provId}</td>
-                            <td style="font-family: monospace; font-size: 13px;">${item.startTime}</td>
-                            <td>${item.sport}</td>
-                            <td style="font-weight: 500; color: #2c3e50;">${item.desc}</td>
-                            <td><span class="status-badge" style="background-color: ${colors.bg}; color: ${colors.col}; border: 1px solid ${colors.border};">${item.status}</span></td>
-                            <td style="text-align: right;">
-                                <button class="btn-action" style="background-color: #17a2b8; border: none;">View Event</button>
-                            </td>
-                        `;
-                    } else {
-                        row.innerHTML = `
-                            <td style="font-weight: 600; color: #007bff;">${item.eventId}</td>
-                            <td style="color: #6c757d; font-size: 13px;">${item.provId}</td>
-                            <td style="font-family: monospace; font-size: 13px;">${item.time}</td>
-                            <td>${item.sport}</td>
-                            <td><span class="status-badge" style="background-color: ${colors.bg}; color: ${colors.col}; border: 1px solid ${colors.border};">${item.status}</span></td>
-                            <td>${item.desc}</td>
-                            <td style="font-size: 13px; color: #555;">${item.type}</td>
-                            <td style="text-align: right;">
-                                <button class="btn-action" style="background-color: #17a2b8; border: none;">View Msg</button>
-                            </td>
-                        `;
-                    }
-                    tableBody.appendChild(row);
+                tableBody.innerHTML = rows.map(event => {
+                    const isSelected = selectedEventIds.has(event.id);
+                    return `
+                    <tr class="${isSelected ? 'selected-event-row' : ''}">
+                        <td><input type="checkbox" class="event-select-checkbox" data-id="${event.id}" ${isSelected ? 'checked' : ''} aria-label="Select event"></td>
+                        <td style="font-weight: 600; color: #007bff;">${event.internalId}${isSelected ? '<span class="pin-indicator">Pinned</span>' : ''}</td>
+                        <td style="color: #6c757d;">${event.providerId}</td>
+                        <td style="font-weight: 500;">${event.provider}</td>
+                        <td>${event.startTime}</td>
+                        <td>${event.sport}</td>
+                        <td class="market-name">${event.desc}</td>
+                        <td><span class="status-badge ${statusClass(event.status)}">${event.status}</span></td>
+                        <td><span class="status-badge ${mappingStatusClass(calculatedMappingStatus(event))}">${calculatedMappingStatus(event)}</span></td>
+                        <td><span class="status-badge ${connectionStatusClass(event)}">${connectionStatus(event)}</span></td>
+                        <td style="text-align: right;">
+                            <span class="row-actions">
+                                <button type="button" class="btn-action view-event-btn" data-id="${event.id}" style="background-color: #007bff;">View</button>
+                            </span>
+                        </td>
+                    </tr>
+                    `;
+                }).join('');
+
+                document.querySelectorAll('.event-select-checkbox').forEach(checkbox => {
+                    checkbox.addEventListener('change', () => {
+                        if (checkbox.checked) {
+                            selectedEventIds.add(checkbox.dataset.id);
+                        } else {
+                            selectedEventIds.delete(checkbox.dataset.id);
+                        }
+                        connectSelectedBtn.disabled = selectedEventIds.size < 2;
+                        renderTable();
+                    });
+                });
+
+                document.querySelectorAll('.view-event-btn').forEach(button => {
+                    button.addEventListener('click', () => showEventDetail(button.dataset.id));
                 });
             }
 
-            // Slušači događaja
-            providerSelect.addEventListener('change', () => { 
-                updateFeedDropdown(); 
-                currentPage = 1; 
-                filterAndRender(); 
+            function showEventDetail(eventId) {
+                currentEvent = events.find(event => event.id === eventId) || events[0];
+                document.getElementById('detailTitle').textContent = currentEvent.desc.replace(' - ', ' vs ');
+                document.getElementById('detailUpdatedAt').textContent = `Last updated at ${currentEvent.updatedAt}`;
+                document.getElementById('eventDetailGrid').innerHTML = `
+                    <div>
+                        <div class="detail-row"><strong>Internal ID:</strong><span>${currentEvent.internalId}</span></div>
+                        <div class="detail-row"><strong>Provider ID:</strong><span>${currentEvent.providerId}</span></div>
+                        <div class="detail-row"><strong>Connection:</strong><span><span class="status-badge ${connectionStatusClass(currentEvent)}">${connectionStatus(currentEvent)}</span></span></div>
+                        <div class="detail-row"><strong>Event mapping:</strong><span><span class="status-badge ${mappingStatusClass(calculatedMappingStatus(currentEvent))}">${calculatedMappingStatus(currentEvent)}</span></span></div>
+                        ${mappingRow('Sport', currentEvent.sportMapping, 'sport', currentEvent)}
+                        ${mappingRow('Category', currentEvent.categoryMapping, 'category', currentEvent)}
+                    </div>
+                    <div>
+                        ${mappingRow('Tournament', currentEvent.tournamentMapping, 'tournament', currentEvent)}
+                        <div class="detail-row"><strong>Season:</strong><span>${currentEvent.season}</span></div>
+                        <div class="detail-row"><strong>Stage:</strong><span>${currentEvent.stage}</span></div>
+                    </div>
+                    <div>
+                        <div class="detail-row"><strong>Start time:</strong><span>${currentEvent.startTime}</span></div>
+                        <div class="detail-row"><strong>Venue:</strong><span>${currentEvent.venue}</span></div>
+                        <div class="detail-row"><strong>Status:</strong><span>${currentEvent.status}</span></div>
+                        <div class="detail-row"><strong>Provider:</strong><span>${currentEvent.provider}</span></div>
+                        <div class="detail-row"><strong>Connected with:</strong><span class="connection-summary">${connectedEvents(currentEvent).length ? connectedEvents(currentEvent).map(event => `<span>${event.provider} - ${event.providerId} (${event.desc})</span>`).join('') : '<span style="color: #888; font-style: italic;">No connected provider events.</span>'}</span></div>
+                    </div>
+                `;
+                renderEventMarkets();
+                eventsListView.style.display = 'none';
+                messageFilterView.style.display = 'none';
+                eventDetailView.style.display = 'block';
+            }
+
+            function renderEventMarkets() {
+                const rows = marketsForEvent(currentEvent);
+                const mappedCount = rows.filter(market => market.status === 'Mapped').length;
+                document.getElementById('eventMarketsSummary').textContent = rows.length
+                    ? `${mappedCount} of ${rows.length} mapped`
+                    : 'No markets received';
+                document.getElementById('eventMarketsBody').innerHTML = rows.length ? rows.map(market => `
+                    <tr>
+                        <td style="font-weight: 600; color: #6c757d;">${market.marketId}</td>
+                        <td class="market-name">${market.providerMarket}</td>
+                        <td>${market.internalMarket}</td>
+                        <td><span class="status-badge ${mappingStatusClass(market.status)}">${market.status}</span></td>
+                        <td style="text-align: right;"><a href="${mapLink('market', currentEvent, market)}" class="btn-action" style="text-decoration: none;">Map</a></td>
+                    </tr>
+                `).join('') : '<tr><td colspan="5" style="text-align: center; color: #888; font-style: italic;">No markets found for this event.</td></tr>';
+            }
+
+            function filteredMessages() {
+                const typeVal = document.getElementById('messageTypeFilter').value.toLowerCase();
+                const searchVal = document.getElementById('messageSearchInput').value.toLowerCase();
+                const dateFrom = document.getElementById('messageDateFrom').value;
+                const dateTo = document.getElementById('messageDateTo').value;
+                return messages.filter(message => {
+                    const messageDate = new Date(message.time);
+                    const fromMatch = !dateFrom || messageDate >= new Date(`${dateFrom}T00:00:00`);
+                    const toMatch = !dateTo || messageDate <= new Date(`${dateTo}T23:59:59`);
+                    const typeMatch = typeVal === 'all' || message.type.toLowerCase().includes(typeVal);
+                    const searchMatch = message.messageId.toLowerCase().includes(searchVal) || message.type.toLowerCase().includes(searchVal);
+                    return message.eventId === currentEvent.id && fromMatch && toMatch && typeMatch && searchMatch;
+                });
+            }
+
+            function renderMessageRows(containerId, rows) {
+                document.getElementById(containerId).innerHTML = rows.length ? rows.map(message => `
+                    <tr>
+                        <td style="font-weight: 600;">${message.messageId}</td>
+                        <td>${message.time}</td>
+                        <td style="font-weight: 600;">${message.type}</td>
+                        <td style="text-align: right;"><button type="button" class="btn-action view-message-btn" data-message-id="${message.messageId}" style="background-color: #007bff;">View</button></td>
+                    </tr>
+                `).join('') : '<tr><td colspan="4" style="text-align: center; color: #888; font-style: italic;">No messages found for this event.</td></tr>';
+                document.querySelectorAll(`#${containerId} .view-message-btn`).forEach(button => {
+                    button.addEventListener('click', () => openMessageDetails(button.dataset.messageId));
+                });
+            }
+
+            function renderFilteredEventMessages() {
+                renderMessageRows('filteredEventMessagesBody', filteredMessages());
+            }
+
+            function showMessageFilters() {
+                document.getElementById('messageFilterSubtitle').textContent = currentEvent.desc;
+                renderFilteredEventMessages();
+                eventsListView.style.display = 'none';
+                eventDetailView.style.display = 'none';
+                messageFilterView.style.display = 'block';
+            }
+
+            function openMessageDetails(messageId) {
+                const message = messages.find(item => item.messageId === messageId);
+                if (!message) return;
+                const event = events.find(item => item.id === message.eventId) || currentEvent;
+                document.getElementById('messageDetailsSubtitle').textContent = `${message.provider} - ${message.messageId} - ${message.type}`;
+                internalMessagePayload.textContent = JSON.stringify(payloadFor(message, event, 'internal'), null, 2);
+                sourceMessagePayload.textContent = JSON.stringify(payloadFor(message, event, 'source'), null, 2);
+                messageDetailsModal.style.display = 'flex';
+            }
+
+            [providerSelect, sportSelect, statusSelect, mappingStatusSelect].forEach(field => field.addEventListener('change', renderTable));
+            searchInput.addEventListener('input', renderTable);
+            document.getElementById('backToEventsBtn').addEventListener('click', () => {
+                eventDetailView.style.display = 'none';
+                messageFilterView.style.display = 'none';
+                eventsListView.style.display = 'block';
             });
-            feedSelect.addEventListener('change', () => { currentPage = 1; filterAndRender(); });
-            sportSelect.addEventListener('change', () => { currentPage = 1; filterAndRender(); });
-            statusSelect.addEventListener('change', () => { currentPage = 1; filterAndRender(); });
-            searchInput.addEventListener('input', () => { currentPage = 1; filterAndRender(); });
-            
-            groupByEventToggle.addEventListener('change', () => { 
-                currentPage = 1; 
-                filterAndRender(); 
+            document.getElementById('openMessageFiltersBtn').addEventListener('click', showMessageFilters);
+            document.getElementById('backToEventDetailBtn').addEventListener('click', () => {
+                messageFilterView.style.display = 'none';
+                eventDetailView.style.display = 'block';
             });
-            
-            rowsPerPageSelect.addEventListener('change', (e) => {
-                rowsPerPage = parseInt(e.target.value);
-                currentPage = 1;
-                filterAndRender();
+            document.getElementById('mergeFromDetailBtn').addEventListener('click', () => openMerge(currentEvent.id));
+            connectSelectedBtn.addEventListener('click', () => {
+                const selectedEvents = events.filter(event => selectedEventIds.has(event.id));
+                if (selectedEvents.length < 2) return;
+                const targetGroup = selectedEvents[0].group;
+                selectedEvents.forEach(event => {
+                    event.group = targetGroup;
+                });
+                selectedEventIds.clear();
+                connectSelectedBtn.disabled = true;
+                renderTable();
+            });
+            document.getElementById('messageTypeFilter').addEventListener('change', renderFilteredEventMessages);
+            document.getElementById('messageSearchInput').addEventListener('input', renderFilteredEventMessages);
+            document.getElementById('messageDateFrom').addEventListener('change', renderFilteredEventMessages);
+            document.getElementById('messageDateTo').addEventListener('change', renderFilteredEventMessages);
+            document.getElementById('closeMergeModalBtn').addEventListener('click', () => mergeModal.style.display = 'none');
+            document.getElementById('cancelMergeBtn').addEventListener('click', () => mergeModal.style.display = 'none');
+            mergeProviderFilter.addEventListener('change', () => renderMergeTargets());
+            mergeSearchInput.addEventListener('input', () => renderMergeTargets());
+            document.getElementById('closeMessageDetailsBtn').addEventListener('click', () => messageDetailsModal.style.display = 'none');
+            document.getElementById('closeMessageDetailsFooterBtn').addEventListener('click', () => messageDetailsModal.style.display = 'none');
+            document.getElementById('copyInternalMessageBtn').addEventListener('click', () => navigator.clipboard?.writeText(internalMessagePayload.textContent));
+            document.getElementById('copySourceMessageBtn').addEventListener('click', () => navigator.clipboard?.writeText(sourceMessagePayload.textContent));
+            document.getElementById('confirmMergeBtn').addEventListener('click', () => {
+                const source = events.find(event => event.id === mergeModal.dataset.sourceId);
+                const target = events.find(event => event.id === selectedMergeTargetId);
+                if (source && target) {
+                    target.group = source.group;
+                    mergeModal.style.display = 'none';
+                    renderTable();
+                }
+            });
+            window.addEventListener('click', event => {
+                if (event.target === mergeModal) mergeModal.style.display = 'none';
+                if (event.target === messageDetailsModal) messageDetailsModal.style.display = 'none';
             });
 
-            prevPageBtn.addEventListener('click', () => {
-                if (currentPage > 1) { currentPage--; filterAndRender(); }
-            });
-
-            nextPageBtn.addEventListener('click', () => {
-                const totalPages = Math.ceil(filteredData.length / rowsPerPage);
-                if (currentPage < totalPages) { currentPage++; filterAndRender(); }
-            });
-
-            // Inicijalno postavljanje
-            updateFeedDropdown();
-            filterAndRender();
+            renderTable();
         });
     </script>
 </body>

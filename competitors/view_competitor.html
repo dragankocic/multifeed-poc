@@ -7,6 +7,14 @@
     <link rel="stylesheet" href="../sports/style.css">
     <link rel="stylesheet" href="../style.css">
     <script src="../auth.js"></script>
+    <style>
+        .lazy-section-toggle { width: 100%; border: 0; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 0; text-align: left; }
+        .lazy-section-toggle h3 { margin: 0; color: #333; font-size: 18px; }
+        .lazy-section-icon { color: #667085; font-size: 18px; transition: transform 0.2s; }
+        .lazy-section.open .lazy-section-icon { transform: rotate(180deg); }
+        .lazy-section-body { display: none; margin-top: 15px; }
+        .lazy-section.open .lazy-section-body { display: block; }
+    </style>
 </head>
 <body>
 
@@ -16,7 +24,7 @@
     <div class="main-content">
         <header class="main-header" style="background-color: #17a2b8; color: white;">
             <h1>Competitor Overview</h1>
-            <p class="page-subtitle">Inspect a competitor and its sport placement.</p>
+            <p class="page-subtitle">Inspect a competitor, provider mappings, and players for team-based sports.</p>
         </header>
 
         <main class="split-layout">
@@ -35,28 +43,102 @@
                     </div>
                 </section>
 
-                <section class="markets-section" style="margin-top: 25px; padding: 25px; background: white; border-radius: 8px; border: 1px solid #e0e0e0;">
-                    <h3 style="margin-bottom: 20px; color: #333; font-size: 18px; border-bottom: 1px solid #eee; padding-bottom: 10px;">Mapped Provider Competitors</h3>
-                    <p style="margin-bottom: 15px; font-size: 14px; color: #666;">Provider competitor values currently connected to this internal competitor.</p>
+                <section class="markets-section lazy-section" id="mappedProviderSection" style="margin-top: 25px; padding: 25px; background: white; border-radius: 8px; border: 1px solid #e0e0e0;">
+                    <div class="section-header" style="display: flex; align-items: center; justify-content: space-between; gap: 16px; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 15px;">
+                        <button type="button" class="lazy-section-toggle" data-target="mappedProviderSection">
+                            <h3>Mapped Provider Competitors</h3>
+                            <span class="lazy-section-icon">⌄</span>
+                        </button>
+                        <button type="button" id="addMappingBtn" class="btn-primary">Add mapping</button>
+                    </div>
+                    <div class="lazy-section-body">
+                        <p style="margin-bottom: 15px; font-size: 14px; color: #666;">Provider competitor values currently connected to this internal competitor.</p>
 
-                    <table class="markets-table" style="margin-bottom: 25px;">
-                        <thead>
-                            <tr>
-                                <th>Provider</th>
-                                <th>Provider Competitor ID</th>
-                                <th>Provider Competitor Name</th>
-                                <th style="text-align: right;">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="providerCompetitorsList"></tbody>
-                    </table>
+                        <table class="markets-table" style="margin-bottom: 25px;">
+                            <thead>
+                                <tr>
+                                    <th>Provider</th>
+                                    <th>Provider Competitor ID</th>
+                                    <th>Provider Competitor Name</th>
+                                    <th style="text-align: right;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="providerCompetitorsList"></tbody>
+                        </table>
+                    </div>
                 </section>
 
-                <div style="margin-top: 25px;">
-                    <a id="editCompetitorLink" href="#" class="btn-primary" style="text-decoration: none; display: inline-block;">Edit Competitor</a>
-                </div>
+                <section class="markets-section lazy-section" id="childEntitySection" style="margin-top: 25px; padding: 25px; background: white; border-radius: 8px; border: 1px solid #e0e0e0;">
+                    <div class="section-header" style="border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 15px;">
+                        <button type="button" class="lazy-section-toggle" data-target="childEntitySection">
+                            <h3>Players</h3>
+                            <span class="lazy-section-icon">⌄</span>
+                        </button>
+                    </div>
+                    <div class="lazy-section-body">
+                        <p style="margin-bottom: 15px; font-size: 14px; color: #666;">Players available under this competitor.</p>
+
+                        <table class="markets-table">
+                            <thead>
+                                <tr>
+                                    <th>Player ID</th>
+                                    <th>Player Name</th>
+                                    <th style="text-align: right;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="childPlayersList"></tbody>
+                        </table>
+                    </div>
+                </section>
+
             </div>
         </main>
+    </div>
+
+    <div id="addMappingModal" class="modal">
+        <div class="modal-content" style="width: min(940px, 92vw);">
+            <span class="close-modal" id="closeAddMappingModalBtn">&times;</span>
+            <h3>Add provider competitor mapping for <span id="mappingCompetitorName" style="color: #17a2b8;"></span></h3>
+            <div class="top-bar" style="box-shadow: none; margin-bottom: 15px;">
+                <div class="filters">
+                    <div class="filter-group">
+                        <label for="providerFilter">Provider</label>
+                        <select id="providerFilter">
+                            <option value="all" selected>All</option>
+                            <option value="ExeFeed">ExeFeed</option>
+                            <option value="SportRadar">SportRadar</option>
+                            <option value="SportGenius">SportGenius</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="sportFilter">Sport</label>
+                        <select id="sportFilter">
+                            <option value="all">All</option>
+                            <option value="Soccer">Soccer</option>
+                            <option value="Tennis">Tennis</option>
+                            <option value="Formula 1">Formula 1</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="providerCompetitorSearch">Search</label>
+                        <input type="text" id="providerCompetitorSearch" placeholder="Search provider competitor..." style="padding: 10px 15px; border: 1px solid #ccc; border-radius: 4px; font-size: 15px; min-width: 260px; background-color: #fdfdfd;">
+                    </div>
+                </div>
+            </div>
+            <table class="markets-table">
+                <thead>
+                    <tr>
+                        <th>Provider</th>
+                        <th>Sport</th>
+                        <th>Provider Competitor ID</th>
+                        <th>Provider Competitor Name</th>
+                        <th>Status</th>
+                        <th style="text-align: right;">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="availableProviderCompetitorsList" data-page-size="10"></tbody>
+            </table>
+        </div>
     </div>
 
     <script src="../pagination.js"></script>
@@ -66,71 +148,137 @@
             const competitorId = urlParams.get('id') || '-';
             const competitorName = urlParams.get('name') || 'Unknown Competitor';
             const sportName = urlParams.get('sport') || '-';
-
             document.getElementById('displayCompetitorId').textContent = competitorId;
             document.getElementById('displayCompetitorName').textContent = competitorName;
             document.getElementById('displaySport').textContent = sportName;
-            document.getElementById('editCompetitorLink').href = `create_competitor.html?edit=true&id=${encodeURIComponent(competitorId)}&name=${encodeURIComponent(competitorName)}&sport=${encodeURIComponent(sportName)}`;
 
             const providerCompetitorMappings = {
                 "Arsenal": [
-                    { provider: "ExeFeed", providerId: "cmp:arsenal", providerName: "Arsenal" },
+                    { provider: "ExeFeed", providerId: "1178653", providerName: "Arsenal" },
                     { provider: "SportRadar", providerId: "sr:competitor:42", providerName: "Arsenal FC" },
-                    { provider: "Bet Genius", providerId: "BG-ARS", providerName: "Arsenal" }
+                    { provider: "SportGenius", providerId: "sg-cmp-ars", providerName: "Arsenal" }
                 ],
                 "Manchester City": [
-                    { provider: "ExeFeed", providerId: "cmp:man-city", providerName: "Manchester City" },
+                    { provider: "ExeFeed", providerId: "1178654", providerName: "Manchester City" },
                     { provider: "SportRadar", providerId: "sr:competitor:17", providerName: "Manchester City FC" },
-                    { provider: "LSports", providerId: "LS-MCI", providerName: "Man City" }
+                    { provider: "SportGenius", providerId: "sg-cmp-mci", providerName: "Man City" }
                 ],
                 "Leeds United": [
-                    { provider: "ExeFeed", providerId: "cmp:leeds", providerName: "Leeds United" },
+                    { provider: "ExeFeed", providerId: "1178656", providerName: "Leeds United" },
                     { provider: "SportRadar", providerId: "sr:competitor:34", providerName: "Leeds United" },
-                    { provider: "Bet Construct", providerId: "BC-LEE", providerName: "Leeds" }
+                    { provider: "SportGenius", providerId: "sg-cmp-lee", providerName: "Leeds" }
                 ],
                 "Real Madrid": [
-                    { provider: "ExeFeed", providerId: "cmp:real-madrid", providerName: "Real Madrid" },
+                    { provider: "ExeFeed", providerId: "1178657", providerName: "Real Madrid" },
                     { provider: "SportRadar", providerId: "sr:competitor:2829", providerName: "Real Madrid" },
-                    { provider: "IMG Arena", providerId: "IMG-RMA", providerName: "Real Madrid CF" }
+                    { provider: "SportGenius", providerId: "sg-cmp-rma", providerName: "Real Madrid CF" }
                 ],
                 "Barcelona": [
-                    { provider: "ExeFeed", providerId: "cmp:barcelona", providerName: "Barcelona" },
+                    { provider: "ExeFeed", providerId: "1178658", providerName: "Barcelona" },
                     { provider: "SportRadar", providerId: "sr:competitor:2817", providerName: "FC Barcelona" },
-                    { provider: "LSports", providerId: "LS-FCB", providerName: "Barcelona" }
+                    { provider: "SportGenius", providerId: "sg-cmp-fcb", providerName: "Barcelona" }
                 ],
                 "Bayern Munich": [
-                    { provider: "ExeFeed", providerId: "cmp:bayern", providerName: "Bayern Munich" },
+                    { provider: "ExeFeed", providerId: "1178659", providerName: "Bayern Munich" },
                     { provider: "SportRadar", providerId: "sr:competitor:2672", providerName: "Bayern Munich" },
-                    { provider: "Bet Genius", providerId: "BG-BAY", providerName: "FC Bayern" }
+                    { provider: "SportGenius", providerId: "sg-cmp-bay", providerName: "FC Bayern" }
                 ],
                 "Carlos Alcaraz": [
-                    { provider: "ExeFeed", providerId: "cmp:alcaraz", providerName: "Carlos Alcaraz" },
+                    { provider: "ExeFeed", providerId: "1178660", providerName: "Carlos Alcaraz" },
                     { provider: "SportRadar", providerId: "sr:competitor:407573", providerName: "Alcaraz, Carlos" },
-                    { provider: "IMG Arena", providerId: "IMG-ALC", providerName: "Carlos Alcaraz" }
+                    { provider: "SportGenius", providerId: "sg-cmp-alcaraz", providerName: "Carlos Alcaraz" }
                 ],
                 "Novak Djokovic": [
-                    { provider: "ExeFeed", providerId: "cmp:djokovic", providerName: "Novak Djokovic" },
+                    { provider: "ExeFeed", providerId: "1178661", providerName: "Novak Djokovic" },
                     { provider: "SportRadar", providerId: "sr:competitor:14882", providerName: "Djokovic, Novak" },
-                    { provider: "IMG Arena", providerId: "IMG-NDJ", providerName: "Novak Djokovic" }
+                    { provider: "SportGenius", providerId: "sg-cmp-djokovic", providerName: "Novak Djokovic" }
                 ],
                 "Max Verstappen": [
-                    { provider: "ExeFeed", providerId: "cmp:verstappen", providerName: "Max Verstappen" },
+                    { provider: "ExeFeed", providerId: "1178662", providerName: "Max Verstappen" },
                     { provider: "SportRadar", providerId: "sr:competitor:7135", providerName: "Verstappen, Max" },
-                    { provider: "Bet Construct", providerId: "BC-MV1", providerName: "M. Verstappen" }
+                    { provider: "SportGenius", providerId: "sg-cmp-verstappen", providerName: "M. Verstappen" }
                 ],
                 "Lewis Hamilton": [
-                    { provider: "ExeFeed", providerId: "cmp:hamilton", providerName: "Lewis Hamilton" },
+                    { provider: "ExeFeed", providerId: "1178663", providerName: "Lewis Hamilton" },
                     { provider: "SportRadar", providerId: "sr:competitor:4515", providerName: "Hamilton, Lewis" },
-                    { provider: "Bet Genius", providerId: "BG-LH44", providerName: "L. Hamilton" }
+                    { provider: "SportGenius", providerId: "sg-cmp-hamilton", providerName: "L. Hamilton" }
                 ]
             };
 
-            const mappedList = providerCompetitorMappings[competitorName] || [];
-            const listContainer = document.getElementById('providerCompetitorsList');
+            const allProviderCompetitors = [
+                { provider: "ExeFeed", sport: "Soccer", category: "England", tournament: "Premier League", providerId: "1178653", providerName: "Arsenal" },
+                { provider: "ExeFeed", sport: "Soccer", category: "England", tournament: "Premier League", providerId: "1178654", providerName: "Manchester City" },
+                { provider: "ExeFeed", sport: "Soccer", category: "England", tournament: "Premier League", providerId: "1178655", providerName: "Liverpool" },
+                { provider: "SportRadar", sport: "Soccer", category: "England", tournament: "Premier League", providerId: "sr:competitor:42", providerName: "Arsenal FC" },
+                { provider: "SportRadar", sport: "Soccer", category: "England", tournament: "Premier League", providerId: "sr:competitor:17", providerName: "Manchester City FC" },
+                { provider: "SportRadar", sport: "Tennis", category: "France", tournament: "Roland Garros", providerId: "sr:competitor:407573", providerName: "Alcaraz, Carlos" },
+                { provider: "SportRadar", sport: "Formula 1", category: "International", tournament: "Formula 1", providerId: "sr:competitor:7135", providerName: "Max Verstappen" },
+                { provider: "SportGenius", sport: "Soccer", category: "Spain", tournament: "LaLiga", providerId: "sg-cmp-rma", providerName: "Real Madrid CF" },
+                { provider: "SportGenius", sport: "Soccer", category: "Spain", tournament: "LaLiga", providerId: "sg-cmp-fcb", providerName: "FC Barcelona" },
+                { provider: "SportGenius", sport: "Formula 1", category: "International", tournament: "Formula 1", providerId: "sg-cmp-leclerc", providerName: "Charles Leclerc" }
+            ];
 
-            if (mappedList.length === 0) {
-                listContainer.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #888; font-style: italic;">No provider competitors mapped to this competitor yet.</td></tr>';
-            } else {
+            const childPlayersByCompetitor = {
+                "Liverpool": [
+                    { id: "P-001", name: "Mohamed Salah" },
+                    { id: "P-002", name: "Virgil van Dijk" },
+                    { id: "P-003", name: "Darwin Nunez" }
+                ],
+                "Arsenal": [
+                    { id: "P-004", name: "Bukayo Saka" },
+                    { id: "P-005", name: "Martin Odegaard" },
+                    { id: "P-012", name: "Declan Rice" }
+                ],
+                "Manchester City": [
+                    { id: "P-006", name: "Erling Haaland" },
+                    { id: "P-007", name: "Kevin De Bruyne" },
+                    { id: "P-013", name: "Phil Foden" }
+                ],
+                "Real Madrid": [
+                    { id: "P-008", name: "Jude Bellingham" },
+                    { id: "P-009", name: "Vinicius Junior" }
+                ],
+                "Barcelona": [
+                    { id: "P-014", name: "Lamine Yamal" },
+                    { id: "P-015", name: "Pedri" }
+                ],
+                "Boston Celtics": [
+                    { id: "P-010", name: "Jayson Tatum" },
+                    { id: "P-011", name: "Jaylen Brown" }
+                ]
+            };
+
+            let mappedList = [...(providerCompetitorMappings[competitorName] || [])];
+            const listContainer = document.getElementById('providerCompetitorsList');
+            const childPlayersList = document.getElementById('childPlayersList');
+            const addMappingModal = document.getElementById('addMappingModal');
+            const providerFilter = document.getElementById('providerFilter');
+            const sportFilter = document.getElementById('sportFilter');
+            const providerCompetitorSearch = document.getElementById('providerCompetitorSearch');
+            const mappingCompetitorName = document.getElementById('mappingCompetitorName');
+            const availableProviderCompetitorsList = document.getElementById('availableProviderCompetitorsList');
+            const loadedSections = new Set();
+
+            function openLazySection(sectionId) {
+                const section = document.getElementById(sectionId);
+                section.classList.toggle('open');
+                if (loadedSections.has(sectionId)) return;
+                if (sectionId === 'mappedProviderSection') renderMappedCompetitors();
+                if (sectionId === 'childEntitySection') renderChildPlayers();
+                loadedSections.add(sectionId);
+            }
+
+            function mappingKey(item) {
+                return `${item.provider}::${item.providerId}::${item.providerName}`;
+            }
+
+            function renderMappedCompetitors() {
+                listContainer.innerHTML = '';
+                if (mappedList.length === 0) {
+                    listContainer.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #888; font-style: italic;">No provider competitors mapped to this competitor yet.</td></tr>';
+                    return;
+                }
+
                 mappedList.forEach(providerCompetitor => {
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
@@ -138,12 +286,98 @@
                         <td style="color: #6c757d;">${providerCompetitor.providerId}</td>
                         <td style="color: #007bff; font-weight: 500;">${providerCompetitor.providerName}</td>
                         <td style="text-align: right;">
-                            <button type="button" class="btn-action" style="background-color: #17a2b8; border: none;">Edit Mapping</button>
+                            <a href="map_competitor.html?provider=${encodeURIComponent(providerCompetitor.provider)}&sport=${encodeURIComponent(sportName)}&provId=${encodeURIComponent(providerCompetitor.providerId)}&provName=${encodeURIComponent(providerCompetitor.providerName)}&internalId=${encodeURIComponent(competitorId)}" class="btn-action" style="background-color: #17a2b8; text-decoration: none; display: inline-block;">Edit Mapping</a>
                         </td>
                     `;
                     listContainer.appendChild(tr);
                 });
             }
+
+            function renderAvailableProviderCompetitors() {
+                const providerVal = providerFilter.value;
+                const sportVal = sportFilter.value;
+                const searchVal = providerCompetitorSearch.value.toLowerCase();
+                const mappedKeys = new Set(mappedList.map(mappingKey));
+                const availableCompetitors = allProviderCompetitors.filter(item => {
+                    const matchesProvider = providerVal === 'all' || item.provider === providerVal;
+                    const matchesSport = sportVal === 'all' || item.sport === sportVal;
+                    const matchesSearch = item.provider.toLowerCase().includes(searchVal) ||
+                        item.sport.toLowerCase().includes(searchVal) ||
+                        item.category.toLowerCase().includes(searchVal) ||
+                        item.tournament.toLowerCase().includes(searchVal) ||
+                        item.providerId.toLowerCase().includes(searchVal) ||
+                        item.providerName.toLowerCase().includes(searchVal);
+                    return matchesProvider && matchesSport && matchesSearch && !mappedKeys.has(mappingKey(item));
+                });
+
+                if (availableCompetitors.length === 0) {
+                    availableProviderCompetitorsList.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #888; font-style: italic;">No not mapped provider competitors found.</td></tr>';
+                    return;
+                }
+
+                availableProviderCompetitorsList.innerHTML = availableCompetitors.map(item => `
+                    <tr>
+                        <td style="font-weight: 500;">${item.provider}</td>
+                        <td>${item.sport}</td>
+                        <td style="color: #6c757d;">${item.providerId}</td>
+                        <td class="market-name" style="color: #007bff;">${item.providerName}</td>
+                        <td><span class="status-badge status-unmapped">Not mapped</span></td>
+                        <td style="text-align: right;">
+                            <button type="button" class="btn-action add-provider-competitor-btn" data-key="${mappingKey(item)}">Map</button>
+                        </td>
+                    </tr>
+                `).join('');
+
+                document.querySelectorAll('.add-provider-competitor-btn').forEach(button => {
+                    button.addEventListener('click', () => {
+                        const selectedCompetitor = allProviderCompetitors.find(item => mappingKey(item) === button.dataset.key);
+                        if (!selectedCompetitor) return;
+                        mappedList.push(selectedCompetitor);
+                        addMappingModal.style.display = 'none';
+                        if (loadedSections.has('mappedProviderSection')) renderMappedCompetitors();
+                        renderAvailableProviderCompetitors();
+                    });
+                });
+            }
+
+            function renderChildPlayers() {
+                const players = childPlayersByCompetitor[competitorName] || [];
+                if (players.length === 0) {
+                    childPlayersList.innerHTML = '<tr><td colspan="3" style="text-align: center; color: #888; font-style: italic;">No players found for this competitor.</td></tr>';
+                    return;
+                }
+
+                childPlayersList.innerHTML = players.map(player => `
+                    <tr>
+                        <td style="font-weight: 500; color: #6c757d;">${player.id}</td>
+                        <td class="market-name">${player.name}</td>
+                        <td style="text-align: right;">
+                            <a href="../players/view_player.html?id=${encodeURIComponent(player.id)}&name=${encodeURIComponent(player.name)}&sport=${encodeURIComponent(sportName)}&competitor=${encodeURIComponent(competitorName)}" class="btn-action" style="background-color: #007bff; text-decoration: none; display: inline-block;">View</a>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+
+            document.getElementById('addMappingBtn').addEventListener('click', () => {
+                providerFilter.value = 'all';
+                sportFilter.value = Array.from(sportFilter.options).some(option => option.value === sportName) ? sportName : 'all';
+                providerCompetitorSearch.value = '';
+                mappingCompetitorName.textContent = competitorName;
+                renderAvailableProviderCompetitors();
+                addMappingModal.style.display = 'flex';
+            });
+            document.getElementById('closeAddMappingModalBtn').addEventListener('click', () => {
+                addMappingModal.style.display = 'none';
+            });
+            providerFilter.addEventListener('change', renderAvailableProviderCompetitors);
+            sportFilter.addEventListener('change', renderAvailableProviderCompetitors);
+            providerCompetitorSearch.addEventListener('input', renderAvailableProviderCompetitors);
+            document.querySelectorAll('.lazy-section-toggle').forEach(button => {
+                button.addEventListener('click', () => openLazySection(button.dataset.target));
+            });
+            window.addEventListener('click', event => {
+                if (event.target === addMappingModal) addMappingModal.style.display = 'none';
+            });
         });
     </script>
 </body>

@@ -10,7 +10,7 @@
 </head>
 <body>
 
-    <div id="sidebar-container" data-root=".." data-active="player-mapping" data-service="sportsbook"></div>
+    <div id="sidebar-container" data-root=".." data-active="player-management" data-service="sportsbook"></div>
     <script src="../sidebar.js"></script>
 
     <div class="main-content">
@@ -22,7 +22,7 @@
         <main class="split-layout">
             <div class="form-side">
                 <div style="margin-bottom: 20px;">
-                    <a href="player_mapping.html" class="btn-secondary" style="text-decoration: none; display: inline-block;">&larr; Back to list</a>
+                    <a href="player.html" class="btn-secondary" style="text-decoration: none; display: inline-block;">&larr; Back to list</a>
                 </div>
                 <div class="info-section">
                     <h2>Connect to Internal Player</h2>
@@ -65,7 +65,6 @@
                             <div class="form-group">
                                 <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
                                     <label>Internal Competitor</label>
-                                    <a href="../competitors/create_competitor.html" class="btn-secondary" style="padding: 6px 10px; text-decoration: none; display: inline-block;">New</a>
                                 </div>
                                 <select id="internalCompetitorSelect" disabled>
                                     <option value="" disabled selected>Select sport first</option>
@@ -74,7 +73,6 @@
                             <div class="form-group" style="margin-bottom: 0;">
                                 <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
                                     <label>Internal Player</label>
-                                    <a href="create_player.html" class="btn-secondary" style="padding: 6px 10px; text-decoration: none; display: inline-block;">New</a>
                                 </div>
                                 <input type="text" id="internalPlayerSearch" placeholder="Search players..." style="margin-bottom: 8px;">
                                 <select id="internalPlayerSelect" disabled>
@@ -213,7 +211,7 @@
                     return;
                 }
                 alert(`Mapping saved successfully! Provider player "${provName}" is now mapped to an internal player.`);
-                window.location.href = 'player_mapping.html';
+                window.location.href = 'player.html';
             });
         });
     </script>

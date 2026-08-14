@@ -4,46 +4,162 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Categories</title>
-    <link rel="stylesheet" href="../sports/style.css">
     <link rel="stylesheet" href="../style.css">
     <script src="../auth.js"></script>
+    <style>
+        .workspace-tabs {
+            display: inline-flex;
+            gap: 4px;
+            padding: 4px;
+            background: #eef3f4;
+            border: 1px solid #d4dee1;
+            border-radius: 6px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .workspace-tab {
+            flex: 1;
+            border: 0;
+            border-radius: 4px;
+            padding: 9px 14px;
+            background: transparent;
+            color: #566;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .workspace-tab.active {
+            background: #17a2b8;
+            color: white;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+        }
+
+        .row-actions {
+            display: inline-flex;
+            justify-content: flex-end;
+            gap: 6px;
+            white-space: nowrap;
+        }
+
+        .workspace-toolbar .filters {
+            display: grid;
+            grid-template-columns: minmax(260px, 340px) minmax(180px, 220px) minmax(210px, 250px) minmax(260px, 1fr);
+            align-items: flex-end;
+            gap: 16px;
+            flex: 1;
+        }
+
+        .workspace-toolbar .filter-group {
+            min-height: 66px;
+            justify-content: flex-end;
+        }
+
+        .workspace-toolbar select,
+        .workspace-toolbar input {
+            width: 100%;
+            height: 41px;
+            min-width: 0 !important;
+            box-sizing: border-box;
+        }
+
+        .workspace-toolbar .actions {
+            display: flex;
+            align-items: flex-end;
+            min-height: 66px;
+            flex-shrink: 0;
+        }
+
+        .workspace-toolbar .btn-primary {
+            height: 41px;
+            display: inline-flex !important;
+            align-items: center;
+            justify-content: center;
+            white-space: nowrap;
+        }
+
+        @media (max-width: 1500px) {
+            .workspace-toolbar {
+                align-items: stretch;
+                gap: 16px;
+            }
+
+            .workspace-toolbar .filters {
+                grid-template-columns: repeat(2, minmax(220px, 1fr));
+            }
+        }
+
+        @media (max-width: 760px) {
+            .workspace-toolbar {
+                flex-direction: column;
+            }
+
+            .workspace-toolbar .filters {
+                grid-template-columns: 1fr;
+            }
+
+            .workspace-toolbar .actions,
+            .workspace-toolbar .btn-primary {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
 <body>
-
-    <div id="sidebar-container" data-root=".." data-active="category-management" data-service="sportsbook"></div>
+    <div id="sidebar-container" data-root=".." data-active="category-management"></div>
     <script src="../sidebar.js"></script>
 
     <div class="main-content">
         <header class="main-header" style="background-color: #17a2b8;">
             <h1>Categories</h1>
-            <p class="page-subtitle">Manage geographical categories used to organize competitions.</p>
+            <p class="page-subtitle">Create, inspect, and map categories from either the internal or provider perspective.</p>
         </header>
 
         <main class="split-layout">
             <div class="form-side">
-                <div class="top-bar">
+                <div class="top-bar workspace-toolbar">
                     <div class="filters">
                         <div class="filter-group">
-                            <label for="searchInput">Search Categories</label>
-                            <input type="text" id="searchInput" placeholder="Search by name or ID..." style="padding: 10px 15px; border: 1px solid #ccc; border-radius: 4px; font-size: 15px; min-width: 250px; background-color: #fdfdfd;">
+                            <label>View</label>
+                            <div class="workspace-tabs" aria-label="Category mapping perspective">
+                                <button type="button" class="workspace-tab active" data-view="internal">Internal categories</button>
+                                <button type="button" class="workspace-tab" data-view="provider">Provider categories</button>
+                            </div>
+                        </div>
+
+                        <div class="filter-group" id="providerFilterGroup" style="display: none;">
+                            <label for="providerSelect">Provider</label>
+                            <select id="providerSelect">
+                                <option value="all" selected>All</option>
+                                <option value="ExeFeed">ExeFeed</option>
+                                <option value="SportRadar">SportRadar</option>
+                                <option value="SportGenius">SportGenius</option>
+                            </select>
+                        </div>
+
+                        <div class="filter-group" id="statusFilterGroup" style="display: none;">
+                            <label for="statusSelect">Mapping status</label>
+                            <select id="statusSelect">
+                                <option value="all" selected>All</option>
+                                <option value="mapped">Mapped</option>
+                                <option value="unmapped">Unmapped</option>
+                            </select>
+                        </div>
+
+                        <div class="filter-group">
+                            <label for="searchInput">Search</label>
+                            <input type="text" id="searchInput" placeholder="Search category..." style="padding: 10px 15px; border: 1px solid #ccc; border-radius: 4px; font-size: 15px; background-color: #fdfdfd;">
                         </div>
                     </div>
 
                     <div class="actions">
-                        <a href="create_category.html" class="btn-primary" style="text-decoration: none; display: inline-block;">Create Category</a>
                     </div>
                 </div>
 
-                <section class="markets-section">
-                    <table class="markets-table">
-                        <thead>
-                            <tr>
-                                <th>Category ID</th>
-                                <th>Category Name</th>
-                                <th style="text-align: right;">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="categoriesBody"></tbody>
+                <section class="markets-section" style="overflow-x: auto;">
+                    <table class="markets-table" id="workspaceTable" style="min-width: 1080px;">
+                        <thead id="workspaceHead"></thead>
+                        <tbody id="workspaceBody"></tbody>
                     </table>
                 </section>
             </div>
@@ -65,23 +181,43 @@
     <script src="../pagination.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const tableBody = document.getElementById('categoriesBody');
-            const searchInput = document.getElementById('searchInput');
-            const deleteModal = document.getElementById('deleteModal');
-            const closeDeleteModalBtn = document.getElementById('closeDeleteModalBtn');
-            const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
-            const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
-            const deleteModalText = document.getElementById('deleteModalText');
-            let categoryToDelete = null;
-
-            let categories = [
+            let internalCategories = [
                 { id: "C-001", name: "England" },
                 { id: "C-002", name: "Spain" },
                 { id: "C-003", name: "Germany" },
                 { id: "C-004", name: "Italy" },
                 { id: "C-005", name: "France" },
-                { id: "C-006", name: "Serbia" }
+                { id: "C-006", name: "Serbia" },
+                { id: "C-007", name: "United States" }
             ];
+
+            const providerCategories = [
+                { provider: "ExeFeed", provId: "1126", provName: "England", internalId: "C-001", internalName: "England", status: "Mapped" },
+                { provider: "ExeFeed", provId: "1127", provName: "Spain", internalId: "C-002", internalName: "Spain", status: "Mapped" },
+                { provider: "ExeFeed", provId: "1128", provName: "Germany", internalId: "C-003", internalName: "Germany", status: "Mapped" },
+                { provider: "ExeFeed", provId: "1129", provName: "United States", internalId: "C-007", internalName: "United States", status: "Mapped" },
+                { provider: "ExeFeed", provId: "1130", provName: "France", internalId: "C-005", internalName: "France", status: "Mapped" },
+                { provider: "SportRadar", provId: "sr:category:1", provName: "England", internalId: "C-001", internalName: "England", status: "Mapped" },
+                { provider: "SportRadar", provId: "sr:category:32", provName: "Spain", internalId: "C-002", internalName: "Spain", status: "Mapped" },
+                { provider: "SportRadar", provId: "sr:category:39", provName: "International", internalId: "-", internalName: "-", status: "Unmapped" },
+                { provider: "SportRadar", provId: "sr:category:15", provName: "Europe", internalId: "-", internalName: "-", status: "Unmapped" },
+                { provider: "SportGenius", provId: "sg-cat-uk", provName: "UK", internalId: "-", internalName: "-", status: "Unmapped" },
+                { provider: "SportGenius", provId: "sg-cat-it", provName: "Italy", internalId: "C-004", internalName: "Italy", status: "Mapped" },
+                { provider: "SportGenius", provId: "sg-cat-rs", provName: "Serbia", internalId: "C-006", internalName: "Serbia", status: "Mapped" }
+            ];
+
+            const tabs = document.querySelectorAll('.workspace-tab');
+            const providerFilterGroup = document.getElementById('providerFilterGroup');
+            const statusFilterGroup = document.getElementById('statusFilterGroup');
+            const providerSelect = document.getElementById('providerSelect');
+            const statusSelect = document.getElementById('statusSelect');
+            const searchInput = document.getElementById('searchInput');
+            const workspaceHead = document.getElementById('workspaceHead');
+            const workspaceBody = document.getElementById('workspaceBody');
+            const deleteModal = document.getElementById('deleteModal');
+            const deleteModalText = document.getElementById('deleteModalText');
+            let activeView = 'internal';
+            let categoryToDelete = null;
 
             function openDeleteModal(category) {
                 categoryToDelete = category;
@@ -94,55 +230,145 @@
                 deleteModal.style.display = 'none';
             }
 
-            function renderCategories() {
-                tableBody.innerHTML = '';
+            function renderInternalView() {
+                workspaceHead.innerHTML = `
+                    <tr>
+                        <th>Category ID</th>
+                        <th>Category Name</th>
+                        <th style="text-align: right;">Action</th>
+                    </tr>
+                `;
+
                 const searchVal = searchInput.value.toLowerCase();
-                const filteredCategories = categories.filter(category =>
+                const rows = internalCategories.filter(category =>
                     category.id.toLowerCase().includes(searchVal) ||
                     category.name.toLowerCase().includes(searchVal)
                 );
 
-                if (filteredCategories.length === 0) {
-                    tableBody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: #888; font-style: italic;">No categories found.</td></tr>';
+                if (rows.length === 0) {
+                    workspaceBody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: #888; font-style: italic; padding: 20px;">No categories found.</td></tr>';
                     return;
                 }
 
-                filteredCategories.forEach(category => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
+                workspaceBody.innerHTML = rows.map(category => `
+                    <tr>
                         <td style="font-weight: 500; color: #6c757d;">${category.id}</td>
                         <td class="market-name">${category.name}</td>
                         <td style="text-align: right;">
-                            <a href="view_category.html?id=${encodeURIComponent(category.id)}&name=${encodeURIComponent(category.name)}" class="btn-action" style="background-color: #007bff; text-decoration: none; display: inline-block; margin-right: 5px;">View</a>
-                            <a href="create_category.html?edit=true&id=${encodeURIComponent(category.id)}&name=${encodeURIComponent(category.name)}" class="btn-action" style="background-color: #17a2b8; text-decoration: none; display: inline-block; margin-right: 5px;">Edit</a>
-                            <button type="button" class="btn-action delete-category-btn" style="background-color: #dc3545; border: none;" data-id="${category.id}">Delete</button>
+                            <span class="row-actions">
+                                <a href="view_category.html?id=${encodeURIComponent(category.id)}&name=${encodeURIComponent(category.name)}" class="btn-action" style="background-color: #007bff; text-decoration: none; display: inline-block;">View</a>
+                                <a href="create_category.html?edit=true&id=${encodeURIComponent(category.id)}&name=${encodeURIComponent(category.name)}" class="btn-action" style="background-color: #17a2b8; text-decoration: none; display: inline-block;">Edit</a>
+                                <button type="button" class="btn-action delete-category-btn" style="background-color: #dc3545; border: none;" data-id="${category.id}">Delete</button>
+                            </span>
                         </td>
-                    `;
-                    tableBody.appendChild(row);
-                });
+                    </tr>
+                `).join('');
 
-                document.querySelectorAll('.delete-category-btn').forEach(btn => {
-                    btn.addEventListener('click', () => {
-                        const category = categories.find(item => item.id === btn.dataset.id);
+                document.querySelectorAll('.delete-category-btn').forEach(button => {
+                    button.addEventListener('click', () => {
+                        const category = internalCategories.find(item => item.id === button.dataset.id);
                         if (category) openDeleteModal(category);
                     });
                 });
             }
 
-            searchInput.addEventListener('input', renderCategories);
-            closeDeleteModalBtn.addEventListener('click', closeDeleteModal);
-            cancelDeleteBtn.addEventListener('click', closeDeleteModal);
-            confirmDeleteBtn.addEventListener('click', () => {
+            function renderProviderView() {
+                workspaceHead.innerHTML = `
+                    <tr>
+                        <th>Provider</th>
+                        <th>Provider Category ID</th>
+                        <th>Provider Category Name</th>
+                        <th>Internal Category ID</th>
+                        <th>Internal Category Name</th>
+                        <th>Status</th>
+                        <th style="text-align: right;">Action</th>
+                    </tr>
+                `;
+
+                const providerVal = providerSelect.value;
+                const statusVal = statusSelect.value;
+                const searchVal = searchInput.value.toLowerCase();
+                const rows = providerCategories.filter(category => {
+                    const matchesProvider = providerVal === 'all' || category.provider === providerVal;
+                    const matchesStatus = statusVal === 'all' || category.status.toLowerCase() === statusVal;
+                    const matchesSearch = category.provider.toLowerCase().includes(searchVal) ||
+                        category.provId.toLowerCase().includes(searchVal) ||
+                        category.provName.toLowerCase().includes(searchVal) ||
+                        category.internalId.toLowerCase().includes(searchVal) ||
+                        category.internalName.toLowerCase().includes(searchVal);
+                    return matchesProvider && matchesStatus && matchesSearch;
+                });
+
+                if (rows.length === 0) {
+                    workspaceBody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: #888; font-style: italic; padding: 20px;">No provider categories found.</td></tr>';
+                    return;
+                }
+
+                workspaceBody.innerHTML = rows.map(category => {
+                    const badgeClass = category.status === 'Mapped' ? 'status-mapped' : 'status-unmapped';
+                    const mapUrl = category.status === 'Mapped'
+                        ? `map_category.html?provider=${encodeURIComponent(category.provider)}&provId=${encodeURIComponent(category.provId)}&provName=${encodeURIComponent(category.provName)}&internalId=${encodeURIComponent(category.internalId)}`
+                        : `map_category.html?provider=${encodeURIComponent(category.provider)}&provId=${encodeURIComponent(category.provId)}&provName=${encodeURIComponent(category.provName)}`;
+                    const mapLabel = category.status === 'Mapped' ? 'Edit mapping' : 'Map';
+                    const viewButton = category.status === 'Mapped'
+                        ? `<a href="view_category.html?id=${encodeURIComponent(category.internalId)}&name=${encodeURIComponent(category.internalName)}" class="btn-action" style="background-color: #007bff; text-decoration: none; display: inline-block;">View</a>`
+                        : '';
+
+                    return `
+                        <tr>
+                            <td style="font-weight: 500;">${category.provider}</td>
+                            <td style="color: #6c757d;">${category.provId}</td>
+                            <td class="market-name" style="color: #007bff;">${category.provName}</td>
+                            <td style="color: #6c757d;">${category.internalId}</td>
+                            <td style="font-weight: 500;">${category.internalName}</td>
+                            <td><span class="status-badge ${badgeClass}">${category.status}</span></td>
+                            <td style="text-align: right;">
+                                <span class="row-actions">
+                                    ${viewButton}
+                                    <a href="${mapUrl}" class="btn-action" style="text-decoration: none; display: inline-block;">${mapLabel}</a>
+                                </span>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+
+            function render() {
+                const showProviderFilters = activeView === 'provider';
+                providerFilterGroup.style.display = showProviderFilters ? 'block' : 'none';
+                statusFilterGroup.style.display = showProviderFilters ? 'block' : 'none';
+                if (activeView === 'internal') {
+                    renderInternalView();
+                } else {
+                    renderProviderView();
+                }
+            }
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    activeView = tab.dataset.view;
+                    tabs.forEach(item => item.classList.toggle('active', item === tab));
+                    searchInput.value = '';
+                    render();
+                });
+            });
+
+            providerSelect.addEventListener('change', render);
+            statusSelect.addEventListener('change', render);
+            searchInput.addEventListener('input', render);
+            document.getElementById('closeDeleteModalBtn').addEventListener('click', closeDeleteModal);
+            document.getElementById('cancelDeleteBtn').addEventListener('click', closeDeleteModal);
+            document.getElementById('confirmDeleteBtn').addEventListener('click', () => {
                 if (!categoryToDelete) return;
-                categories = categories.filter(category => category.id !== categoryToDelete.id);
+                internalCategories = internalCategories.filter(category => category.id !== categoryToDelete.id);
                 closeDeleteModal();
-                renderCategories();
+                render();
             });
             window.addEventListener('click', event => {
                 if (event.target === deleteModal) closeDeleteModal();
             });
 
-            renderCategories();
+            render();
         });
     </script>
 </body>
