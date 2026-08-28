@@ -13,7 +13,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const sportDataManagementPages = [
         'sports/hermes_sports.html',
-        'sports/create_sport.html',
         'sports/view_hermes_sport.html'
     ];
     const categoryDataManagementPages = [
