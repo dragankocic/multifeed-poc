@@ -15,11 +15,19 @@
         }
 
         .event-toolbar .filter-group {
-            flex: 0 0 170px;
+            flex: 0 0 160px;
         }
 
         .event-toolbar .filter-group.search-filter {
             flex-basis: 240px;
+        }
+
+        .event-toolbar .filter-group.tournament-filter {
+            flex: 0 0 220px;
+        }
+
+        .event-toolbar .filter-group.start-time-filter {
+            flex: 0 0 270px;
         }
 
         .event-toolbar select,
@@ -28,18 +36,6 @@
             height: 41px;
             min-width: 0 !important;
             box-sizing: border-box;
-        }
-
-        .mapping-status-line {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 10px;
-        }
-
-        .mapping-status-line a {
-            font-size: 12px;
-            padding: 5px 8px;
         }
 
         .event-detail-grid {
@@ -66,9 +62,22 @@
 
         .event-message-filters {
             display: grid;
-            grid-template-columns: minmax(280px, 1.2fr) minmax(220px, 1fr) minmax(220px, 1fr);
+            grid-template-columns: repeat(4, minmax(0, 1fr));
             gap: 14px;
             align-items: end;
+        }
+
+        .event-message-filters input,
+        .event-message-filters select {
+            width: 100%;
+            min-width: 0 !important;
+            height: 41px;
+            box-sizing: border-box;
+            padding: 10px 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: #fdfdfd;
+            font-size: 15px;
         }
 
         .date-range-fields {
@@ -77,44 +86,14 @@
             gap: 10px;
         }
 
-        .merge-modal-content {
-            width: min(960px, 94vw);
-            padding: 30px;
-        }
-
-        .merge-form {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 16px;
-            margin-top: 18px;
-        }
-
-        .merge-filter-grid {
-            display: grid;
-            grid-template-columns: minmax(160px, 0.8fr) minmax(220px, 1.2fr);
-            gap: 12px;
-        }
-
-        .merge-form .form-group {
-            margin-bottom: 0;
-        }
-
-        .merge-form input,
-        .merge-form select {
-            width: 100%;
-            min-width: 0 !important;
-            height: 42px;
-            box-sizing: border-box;
-        }
-
-        .merge-actions {
+        .modal-actions {
             display: flex;
             justify-content: flex-end;
             gap: 10px;
             margin-top: 22px;
         }
 
-        .merge-actions .btn-secondary {
+        .modal-actions .btn-secondary {
             min-height: 42px;
             padding: 10px 18px;
             border: 1px solid #d1d5db;
@@ -124,56 +103,11 @@
             font-weight: 600;
         }
 
-        .merge-candidate-list {
-            max-height: 330px;
-            overflow: auto;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-        }
-
-        .merge-candidate-list .markets-table {
-            border-radius: 0;
-        }
-
-        .merge-candidate-row {
-            cursor: pointer;
-        }
-
-        .merge-candidate-row.selected td {
-            background-color: #eef9fb !important;
-            border-top: 1px solid #b8e3ea;
-            border-bottom: 1px solid #b8e3ea;
-        }
-
         .row-actions {
             display: inline-flex;
             gap: 8px;
             justify-content: flex-end;
             white-space: nowrap;
-        }
-
-        .selected-event-row td {
-            background-color: #eef9fb !important;
-            border-top: 1px solid #b8e3ea;
-            border-bottom: 1px solid #b8e3ea;
-        }
-
-        .pin-indicator {
-            display: inline-block;
-            margin-left: 6px;
-            padding: 2px 6px;
-            border-radius: 999px;
-            background: #d1ecf1;
-            color: #0c5460;
-            font-size: 11px;
-            font-weight: 700;
-            text-transform: uppercase;
-        }
-
-        .connection-summary {
-            display: grid;
-            gap: 8px;
-            margin-top: 8px;
         }
 
         .event-markets-table th,
@@ -221,6 +155,101 @@
             margin-bottom: 20px;
         }
 
+        .detail-actions .btn-secondary,
+        .nav-button {
+            min-height: 42px;
+            padding: 10px 16px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            background: #fff;
+            color: #2c3e50;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .link-event-modal-content {
+            width: min(980px, 94vw);
+            padding: 26px;
+        }
+
+        .link-event-filters {
+            display: grid;
+            grid-template-columns: minmax(160px, 0.8fr) minmax(220px, 1fr) minmax(260px, 1.2fr);
+            gap: 12px;
+            align-items: end;
+            margin: 18px 0;
+        }
+
+        .link-event-filters input,
+        .link-event-filters select {
+            width: 100%;
+            min-width: 0 !important;
+            height: 42px;
+            box-sizing: border-box;
+        }
+
+        .link-events-list {
+            max-height: 360px;
+            overflow: auto;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+        }
+
+        .link-events-list .markets-table {
+            border-radius: 0;
+        }
+
+        .link-event-row {
+            cursor: pointer;
+        }
+
+        .link-event-row.selected td {
+            background-color: #eef9fb !important;
+            border-top: 1px solid #b8e3ea;
+            border-bottom: 1px solid #b8e3ea;
+        }
+
+        .linked-events-list {
+            display: grid;
+            gap: 10px;
+        }
+
+        .linked-event-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 12px;
+            border: 1px solid #e1e5ea;
+            border-radius: 8px;
+            background: #f8f9fa;
+        }
+
+        .linked-event-row.selected {
+            border-color: #17a2b8;
+            background: #eef9fb;
+        }
+
+        .linked-event-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 0 0 auto;
+        }
+
+        .linked-event-meta {
+            color: #667085;
+            font-size: 13px;
+            margin-top: 4px;
+        }
+
+        .unlink-event-btn {
+            flex: 0 0 auto;
+            background: #fff;
+            border: 1px solid #dc3545;
+            color: #c82333;
+        }
+
         @media (max-width: 1100px) {
             .event-detail-grid,
             .event-message-filters,
@@ -234,15 +263,15 @@
                 grid-template-columns: 1fr;
             }
 
-            .merge-actions {
+            .modal-actions {
                 flex-direction: column-reverse;
             }
 
-            .merge-actions button {
+            .modal-actions button {
                 width: 100%;
             }
 
-            .merge-filter-grid {
+            .link-event-filters {
                 grid-template-columns: 1fr;
             }
         }
@@ -255,7 +284,7 @@
     <div class="main-content">
         <header class="main-header">
             <h1>View Events</h1>
-            <p class="page-subtitle">Browse provider events, inspect event messages, and connect matching events manually.</p>
+            <p class="page-subtitle">Browse Hermes events and inspect event details, markets, and messages.</p>
         </header>
 
         <main class="split-layout">
@@ -300,23 +329,24 @@
                                 </select>
                             </div>
 
-                            <div class="filter-group">
-                                <label for="mappingStatusSelect">Mapping</label>
-                                <select id="mappingStatusSelect">
-                                    <option value="all" selected>All</option>
-                                    <option value="mapped">Mapped</option>
-                                    <option value="partially mapped">Partially mapped</option>
-                                    <option value="unmapped">Unmapped</option>
-                                </select>
+                            <div class="filter-group tournament-filter">
+                                <label for="tournamentInput">Tournament</label>
+                                <input type="text" id="tournamentInput" list="tournamentOptions" placeholder="All tournaments">
+                                <datalist id="tournamentOptions"></datalist>
+                            </div>
+
+                            <div class="filter-group start-time-filter">
+                                <label>Start time</label>
+                                <div class="date-range-fields">
+                                    <input type="date" id="eventStartFrom" aria-label="Event start time from">
+                                    <input type="date" id="eventStartTo" aria-label="Event start time to">
+                                </div>
                             </div>
 
                             <div class="filter-group search-filter">
                                 <label for="searchInput">Search</label>
                                 <input type="text" id="searchInput" placeholder="Search ID or event...">
                             </div>
-                        </div>
-                        <div class="actions">
-                            <button type="button" id="connectSelectedBtn" class="btn-primary" disabled>Connect selected</button>
                         </div>
                     </div>
 
@@ -331,15 +361,15 @@
                 <div id="eventDetailView" style="display: none;">
                     <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 20px;">
                         <div style="display: flex; align-items: center; gap: 12px;">
-                            <button type="button" id="backToEventsBtn" class="btn-secondary" style="padding: 10px 14px;">&larr;</button>
+                            <button type="button" id="backToEventsBtn" class="nav-button">&larr;</button>
                             <div>
                                 <h2 id="detailTitle" style="font-size: 28px; color: #111; margin: 0;"></h2>
                                 <p id="detailUpdatedAt" style="font-size: 15px; color: #777; margin-top: 6px;"></p>
                             </div>
                         </div>
-                        <div class="actions" style="display: flex; gap: 10px; justify-content: flex-end;">
+                        <div class="actions detail-actions" style="display: flex; gap: 10px; justify-content: flex-end;">
+                            <button type="button" id="openLinkEventsBtn" class="btn-secondary">Link events</button>
                             <button type="button" id="openMessageFiltersBtn" class="btn-secondary">Messages</button>
-                            <button type="button" id="mergeFromDetailBtn" class="btn-primary">Connect event</button>
                         </div>
                     </div>
 
@@ -347,9 +377,14 @@
                         <div class="event-detail-grid" id="eventDetailGrid"></div>
                     </section>
 
+                    <section class="markets-section" id="linkedEventsSection" style="display: none; padding: 20px; margin-bottom: 20px;">
+                        <h3 style="margin: 0 0 14px;">Linked provider events</h3>
+                        <div class="linked-events-list" id="linkedEventsList"></div>
+                    </section>
+
                     <section class="markets-section" style="margin-bottom: 20px;">
                         <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 20px; border-bottom: 1px solid #e9ecef;">
-                            <h3 style="margin: 0;">Markets</h3>
+                            <h3 id="eventMarketsTitle" style="margin: 0;">Provider markets</h3>
                             <span id="eventMarketsSummary" style="color: #666; font-size: 14px;"></span>
                         </div>
                         <table class="markets-table event-markets-table">
@@ -357,8 +392,8 @@
                                 <tr>
                                     <th>Market ID</th>
                                     <th>Provider Market</th>
-                                    <th>Internal Market</th>
                                     <th>Status</th>
+                                    <th>Mapped Market</th>
                                     <th style="text-align: right;">Action</th>
                                 </tr>
                             </thead>
@@ -370,7 +405,7 @@
                 <div id="messageFilterView" style="display: none;">
                     <div class="message-filter-header">
                         <div style="display: flex; align-items: center; gap: 12px;">
-                            <button type="button" id="backToEventDetailBtn" class="btn-secondary" style="padding: 10px 14px;">&larr;</button>
+                            <button type="button" id="backToEventDetailBtn" class="nav-button">&larr;</button>
                             <div>
                                 <h2 id="messageFilterTitle" style="font-size: 28px; color: #111; margin: 0;">Filter Messages</h2>
                                 <p id="messageFilterSubtitle" style="font-size: 15px; color: #777; margin-top: 6px;"></p>
@@ -380,6 +415,12 @@
 
                     <section class="markets-section" style="padding: 20px; margin-bottom: 20px;">
                         <div class="event-message-filters">
+                            <div class="filter-group">
+                                <label for="messageProviderFilter">Feed Provider</label>
+                                <select id="messageProviderFilter">
+                                    <option value="all" selected>All</option>
+                                </select>
+                            </div>
                             <div class="filter-group">
                                 <label>Received Between</label>
                                 <div class="date-range-fields">
@@ -410,6 +451,7 @@
                             <thead>
                                 <tr>
                                     <th>Message ID</th>
+                                    <th>Feed Provider</th>
                                     <th>Timestamp</th>
                                     <th>Type</th>
                                     <th style="text-align: right;">Action</th>
@@ -423,54 +465,6 @@
         </main>
     </div>
 
-    <div id="mergeModal" class="modal">
-        <div class="modal-content merge-modal-content">
-            <span class="close-modal" id="closeMergeModalBtn">&times;</span>
-            <h3 style="font-size: 24px; margin-bottom: 12px; padding-bottom: 14px; border-bottom: 1px solid #e5e5e5;">Connect matching events</h3>
-            <p style="margin: 0; color: #666; line-height: 1.45;">Select another provider event that represents the same real event. This creates one grouped event across providers.</p>
-            <div class="merge-form">
-                <div class="form-group">
-                    <label>Selected event</label>
-                    <input type="text" id="mergeSourceEvent" readonly>
-                </div>
-                <div class="merge-filter-grid">
-                    <div class="form-group">
-                        <label for="mergeProviderFilter">Provider</label>
-                        <select id="mergeProviderFilter">
-                            <option value="all" selected>All</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="mergeSearchInput">Search</label>
-                        <input type="text" id="mergeSearchInput" placeholder="Search event, ID, sport...">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>Connect with</label>
-                    <div class="merge-candidate-list">
-                        <table class="markets-table">
-                            <thead>
-                                <tr>
-                                    <th style="width: 44px;">Select</th>
-                                    <th>Event</th>
-                                    <th>Provider</th>
-                                    <th>Provider ID</th>
-                                    <th>Start Time</th>
-                                    <th>Competition</th>
-                                </tr>
-                            </thead>
-                            <tbody id="mergeTargetEventList"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            <div class="merge-actions">
-                <button type="button" id="cancelMergeBtn" class="btn-secondary">Cancel</button>
-                <button type="button" id="confirmMergeBtn" class="btn-primary">Connect events</button>
-            </div>
-        </div>
-    </div>
-
     <div id="messageDetailsModal" class="modal">
         <div class="modal-content message-modal-content">
             <span class="close-modal" id="closeMessageDetailsBtn">&times;</span>
@@ -479,15 +473,58 @@
             <div class="message-payload-grid">
                 <div class="payload-panel">
                     <pre id="internalMessagePayload" class="payload-box"></pre>
-                    <button type="button" id="copyInternalMessageBtn" class="btn-secondary">Copy Internal Message</button>
+                    <button type="button" id="copyInternalMessageBtn" class="btn-secondary">Copy Multifeed Message</button>
                 </div>
                 <div class="payload-panel">
                     <pre id="sourceMessagePayload" class="payload-box"></pre>
                     <button type="button" id="copySourceMessageBtn" class="btn-secondary">Copy Source Message</button>
                 </div>
             </div>
-            <div class="merge-actions">
+            <div class="modal-actions">
                 <button type="button" id="closeMessageDetailsFooterBtn" class="btn-primary">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="linkEventsModal" class="modal">
+        <div class="modal-content link-event-modal-content">
+            <span class="close-modal" id="closeLinkEventsBtn">&times;</span>
+            <h3 style="font-size: 24px; margin: 0 0 8px;">Link events</h3>
+            <p id="linkEventsSubtitle" style="margin: 0; color: #666;"></p>
+            <div class="link-event-filters">
+                <div class="form-group">
+                    <label for="linkProviderFilter">Feed Provider</label>
+                    <select id="linkProviderFilter">
+                        <option value="all" selected>All</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="linkTournamentInput">Tournament</label>
+                    <input type="text" id="linkTournamentInput" list="linkTournamentOptions" placeholder="All tournaments">
+                    <datalist id="linkTournamentOptions"></datalist>
+                </div>
+                <div class="form-group">
+                    <label for="linkEventSearch">Search</label>
+                    <input type="text" id="linkEventSearch" placeholder="Search event, ID, tournament...">
+                </div>
+            </div>
+            <div class="link-events-list">
+                <table class="markets-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 44px;">Select</th>
+                            <th>Event</th>
+                            <th>Event ID</th>
+                            <th>Start Time</th>
+                            <th>Tournament</th>
+                        </tr>
+                    </thead>
+                    <tbody id="linkEventsBody"></tbody>
+                </table>
+            </div>
+            <div class="modal-actions">
+                <button type="button" id="cancelLinkEventsBtn" class="btn-secondary">Cancel</button>
+                <button type="button" id="confirmLinkEventsBtn" class="btn-primary" disabled>Link events</button>
             </div>
         </div>
     </div>
@@ -495,14 +532,15 @@
     <script src="../../pagination.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const events = [
+            const providerEvents = [
                 { id: "EV-001", internalId: "event:56418719", providerId: "sr:match:61300621", provider: "SportRadar", sport: "Soccer", category: "England", competition: "Premier League", season: "2025/26", stage: "-", startTime: "17.03.2026. 16:00", venue: "Old Trafford", status: "Not started", desc: "Manchester United vs Liverpool", updatedAt: "04:46:32 PM", group: "G-001", mappingStatus: "Mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Mapped" },
                 { id: "EV-011", internalId: "event:56418719", providerId: "6569588", provider: "ExeFeed", sport: "Soccer", category: "England", competition: "Premier League", season: "2025/26", stage: "-", startTime: "17.03.2026. 16:00", venue: "Old Trafford", status: "Not started", desc: "Manchester United - Liverpool", updatedAt: "04:45:10 PM", group: "G-001", mappingStatus: "Mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Mapped" },
                 { id: "EV-002", internalId: "event:56418720", providerId: "61310022", provider: "ExeFeed", sport: "Basketball", category: "United States", competition: "NBA", season: "2025/26", stage: "Regular season", startTime: "09.06.2026. 12:28", venue: "Madison Square Garden", status: "Live", desc: "New York Knicks - San Antonio Spurs", updatedAt: "12:28:10 PM", group: "G-002", mappingStatus: "Partially mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Unmapped" },
                 { id: "EV-003", internalId: "event:56418721", providerId: "bg:match:33000033", provider: "Bet Genius", sport: "Tennis", category: "France", competition: "Roland Garros", season: "2026", stage: "Final", startTime: "09.06.2026. 11:00", venue: "Court Philippe-Chatrier", status: "Ended", desc: "Novak Djokovic - Carlos Alcaraz", updatedAt: "11:00:00 AM", group: "G-003", mappingStatus: "Mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Mapped" },
-                { id: "EV-004", internalId: "event:56418722", providerId: "sr:match:61300622", provider: "SportRadar", sport: "Soccer", category: "England", competition: "Premier League", season: "2025/26", stage: "-", startTime: "10.06.2026. 20:45", venue: "Etihad Stadium", status: "Not started", desc: "Manchester City - Arsenal", updatedAt: "03:00:00 PM", group: "G-004", mappingStatus: "Partially mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Unmapped" },
-                { id: "EV-012", internalId: "event:56418725", providerId: "61310622", provider: "ExeFeed", sport: "Soccer", category: "England", competition: "Premier League", season: "2025/26", stage: "-", startTime: "10.06.2026. 20:45", venue: "Etihad Stadium", status: "Not started", desc: "Manchester City - Arsenal", updatedAt: "03:02:14 PM", group: "G-012", mappingStatus: "Partially mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Unmapped" },
+                { id: "EV-004", internalId: "event:56418722", providerId: "sr:match:61300622", provider: "SportRadar", sport: "Soccer", category: "England", competition: "Premier League", season: "2025/26", stage: "-", startTime: "10.06.2026. 20:45", venue: "Etihad Stadium", status: "Not started", desc: "Manchester City FC - Arsenal FC", updatedAt: "03:00:00 PM", group: "G-004", mappingStatus: "Partially mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Unmapped" },
+                { id: "EV-012", internalId: "event:56418725", providerId: "61310622", provider: "ExeFeed", sport: "Soccer", category: "England", competition: "Premier League", season: "2025/26", stage: "-", startTime: "10.06.2026. 20:45", venue: "Etihad Stadium", status: "Not started", desc: "Man Cit - Ars", updatedAt: "03:02:14 PM", group: "G-012", mappingStatus: "Partially mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Unmapped" },
                 { id: "EV-005", internalId: "event:56418723", providerId: "61310055", provider: "ExeFeed", sport: "Soccer", category: "Germany", competition: "Bundesliga", season: "2025/26", stage: "-", startTime: "09.06.2026. 10:15", venue: "Allianz Arena", status: "Cancelled", desc: "Bayern Munich - BVB", updatedAt: "10:15:00 AM", group: "G-005", mappingStatus: "Unmapped", sportMapping: "Mapped", categoryMapping: "Unmapped", tournamentMapping: "Unmapped" },
+                { id: "EV-013", internalId: "event:56418723", providerId: "sr:match:61310055", provider: "SportRadar", sport: "Soccer", category: "Germany", competition: "Bundesliga", season: "2025/26", stage: "-", startTime: "09.06.2026. 10:15", venue: "Allianz Arena", status: "Cancelled", desc: "FC Bayern Munich vs Borussia Dortmund", updatedAt: "10:16:22 AM", group: "G-005", mappingStatus: "Unmapped", sportMapping: "Mapped", categoryMapping: "Unmapped", tournamentMapping: "Unmapped" },
                 { id: "EV-008", internalId: "event:56418724", providerId: "sr:race:1", provider: "IMG Arena", sport: "Motorsport", category: "International", competition: "Formula 1", season: "2026", stage: "Race", startTime: "14.06.2026. 15:00", venue: "Monaco", status: "Delayed", desc: "Monaco GP", updatedAt: "02:00:00 PM", group: "G-008", mappingStatus: "Unmapped", sportMapping: "Unmapped", categoryMapping: "Unmapped", tournamentMapping: "Unmapped" }
             ];
 
@@ -513,8 +551,17 @@
                 { eventId: "EV-001", messageId: "event:56418722", time: "07/10/2025 10:45:00 PM", type: "match paused", provider: "SportRadar", sourceRef: "sr:message:61300621:pause" },
                 { eventId: "EV-001", messageId: "event:56418723", time: "07/10/2025 10:45:00 PM", type: "fixture", provider: "SportRadar", sourceRef: "sr:message:61300621:fixture" },
                 { eventId: "EV-001", messageId: "event:56418724", time: "07/10/2025 10:45:00 PM", type: "odds change", provider: "SportRadar", sourceRef: "sr:message:61300621:market" },
+                { eventId: "EV-011", messageId: "event:56418725", time: "07/10/2025 10:45:08 PM", type: "fixture", provider: "ExeFeed", sourceRef: "6569588:fixture" },
+                { eventId: "EV-011", messageId: "event:56418726", time: "07/10/2025 10:45:12 PM", type: "odds change", provider: "ExeFeed", sourceRef: "6569588:odds" },
                 { eventId: "EV-002", messageId: "event:56418801", time: "06/09/2026 12:28:10 PM", type: "period update", provider: "ExeFeed", sourceRef: "61310022:period" },
-                { eventId: "EV-003", messageId: "event:56418802", time: "06/09/2026 11:00:00 AM", type: "status update", provider: "Bet Genius", sourceRef: "bg:message:33000033:status" }
+                { eventId: "EV-003", messageId: "event:56418802", time: "06/09/2026 11:00:00 AM", type: "status update", provider: "Bet Genius", sourceRef: "bg:message:33000033:status" },
+                { eventId: "EV-005", messageId: "event:56418810", time: "06/09/2026 09:58:00 AM", type: "fixture", provider: "ExeFeed", sourceRef: "61310055:fixture" },
+                { eventId: "EV-005", messageId: "event:56418811", time: "06/09/2026 10:01:42 AM", type: "odds change", provider: "ExeFeed", sourceRef: "61310055:odds:pre" },
+                { eventId: "EV-005", messageId: "event:56418812", time: "06/09/2026 10:12:05 AM", type: "status update", provider: "ExeFeed", sourceRef: "61310055:status:cancelled" },
+                { eventId: "EV-005", messageId: "event:56418813", time: "06/09/2026 10:14:33 AM", type: "market update", provider: "ExeFeed", sourceRef: "61310055:markets:suspended" },
+                { eventId: "EV-013", messageId: "event:56418814", time: "06/09/2026 09:59:18 AM", type: "fixture", provider: "SportRadar", sourceRef: "sr:message:61310055:fixture" },
+                { eventId: "EV-013", messageId: "event:56418815", time: "06/09/2026 10:03:21 AM", type: "odds change", provider: "SportRadar", sourceRef: "sr:message:61310055:odds" },
+                { eventId: "EV-013", messageId: "event:56418816", time: "06/09/2026 10:15:54 AM", type: "status update", provider: "SportRadar", sourceRef: "sr:message:61310055:cancelled" }
             ];
 
             const eventMarkets = [
@@ -531,7 +578,25 @@
                 { eventId: "EV-004", marketId: "sr:market:18", providerMarket: "Total Goals", internalId: "-", internalMarket: "-", status: "Unmapped" },
                 { eventId: "EV-012", marketId: "101", providerMarket: "1X2", internalId: "HRM-001", internalMarket: "1x2", status: "Mapped" },
                 { eventId: "EV-012", marketId: "102", providerMarket: "TOTAL_GOALS", internalId: "-", internalMarket: "-", status: "Unmapped" },
-                { eventId: "EV-005", marketId: "301", providerMarket: "1X2", internalId: "-", internalMarket: "-", status: "Unmapped" },
+                { eventId: "EV-005", marketId: "301", providerMarket: "1X2", internalId: "HRM-001", internalMarket: "1x2", status: "Mapped" },
+                { eventId: "EV-005", marketId: "302", providerMarket: "TOTAL_GOALS", internalId: "HRM-002", internalMarket: "TOTAL_GOALS", status: "Mapped" },
+                { eventId: "EV-005", marketId: "303", providerMarket: "BOTH_TEAMS_TO_SCORE", internalId: "HRM-003", internalMarket: "BTTS", status: "Mapped" },
+                { eventId: "EV-005", marketId: "306", providerMarket: "DOUBLE_CHANCE", internalId: "HRM-007", internalMarket: "DOUBLE_CHANCE", status: "Mapped" },
+                { eventId: "EV-005", marketId: "307", providerMarket: "DRAW_NO_BET", internalId: "HRM-008", internalMarket: "DRAW_NO_BET", status: "Mapped" },
+                { eventId: "EV-005", marketId: "308", providerMarket: "CORRECT_SCORE", internalId: "HRM-009", internalMarket: "CORRECT_SCORE", status: "Mapped" },
+                { eventId: "EV-005", marketId: "309", providerMarket: "HALFTIME_FULLTIME", internalId: "HRM-010", internalMarket: "HALFTIME_FULLTIME", status: "Mapped" },
+                { eventId: "EV-005", marketId: "310", providerMarket: "TEAM_TOTAL_GOALS", internalId: "HRM-011", internalMarket: "TEAM_TOTAL_GOALS", status: "Mapped" },
+                { eventId: "EV-005", marketId: "304", providerMarket: "ASIAN_HANDICAP", internalId: "-", internalMarket: "-", status: "Unmapped" },
+                { eventId: "EV-005", marketId: "305", providerMarket: "FIRST_TEAM_TO_SCORE", internalId: "-", internalMarket: "-", status: "Unmapped" },
+                { eventId: "EV-013", marketId: "sr:market:1", providerMarket: "1x2", internalId: "HRM-001", internalMarket: "1x2", status: "Mapped" },
+                { eventId: "EV-013", marketId: "sr:market:18", providerMarket: "Total Goals", internalId: "HRM-002", internalMarket: "TOTAL_GOALS", status: "Mapped" },
+                { eventId: "EV-013", marketId: "sr:market:29", providerMarket: "Both Teams To Score", internalId: "HRM-003", internalMarket: "BTTS", status: "Mapped" },
+                { eventId: "EV-013", marketId: "sr:market:10", providerMarket: "Double Chance", internalId: "HRM-007", internalMarket: "DOUBLE_CHANCE", status: "Mapped" },
+                { eventId: "EV-013", marketId: "sr:market:47", providerMarket: "Draw No Bet", internalId: "HRM-008", internalMarket: "DRAW_NO_BET", status: "Mapped" },
+                { eventId: "EV-013", marketId: "sr:market:90", providerMarket: "Correct Score", internalId: "HRM-009", internalMarket: "CORRECT_SCORE", status: "Mapped" },
+                { eventId: "EV-013", marketId: "sr:market:65", providerMarket: "Halftime/Fulltime", internalId: "HRM-010", internalMarket: "HALFTIME_FULLTIME", status: "Mapped" },
+                { eventId: "EV-013", marketId: "sr:market:147", providerMarket: "Asian Handicap", internalId: "-", internalMarket: "-", status: "Unmapped" },
+                { eventId: "EV-013", marketId: "sr:market:190", providerMarket: "First Team To Score", internalId: "-", internalMarket: "-", status: "Unmapped" },
                 { eventId: "EV-008", marketId: "img:market:race-winner", providerMarket: "Race Winner", internalId: "-", internalMarket: "-", status: "Unmapped" }
             ];
 
@@ -543,20 +608,158 @@
             const providerSelect = document.getElementById('providerSelect');
             const sportSelect = document.getElementById('sportSelect');
             const statusSelect = document.getElementById('statusSelect');
-            const mappingStatusSelect = document.getElementById('mappingStatusSelect');
+            const tournamentInput = document.getElementById('tournamentInput');
+            const tournamentOptions = document.getElementById('tournamentOptions');
             const searchInput = document.getElementById('searchInput');
-            const mergeModal = document.getElementById('mergeModal');
-            const mergeSourceEvent = document.getElementById('mergeSourceEvent');
-            const mergeTargetEventList = document.getElementById('mergeTargetEventList');
-            const mergeProviderFilter = document.getElementById('mergeProviderFilter');
-            const mergeSearchInput = document.getElementById('mergeSearchInput');
+            const eventStartFrom = document.getElementById('eventStartFrom');
+            const eventStartTo = document.getElementById('eventStartTo');
             const messageDetailsModal = document.getElementById('messageDetailsModal');
+            const linkEventsModal = document.getElementById('linkEventsModal');
+            const linkProviderFilter = document.getElementById('linkProviderFilter');
+            const linkTournamentInput = document.getElementById('linkTournamentInput');
+            const linkTournamentOptions = document.getElementById('linkTournamentOptions');
+            const linkEventSearch = document.getElementById('linkEventSearch');
+            const linkEventsBody = document.getElementById('linkEventsBody');
+            const confirmLinkEventsBtn = document.getElementById('confirmLinkEventsBtn');
             const internalMessagePayload = document.getElementById('internalMessagePayload');
             const sourceMessagePayload = document.getElementById('sourceMessagePayload');
-            const connectSelectedBtn = document.getElementById('connectSelectedBtn');
-            const selectedEventIds = new Set();
+            let events = buildMasterEvents(providerEvents);
             let currentEvent = events[0];
-            let selectedMergeTargetId = '';
+            let selectedLinkGroupId = '';
+            let selectedProviderEventId = '';
+
+            function uniqueValues(values) {
+                return [...new Set(values.filter(Boolean))].sort();
+            }
+
+            function buildMasterEvents(rows) {
+                const groups = new Map();
+                rows.forEach(event => {
+                    if (!groups.has(event.group)) groups.set(event.group, []);
+                    groups.get(event.group).push(event);
+                });
+                return [...groups.values()].map(groupEvents => {
+                    const leadEvent = groupEvents[0];
+                    const providers = uniqueValues(groupEvents.map(event => event.provider));
+                    const leadingFeedProvider = providers.includes('ExeFeed') ? 'ExeFeed' : providers[0];
+                    const providerIds = groupEvents.map(event => `${event.provider}: ${event.providerId}`);
+                    return {
+                        ...leadEvent,
+                        id: leadEvent.group,
+                        providerId: providerIds.join(', '),
+                        provider: providers.join(', '),
+                        leadingFeedProvider,
+                        providerEvents: groupEvents,
+                        sourceEventIds: groupEvents.map(event => event.id)
+                    };
+                });
+            }
+
+            function populateTournamentOptions() {
+                tournamentOptions.innerHTML = uniqueValues(events.map(event => event.competition))
+                    .map(tournament => `<option value="${tournament}"></option>`)
+                    .join('');
+            }
+
+            function populateMessageProviderOptions() {
+                const providerFilter = document.getElementById('messageProviderFilter');
+                const providers = uniqueValues(currentEvent.providerEvents.map(event => event.provider));
+                providerFilter.innerHTML = '<option value="all" selected>All</option>' +
+                    providers.map(provider => `<option value="${provider}">${provider}</option>`).join('');
+            }
+
+            function linkEvents(targetGroupId) {
+                providerEvents
+                    .filter(event => event.group === targetGroupId)
+                    .forEach(event => {
+                        if (!event.linkOrigin) {
+                            event.linkOrigin = {
+                                group: event.group,
+                                internalId: event.internalId
+                            };
+                        }
+                        event.group = currentEvent.id;
+                        event.internalId = currentEvent.internalId;
+                    });
+                events = buildMasterEvents(providerEvents);
+                currentEvent = events.find(event => event.id === currentEvent.id) || events[0];
+                renderTable();
+                showEventDetail(currentEvent.id);
+            }
+
+            function unlinkProviderEvent(providerEventId) {
+                const providerEvent = providerEvents.find(event => event.id === providerEventId);
+                if (!providerEvent || providerEvent.group !== currentEvent.id || currentEvent.providerEvents.length < 2) return;
+
+                const originalGroup = providerEvent.linkOrigin?.group || `G-${providerEvent.id}`;
+                const originalInternalId = providerEvent.linkOrigin?.internalId || `event:${providerEvent.providerId}`;
+                providerEvent.group = originalGroup;
+                providerEvent.internalId = originalInternalId;
+                delete providerEvent.linkOrigin;
+
+                events = buildMasterEvents(providerEvents);
+                currentEvent = events.find(event => event.id === currentEvent.id) || events[0];
+                renderTable();
+                showEventDetail(currentEvent.id);
+            }
+
+            function linkEventCandidates() {
+                const providerVal = linkProviderFilter.value;
+                const tournamentVal = linkTournamentInput.value.trim().toLowerCase();
+                const searchVal = linkEventSearch.value.trim().toLowerCase();
+                return events.filter(event => {
+                    const providerMatch = providerVal === 'all' || event.providerEvents.some(source => source.provider === providerVal);
+                    const sportMatch = event.sport === currentEvent.sport;
+                    const tournamentMatch = !tournamentVal || event.competition.toLowerCase().includes(tournamentVal);
+                    const searchMatch = !searchVal ||
+                        event.internalId.toLowerCase().includes(searchVal) ||
+                        event.providerId.toLowerCase().includes(searchVal) ||
+                        event.desc.toLowerCase().includes(searchVal) ||
+                        event.sport.toLowerCase().includes(searchVal) ||
+                        event.competition.toLowerCase().includes(searchVal);
+                    return event.id !== currentEvent.id && providerMatch && sportMatch && tournamentMatch && searchMatch;
+                });
+            }
+
+            function populateLinkProviderFilter() {
+                const providers = uniqueValues(providerEvents.map(event => event.provider));
+                linkProviderFilter.innerHTML = '<option value="all" selected>All</option>' +
+                    providers.map(provider => `<option value="${provider}">${provider}</option>`).join('');
+            }
+
+            function populateLinkTournamentOptions() {
+                linkTournamentOptions.innerHTML = uniqueValues(events.map(event => event.competition))
+                    .map(tournament => `<option value="${tournament}"></option>`)
+                    .join('');
+            }
+
+            function renderLinkEventRows() {
+                const candidates = linkEventCandidates();
+                if (!candidates.some(event => event.id === selectedLinkGroupId)) {
+                    selectedLinkGroupId = '';
+                }
+                confirmLinkEventsBtn.disabled = !selectedLinkGroupId;
+                linkEventsBody.innerHTML = candidates.length ? candidates.map(event => `
+                    <tr class="link-event-row ${event.id === selectedLinkGroupId ? 'selected' : ''}" data-group-id="${event.id}">
+                        <td><input type="radio" name="linkEventTarget" ${event.id === selectedLinkGroupId ? 'checked' : ''} aria-label="Select event to link"></td>
+                        <td class="market-name">${event.desc}</td>
+                        <td>${event.internalId}</td>
+                        <td>${event.startTime}</td>
+                        <td>${event.competition}</td>
+                    </tr>
+                `).join('') : '<tr><td colspan="5" style="text-align: center; color: #888; font-style: italic; padding: 18px;">No events found.</td></tr>';
+            }
+
+            function openLinkEventsModal() {
+                selectedLinkGroupId = '';
+                document.getElementById('linkEventsSubtitle').textContent = `Select an event to link with ${currentEvent.desc}.`;
+                linkTournamentInput.value = '';
+                linkEventSearch.value = '';
+                populateLinkProviderFilter();
+                populateLinkTournamentOptions();
+                renderLinkEventRows();
+                linkEventsModal.style.display = 'flex';
+            }
 
             function statusClass(status) {
                 if (status === 'Live') return 'status-mapped';
@@ -571,51 +774,23 @@
             }
 
             function marketsForEvent(event) {
-                return eventMarkets.filter(market => market.eventId === event.id);
-            }
-
-            function calculatedMappingStatus(event) {
-                const entityStatuses = [
-                    event.sportMapping,
-                    event.categoryMapping,
-                    event.tournamentMapping,
-                    ...marketsForEvent(event).map(market => market.status)
-                ];
-                if (entityStatuses.every(status => status === 'Mapped')) return 'Mapped';
-                if (entityStatuses.some(status => status === 'Mapped')) return 'Partially mapped';
-                return 'Unmapped';
-            }
-
-            function connectedEvents(event) {
-                return events.filter(item => item.id !== event.id && item.group === event.group);
-            }
-
-            function connectionStatus(event) {
-                return connectedEvents(event).length > 0 ? 'Connected' : 'Not connected';
-            }
-
-            function connectionStatusClass(event) {
-                return connectedEvents(event).length > 0 ? 'status-mapped' : 'status-unmapped';
+                const eventIds = event.sourceEventIds || [event.id];
+                return eventMarkets.filter(market => eventIds.includes(market.eventId));
             }
 
             function mapLink(type, event, market = null) {
-                if (type === 'sport') {
-                    return `../../sports/map_sport.html?provider=${encodeURIComponent(event.provider)}&provName=${encodeURIComponent(event.sport)}`;
-                }
-                if (type === 'category') {
-                    return `../../categories/map_category.html?provider=${encodeURIComponent(event.provider)}&provId=${encodeURIComponent(event.category)}&provName=${encodeURIComponent(event.category)}`;
-                }
                 if (type === 'market') {
+                    const sourceEvent = event.providerEvents.find(item => item.id === market.eventId) || event.providerEvents[0];
                     const params = new URLSearchParams({
-                        provider: event.provider,
-                        sport: event.sport,
+                        provider: sourceEvent.provider,
+                        sport: sourceEvent.sport,
                         market: market.providerMarket,
                         marketId: market.marketId,
                         internalId: market.internalId
                     });
                     return `../../mapping/mapping.html?${params.toString()}`;
                 }
-                return `../../tournaments/map_tournament.html?provider=${encodeURIComponent(event.provider)}&sport=${encodeURIComponent(event.sport)}&category=${encodeURIComponent(event.category)}&provId=${encodeURIComponent(event.competition)}&provName=${encodeURIComponent(event.competition)}`;
+                return '#';
             }
 
             function payloadFor(message, event, direction) {
@@ -669,158 +844,71 @@
                 };
             }
 
-            function mappingRow(label, status, type, event) {
-                return `
-                    <div class="detail-row">
-                        <strong>${label}:</strong>
-                        <span class="mapping-status-line">
-                            <span>${event[type === 'sport' ? 'sport' : type === 'category' ? 'category' : 'competition']} <span class="status-badge ${mappingStatusClass(status)}">${status}</span></span>
-                            <a href="${mapLink(type, event)}" class="btn-action" style="text-decoration: none;">Map</a>
-                        </span>
-                    </div>
-                `;
-            }
-
             function filteredRows() {
                 const providerVal = providerSelect.value;
                 const sportVal = sportSelect.value;
                 const statusVal = statusSelect.value;
-                const mappingStatusVal = mappingStatusSelect.value;
+                const tournamentVal = tournamentInput.value.trim().toLowerCase();
                 const searchVal = searchInput.value.toLowerCase();
+                const startFrom = eventStartFrom.value;
+                const startTo = eventStartTo.value;
 
                 const rows = events.filter(event => {
-                    const providerMatch = providerVal === 'all' || event.provider === providerVal;
+                    const eventStartTime = parseEventStartTime(event.startTime);
+                    const providerMatch = providerVal === 'all' || event.providerEvents.some(source => source.provider === providerVal);
                     const sportMatch = sportVal === 'all' || event.sport === sportVal;
                     const statusMatch = statusVal === 'all' || event.status === statusVal;
-                    const mappingStatusMatch = mappingStatusVal === 'all' || calculatedMappingStatus(event).toLowerCase() === mappingStatusVal;
+                    const tournamentMatch = !tournamentVal || event.competition.toLowerCase().includes(tournamentVal);
+                    const startFromMatch = !startFrom || eventStartTime >= new Date(`${startFrom}T00:00:00`);
+                    const startToMatch = !startTo || eventStartTime <= new Date(`${startTo}T23:59:59`);
                     const searchMatch = event.id.toLowerCase().includes(searchVal) ||
                         event.providerId.toLowerCase().includes(searchVal) ||
                         event.desc.toLowerCase().includes(searchVal) ||
                         event.competition.toLowerCase().includes(searchVal);
-                    return providerMatch && sportMatch && statusMatch && mappingStatusMatch && searchMatch;
+                    return providerMatch && sportMatch && statusMatch && tournamentMatch && startFromMatch && startToMatch && searchMatch;
                 });
-                return rows.sort((a, b) => {
-                    const aSelected = selectedEventIds.has(a.id) ? 0 : 1;
-                    const bSelected = selectedEventIds.has(b.id) ? 0 : 1;
-                    if (aSelected !== bSelected) return aSelected - bSelected;
-                    return a.startTime.localeCompare(b.startTime);
-                });
+                return rows.sort((a, b) => a.startTime.localeCompare(b.startTime));
             }
 
-            function openMerge(eventId) {
-                const source = events.find(event => event.id === eventId) || currentEvent;
-                mergeSourceEvent.value = `${source.desc} (${source.provider})`;
-                mergeModal.dataset.sourceId = source.id;
-                mergeSearchInput.value = '';
-                selectedMergeTargetId = '';
-                renderMergeProviders(source);
-                renderMergeTargets(source);
-                mergeModal.style.display = 'flex';
-            }
-
-            function mergeCandidates(source) {
-                return events.filter(event => event.id !== source.id && event.group !== source.group);
-            }
-
-            function renderMergeProviders(source) {
-                const providers = [...new Set(mergeCandidates(source).map(event => event.provider))].sort();
-                mergeProviderFilter.innerHTML = '<option value="all" selected>All</option>' +
-                    providers.map(provider => `<option value="${provider}">${provider}</option>`).join('');
-            }
-
-            function renderMergeTargets(source = events.find(event => event.id === mergeModal.dataset.sourceId)) {
-                if (!source) return;
-                const providerVal = mergeProviderFilter.value;
-                const searchVal = mergeSearchInput.value.trim().toLowerCase();
-                const candidates = mergeCandidates(source).filter(event => {
-                    const providerMatch = providerVal === 'all' || event.provider === providerVal;
-                    const searchMatch = !searchVal ||
-                        event.desc.toLowerCase().includes(searchVal) ||
-                        event.providerId.toLowerCase().includes(searchVal) ||
-                        event.sport.toLowerCase().includes(searchVal) ||
-                        event.category.toLowerCase().includes(searchVal) ||
-                        event.competition.toLowerCase().includes(searchVal);
-                    return providerMatch && searchMatch;
-                });
-                if (!candidates.some(event => event.id === selectedMergeTargetId)) {
-                    selectedMergeTargetId = candidates[0]?.id || '';
-                }
-                mergeTargetEventList.innerHTML = candidates.length ? candidates.map(event => `
-                    <tr class="merge-candidate-row ${event.id === selectedMergeTargetId ? 'selected' : ''}" data-id="${event.id}">
-                        <td><input type="radio" name="mergeTargetEvent" ${event.id === selectedMergeTargetId ? 'checked' : ''} aria-label="Select matching event"></td>
-                        <td class="market-name">${event.desc}</td>
-                        <td>${event.provider}</td>
-                        <td style="color: #6c757d;">${event.providerId}</td>
-                        <td>${event.startTime}</td>
-                        <td>${event.competition}</td>
-                    </tr>
-                `).join('') : '<tr><td colspan="6" style="text-align: center; color: #888; font-style: italic; padding: 18px;">No matching events found.</td></tr>';
-                document.getElementById('confirmMergeBtn').disabled = !selectedMergeTargetId;
-                document.querySelectorAll('.merge-candidate-row').forEach(row => {
-                    row.addEventListener('click', () => {
-                        selectedMergeTargetId = row.dataset.id;
-                        renderMergeTargets(source);
-                    });
-                });
+            function parseEventStartTime(value) {
+                const match = value.match(/^(\d{2})\.(\d{2})\.(\d{4})\.\s+(\d{2}):(\d{2})$/);
+                if (!match) return new Date(0);
+                const [, day, month, year, hour, minute] = match;
+                return new Date(Number(year), Number(month) - 1, Number(day), Number(hour), Number(minute));
             }
 
             function renderTable() {
                 tableHead.innerHTML = `
                     <tr>
-                        <th style="width: 48px;">Select</th>
                         <th>Event ID</th>
-                        <th>Provider Event ID</th>
-                        <th>Feed Provider</th>
                         <th>Start Time</th>
                         <th>Sport</th>
+                        <th>Tournament</th>
                         <th>Description</th>
-                        <th>Status</th>
-                        <th>Mapping</th>
-                        <th>Connection</th>
                         <th style="text-align: right;">Action</th>
                     </tr>
                 `;
 
                 const rows = filteredRows();
                 if (rows.length === 0) {
-                    tableBody.innerHTML = '<tr><td colspan="11" style="text-align: center; color: #888; font-style: italic; padding: 20px;">No events found.</td></tr>';
+                    tableBody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #888; font-style: italic; padding: 20px;">No events found.</td></tr>';
                     return;
                 }
 
-                tableBody.innerHTML = rows.map(event => {
-                    const isSelected = selectedEventIds.has(event.id);
-                    return `
-                    <tr class="${isSelected ? 'selected-event-row' : ''}">
-                        <td><input type="checkbox" class="event-select-checkbox" data-id="${event.id}" ${isSelected ? 'checked' : ''} aria-label="Select event"></td>
-                        <td style="font-weight: 600; color: #007bff;">${event.internalId}${isSelected ? '<span class="pin-indicator">Pinned</span>' : ''}</td>
-                        <td style="color: #6c757d;">${event.providerId}</td>
-                        <td style="font-weight: 500;">${event.provider}</td>
+                tableBody.innerHTML = rows.map(event => `
+                    <tr>
+                        <td style="font-weight: 600; color: #007bff;">${event.internalId}</td>
                         <td>${event.startTime}</td>
                         <td>${event.sport}</td>
+                        <td>${event.competition}</td>
                         <td class="market-name">${event.desc}</td>
-                        <td><span class="status-badge ${statusClass(event.status)}">${event.status}</span></td>
-                        <td><span class="status-badge ${mappingStatusClass(calculatedMappingStatus(event))}">${calculatedMappingStatus(event)}</span></td>
-                        <td><span class="status-badge ${connectionStatusClass(event)}">${connectionStatus(event)}</span></td>
                         <td style="text-align: right;">
                             <span class="row-actions">
                                 <button type="button" class="btn-action view-event-btn" data-id="${event.id}" style="background-color: #007bff;">View</button>
                             </span>
                         </td>
                     </tr>
-                    `;
-                }).join('');
-
-                document.querySelectorAll('.event-select-checkbox').forEach(checkbox => {
-                    checkbox.addEventListener('change', () => {
-                        if (checkbox.checked) {
-                            selectedEventIds.add(checkbox.dataset.id);
-                        } else {
-                            selectedEventIds.delete(checkbox.dataset.id);
-                        }
-                        connectSelectedBtn.disabled = selectedEventIds.size < 2;
-                        renderTable();
-                    });
-                });
+                `).join('');
 
                 document.querySelectorAll('.view-event-btn').forEach(button => {
                     button.addEventListener('click', () => showEventDetail(button.dataset.id));
@@ -829,19 +917,19 @@
 
             function showEventDetail(eventId) {
                 currentEvent = events.find(event => event.id === eventId) || events[0];
+                if (!currentEvent.providerEvents.some(event => event.id === selectedProviderEventId)) {
+                    selectedProviderEventId = currentEvent.providerEvents[0]?.id || '';
+                }
                 document.getElementById('detailTitle').textContent = currentEvent.desc.replace(' - ', ' vs ');
                 document.getElementById('detailUpdatedAt').textContent = `Last updated at ${currentEvent.updatedAt}`;
                 document.getElementById('eventDetailGrid').innerHTML = `
                     <div>
-                        <div class="detail-row"><strong>Internal ID:</strong><span>${currentEvent.internalId}</span></div>
-                        <div class="detail-row"><strong>Provider ID:</strong><span>${currentEvent.providerId}</span></div>
-                        <div class="detail-row"><strong>Connection:</strong><span><span class="status-badge ${connectionStatusClass(currentEvent)}">${connectionStatus(currentEvent)}</span></span></div>
-                        <div class="detail-row"><strong>Event mapping:</strong><span><span class="status-badge ${mappingStatusClass(calculatedMappingStatus(currentEvent))}">${calculatedMappingStatus(currentEvent)}</span></span></div>
-                        ${mappingRow('Sport', currentEvent.sportMapping, 'sport', currentEvent)}
-                        ${mappingRow('Category', currentEvent.categoryMapping, 'category', currentEvent)}
+                        <div class="detail-row"><strong>Event ID:</strong><span>${currentEvent.internalId}</span></div>
+                        <div class="detail-row"><strong>Sport:</strong><span>${currentEvent.sport}</span></div>
+                        <div class="detail-row"><strong>Category:</strong><span>${currentEvent.category}</span></div>
                     </div>
                     <div>
-                        ${mappingRow('Tournament', currentEvent.tournamentMapping, 'tournament', currentEvent)}
+                        <div class="detail-row"><strong>Tournament:</strong><span>${currentEvent.competition}</span></div>
                         <div class="detail-row"><strong>Season:</strong><span>${currentEvent.season}</span></div>
                         <div class="detail-row"><strong>Stage:</strong><span>${currentEvent.stage}</span></div>
                     </div>
@@ -849,36 +937,63 @@
                         <div class="detail-row"><strong>Start time:</strong><span>${currentEvent.startTime}</span></div>
                         <div class="detail-row"><strong>Venue:</strong><span>${currentEvent.venue}</span></div>
                         <div class="detail-row"><strong>Status:</strong><span>${currentEvent.status}</span></div>
-                        <div class="detail-row"><strong>Provider:</strong><span>${currentEvent.provider}</span></div>
-                        <div class="detail-row"><strong>Connected with:</strong><span class="connection-summary">${connectedEvents(currentEvent).length ? connectedEvents(currentEvent).map(event => `<span>${event.provider} - ${event.providerId} (${event.desc})</span>`).join('') : '<span style="color: #888; font-style: italic;">No connected provider events.</span>'}</span></div>
+                        <div class="detail-row"><strong>Feed Providers:</strong><span>${currentEvent.provider}</span></div>
+                        <div class="detail-row"><strong>Provider IDs:</strong><span>${currentEvent.providerId}</span></div>
                     </div>
                 `;
+                renderLinkedEvents();
                 renderEventMarkets();
                 eventsListView.style.display = 'none';
                 messageFilterView.style.display = 'none';
                 eventDetailView.style.display = 'block';
             }
 
+            function renderLinkedEvents() {
+                const section = document.getElementById('linkedEventsSection');
+                const list = document.getElementById('linkedEventsList');
+                const linkedProviderEvents = currentEvent.providerEvents;
+                section.style.display = linkedProviderEvents.length ? 'block' : 'none';
+                list.innerHTML = linkedProviderEvents.map(event => `
+                    <div class="linked-event-row ${event.id === selectedProviderEventId ? 'selected' : ''}">
+                        <div>
+                            <strong>${event.desc}</strong>
+                            <div class="linked-event-meta">${event.provider} · ${event.providerId} · ${event.startTime} · <span class="status-badge ${statusClass(event.status)}">${event.status}</span></div>
+                        </div>
+                        <div class="linked-event-actions">
+                            <button type="button" class="btn-action select-provider-event-btn" data-provider-event-id="${event.id}" style="background-color: #007bff;">Markets</button>
+                            ${linkedProviderEvents.length > 1
+                                ? `<button type="button" class="btn-action unlink-event-btn" data-provider-event-id="${event.id}">Remove link</button>`
+                                : ''}
+                        </div>
+                    </div>
+                `).join('');
+            }
+
             function renderEventMarkets() {
-                const rows = marketsForEvent(currentEvent);
-                const mappedCount = rows.filter(market => market.status === 'Mapped').length;
+                const providerEvent = currentEvent.providerEvents.find(event => event.id === selectedProviderEventId) || currentEvent.providerEvents[0];
+                if (!providerEvent) return;
+                const rows = eventMarkets.filter(market => market.eventId === providerEvent.id);
+                document.getElementById('eventMarketsTitle').textContent = `Provider markets: ${providerEvent.provider}`;
                 document.getElementById('eventMarketsSummary').textContent = rows.length
-                    ? `${mappedCount} of ${rows.length} mapped`
-                    : 'No markets received';
+                    ? `${rows.length} markets · Event status: ${providerEvent.status}`
+                    : `No markets received · Event status: ${providerEvent.status}`;
                 document.getElementById('eventMarketsBody').innerHTML = rows.length ? rows.map(market => `
                     <tr>
                         <td style="font-weight: 600; color: #6c757d;">${market.marketId}</td>
                         <td class="market-name">${market.providerMarket}</td>
-                        <td>${market.internalMarket}</td>
                         <td><span class="status-badge ${mappingStatusClass(market.status)}">${market.status}</span></td>
-                        <td style="text-align: right;"><a href="${mapLink('market', currentEvent, market)}" class="btn-action" style="text-decoration: none;">Map</a></td>
+                        <td>${market.internalId && market.internalId !== '-' ? market.internalMarket : '<span style="color: #98a2b3;">-</span>'}</td>
+                        <td style="text-align: right;">${market.internalId && market.internalId !== '-'
+                            ? `<a href="../../view_hermes_market.html?id=${encodeURIComponent(market.internalId)}&market=${encodeURIComponent(market.internalMarket)}&sport=${encodeURIComponent(providerEvent.sport)}" class="btn-action" style="background-color: #007bff; text-decoration: none; display: inline-block;">View</a>`
+                            : '<span style="color: #98a2b3;">-</span>'}</td>
                     </tr>
-                `).join('') : '<tr><td colspan="5" style="text-align: center; color: #888; font-style: italic;">No markets found for this event.</td></tr>';
+                `).join('') : '<tr><td colspan="5" style="text-align: center; color: #888; font-style: italic;">No markets found for this provider event.</td></tr>';
             }
 
             function filteredMessages() {
                 const typeVal = document.getElementById('messageTypeFilter').value.toLowerCase();
                 const searchVal = document.getElementById('messageSearchInput').value.toLowerCase();
+                const providerVal = document.getElementById('messageProviderFilter').value;
                 const dateFrom = document.getElementById('messageDateFrom').value;
                 const dateTo = document.getElementById('messageDateTo').value;
                 return messages.filter(message => {
@@ -886,8 +1001,9 @@
                     const fromMatch = !dateFrom || messageDate >= new Date(`${dateFrom}T00:00:00`);
                     const toMatch = !dateTo || messageDate <= new Date(`${dateTo}T23:59:59`);
                     const typeMatch = typeVal === 'all' || message.type.toLowerCase().includes(typeVal);
+                    const providerMatch = providerVal === 'all' || message.provider === providerVal;
                     const searchMatch = message.messageId.toLowerCase().includes(searchVal) || message.type.toLowerCase().includes(searchVal);
-                    return message.eventId === currentEvent.id && fromMatch && toMatch && typeMatch && searchMatch;
+                    return currentEvent.sourceEventIds.includes(message.eventId) && fromMatch && toMatch && typeMatch && providerMatch && searchMatch;
                 });
             }
 
@@ -895,14 +1011,12 @@
                 document.getElementById(containerId).innerHTML = rows.length ? rows.map(message => `
                     <tr>
                         <td style="font-weight: 600;">${message.messageId}</td>
+                        <td>${message.provider}</td>
                         <td>${message.time}</td>
                         <td style="font-weight: 600;">${message.type}</td>
                         <td style="text-align: right;"><button type="button" class="btn-action view-message-btn" data-message-id="${message.messageId}" style="background-color: #007bff;">View</button></td>
                     </tr>
-                `).join('') : '<tr><td colspan="4" style="text-align: center; color: #888; font-style: italic;">No messages found for this event.</td></tr>';
-                document.querySelectorAll(`#${containerId} .view-message-btn`).forEach(button => {
-                    button.addEventListener('click', () => openMessageDetails(button.dataset.messageId));
-                });
+                `).join('') : '<tr><td colspan="5" style="text-align: center; color: #888; font-style: italic;">No messages found for this event.</td></tr>';
             }
 
             function renderFilteredEventMessages() {
@@ -911,6 +1025,7 @@
 
             function showMessageFilters() {
                 document.getElementById('messageFilterSubtitle').textContent = currentEvent.desc;
+                populateMessageProviderOptions();
                 renderFilteredEventMessages();
                 eventsListView.style.display = 'none';
                 eventDetailView.style.display = 'none';
@@ -920,63 +1035,76 @@
             function openMessageDetails(messageId) {
                 const message = messages.find(item => item.messageId === messageId);
                 if (!message) return;
-                const event = events.find(item => item.id === message.eventId) || currentEvent;
+                const event = providerEvents.find(item => item.id === message.eventId) || currentEvent.providerEvents[0] || currentEvent;
                 document.getElementById('messageDetailsSubtitle').textContent = `${message.provider} - ${message.messageId} - ${message.type}`;
                 internalMessagePayload.textContent = JSON.stringify(payloadFor(message, event, 'internal'), null, 2);
                 sourceMessagePayload.textContent = JSON.stringify(payloadFor(message, event, 'source'), null, 2);
                 messageDetailsModal.style.display = 'flex';
             }
 
-            [providerSelect, sportSelect, statusSelect, mappingStatusSelect].forEach(field => field.addEventListener('change', renderTable));
+            [providerSelect, sportSelect, statusSelect].forEach(field => field.addEventListener('change', renderTable));
+            tournamentInput.addEventListener('input', renderTable);
             searchInput.addEventListener('input', renderTable);
+            eventStartFrom.addEventListener('change', renderTable);
+            eventStartTo.addEventListener('change', renderTable);
             document.getElementById('backToEventsBtn').addEventListener('click', () => {
                 eventDetailView.style.display = 'none';
                 messageFilterView.style.display = 'none';
                 eventsListView.style.display = 'block';
             });
             document.getElementById('openMessageFiltersBtn').addEventListener('click', showMessageFilters);
+            document.getElementById('openLinkEventsBtn').addEventListener('click', openLinkEventsModal);
             document.getElementById('backToEventDetailBtn').addEventListener('click', () => {
                 messageFilterView.style.display = 'none';
                 eventDetailView.style.display = 'block';
             });
-            document.getElementById('mergeFromDetailBtn').addEventListener('click', () => openMerge(currentEvent.id));
-            connectSelectedBtn.addEventListener('click', () => {
-                const selectedEvents = events.filter(event => selectedEventIds.has(event.id));
-                if (selectedEvents.length < 2) return;
-                const targetGroup = selectedEvents[0].group;
-                selectedEvents.forEach(event => {
-                    event.group = targetGroup;
-                });
-                selectedEventIds.clear();
-                connectSelectedBtn.disabled = true;
-                renderTable();
-            });
             document.getElementById('messageTypeFilter').addEventListener('change', renderFilteredEventMessages);
+            document.getElementById('messageProviderFilter').addEventListener('change', renderFilteredEventMessages);
             document.getElementById('messageSearchInput').addEventListener('input', renderFilteredEventMessages);
             document.getElementById('messageDateFrom').addEventListener('change', renderFilteredEventMessages);
             document.getElementById('messageDateTo').addEventListener('change', renderFilteredEventMessages);
-            document.getElementById('closeMergeModalBtn').addEventListener('click', () => mergeModal.style.display = 'none');
-            document.getElementById('cancelMergeBtn').addEventListener('click', () => mergeModal.style.display = 'none');
-            mergeProviderFilter.addEventListener('change', () => renderMergeTargets());
-            mergeSearchInput.addEventListener('input', () => renderMergeTargets());
+            document.getElementById('filteredEventMessagesBody').addEventListener('click', event => {
+                const viewButton = event.target.closest('.view-message-btn');
+                if (viewButton) openMessageDetails(viewButton.dataset.messageId);
+            });
+            linkProviderFilter.addEventListener('change', renderLinkEventRows);
+            linkTournamentInput.addEventListener('input', renderLinkEventRows);
+            linkEventSearch.addEventListener('input', renderLinkEventRows);
+            linkEventsBody.addEventListener('click', event => {
+                const row = event.target.closest('.link-event-row');
+                if (!row) return;
+                selectedLinkGroupId = row.dataset.groupId;
+                renderLinkEventRows();
+            });
+            document.getElementById('linkedEventsList').addEventListener('click', event => {
+                const selectButton = event.target.closest('.select-provider-event-btn');
+                if (selectButton) {
+                    selectedProviderEventId = selectButton.dataset.providerEventId;
+                    renderLinkedEvents();
+                    renderEventMarkets();
+                    return;
+                }
+                const unlinkButton = event.target.closest('.unlink-event-btn');
+                if (!unlinkButton) return;
+                unlinkProviderEvent(unlinkButton.dataset.providerEventId);
+            });
+            confirmLinkEventsBtn.addEventListener('click', () => {
+                if (!selectedLinkGroupId) return;
+                linkEventsModal.style.display = 'none';
+                linkEvents(selectedLinkGroupId);
+            });
+            document.getElementById('closeLinkEventsBtn').addEventListener('click', () => linkEventsModal.style.display = 'none');
+            document.getElementById('cancelLinkEventsBtn').addEventListener('click', () => linkEventsModal.style.display = 'none');
             document.getElementById('closeMessageDetailsBtn').addEventListener('click', () => messageDetailsModal.style.display = 'none');
             document.getElementById('closeMessageDetailsFooterBtn').addEventListener('click', () => messageDetailsModal.style.display = 'none');
             document.getElementById('copyInternalMessageBtn').addEventListener('click', () => navigator.clipboard?.writeText(internalMessagePayload.textContent));
             document.getElementById('copySourceMessageBtn').addEventListener('click', () => navigator.clipboard?.writeText(sourceMessagePayload.textContent));
-            document.getElementById('confirmMergeBtn').addEventListener('click', () => {
-                const source = events.find(event => event.id === mergeModal.dataset.sourceId);
-                const target = events.find(event => event.id === selectedMergeTargetId);
-                if (source && target) {
-                    target.group = source.group;
-                    mergeModal.style.display = 'none';
-                    renderTable();
-                }
-            });
             window.addEventListener('click', event => {
-                if (event.target === mergeModal) mergeModal.style.display = 'none';
                 if (event.target === messageDetailsModal) messageDetailsModal.style.display = 'none';
+                if (event.target === linkEventsModal) linkEventsModal.style.display = 'none';
             });
 
+            populateTournamentOptions();
             renderTable();
         });
     </script>

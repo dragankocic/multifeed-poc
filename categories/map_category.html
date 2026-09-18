@@ -16,7 +16,7 @@
     <div class="main-content">
         <header class="main-header">
             <h1>Map Provider Category</h1>
-            <p class="page-subtitle">Connect a provider category to the correct internal category.</p>
+            <p class="page-subtitle">Connect a provider category to the correct category.</p>
         </header>
 
         <main class="split-layout">
@@ -26,7 +26,7 @@
                 </div>
 
                 <div class="info-section">
-                    <h2>Connect to Internal Category</h2>
+                    <h2>Connect to Category</h2>
                     <p class="provider-text">Provider: <strong id="displayProvider"></strong></p>
                 </div>
 
@@ -52,7 +52,7 @@
                         <div class="form-column" style="flex: 1;">
                             <div class="form-group" style="margin-bottom: 0;">
                                 <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
-                                    <label>Internal Category</label>
+                                    <label>Category</label>
                                 </div>
                                 <input type="text" id="internalCategorySearch" placeholder="Search categories..." style="margin-bottom: 8px;">
                                 <select id="internalCategorySelect">
@@ -132,10 +132,10 @@
 
             document.getElementById('saveMappingBtn').addEventListener('click', () => {
                 if(!internalCategorySelect.value) {
-                    alert('Please select an internal category before saving.');
+                    alert('Please select an category before saving.');
                     return;
                 }
-                alert(`Mapping saved successfully! Provider category "${provName}" is now mapped to an internal category.`);
+                alert(`Mapping saved successfully! Provider category "${provName}" is now mapped to an category.`);
                 window.location.href = 'category.html';
             });
         });

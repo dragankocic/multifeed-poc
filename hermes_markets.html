@@ -135,7 +135,7 @@
     <div class="main-content">
         <header class="main-header">
             <h1>Markets</h1>
-            <p class="page-subtitle">Browse internal and provider markets, then manage their mappings.</p>
+            <p class="page-subtitle">Browse markets and provider markets, then manage their mappings.</p>
         </header>
 
         <main class="split-layout">
@@ -145,7 +145,7 @@
                         <div class="filter-group">
                             <label>View</label>
                             <div class="workspace-tabs" aria-label="Market mapping perspective">
-                                <button type="button" class="workspace-tab active" data-view="internal">Internal markets</button>
+                                <button type="button" class="workspace-tab active" data-view="internal">Markets</button>
                                 <button type="button" class="workspace-tab" data-view="provider">Provider markets</button>
                             </div>
                         </div>
@@ -153,7 +153,6 @@
                         <div class="filter-group" id="providerFilterGroup" style="display: none;">
                             <label for="providerSelect">Provider</label>
                             <select id="providerSelect">
-                                <option value="all">All</option>
                                 <option value="ExeFeed" selected>ExeFeed</option>
                                 <option value="SportRadar">SportRadar</option>
                                 <option value="SportGenius">SportGenius</option>
@@ -198,6 +197,7 @@
                     </div>
 
                     <div class="actions">
+                        <a href="create_market/create_market.html" class="btn-primary" style="text-decoration: none; display: inline-block;">New market</a>
                     </div>
                 </div>
 

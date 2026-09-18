@@ -52,7 +52,7 @@
                         <button type="button" id="addMappingBtn" class="btn-primary">Add mapping</button>
                     </div>
                     <div class="lazy-section-body">
-                        <p style="margin-bottom: 15px; font-size: 14px; color: #666;">Provider competitor values currently connected to this internal competitor.</p>
+                        <p style="margin-bottom: 15px; font-size: 14px; color: #666;">Provider competitor values currently connected to this competitor.</p>
 
                         <table class="markets-table" style="margin-bottom: 25px;">
                             <thead>
@@ -104,8 +104,7 @@
                     <div class="filter-group">
                         <label for="providerFilter">Provider</label>
                         <select id="providerFilter">
-                            <option value="all" selected>All</option>
-                            <option value="ExeFeed">ExeFeed</option>
+                            <option value="ExeFeed" selected>ExeFeed</option>
                             <option value="SportRadar">SportRadar</option>
                             <option value="SportGenius">SportGenius</option>
                         </select>
@@ -359,7 +358,7 @@
             }
 
             document.getElementById('addMappingBtn').addEventListener('click', () => {
-                providerFilter.value = 'all';
+                providerFilter.value = 'ExeFeed';
                 sportFilter.value = Array.from(sportFilter.options).some(option => option.value === sportName) ? sportName : 'all';
                 providerCompetitorSearch.value = '';
                 mappingCompetitorName.textContent = competitorName;

@@ -112,7 +112,7 @@
     <div class="main-content">
         <header class="main-header" style="background-color: #17a2b8;">
             <h1>Categories</h1>
-            <p class="page-subtitle">Create, inspect, and map categories from either the internal or provider perspective.</p>
+            <p class="page-subtitle">Create, inspect, and map categories from either the entity or provider perspective.</p>
         </header>
 
         <main class="split-layout">
@@ -122,7 +122,7 @@
                         <div class="filter-group">
                             <label>View</label>
                             <div class="workspace-tabs" aria-label="Category mapping perspective">
-                                <button type="button" class="workspace-tab active" data-view="internal">Internal categories</button>
+                                <button type="button" class="workspace-tab active" data-view="internal">Categories</button>
                                 <button type="button" class="workspace-tab" data-view="provider">Provider categories</button>
                             </div>
                         </div>
@@ -130,8 +130,7 @@
                         <div class="filter-group" id="providerFilterGroup" style="display: none;">
                             <label for="providerSelect">Provider</label>
                             <select id="providerSelect">
-                                <option value="all" selected>All</option>
-                                <option value="ExeFeed">ExeFeed</option>
+                                <option value="ExeFeed" selected>ExeFeed</option>
                                 <option value="SportRadar">SportRadar</option>
                                 <option value="SportGenius">SportGenius</option>
                             </select>
@@ -278,8 +277,8 @@
                         <th>Provider</th>
                         <th>Provider Category ID</th>
                         <th>Provider Category Name</th>
-                        <th>Internal Category ID</th>
-                        <th>Internal Category Name</th>
+                        <th>Category ID</th>
+                        <th>Category Name</th>
                         <th>Status</th>
                         <th style="text-align: right;">Action</th>
                     </tr>

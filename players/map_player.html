@@ -16,7 +16,7 @@
     <div class="main-content">
         <header class="main-header">
             <h1>Map Provider Player</h1>
-            <p class="page-subtitle">Connect a provider player to the correct internal player.</p>
+            <p class="page-subtitle">Connect a provider player to the correct player.</p>
         </header>
 
         <main class="split-layout">
@@ -25,7 +25,7 @@
                     <a href="player.html" class="btn-secondary" style="text-decoration: none; display: inline-block;">&larr; Back to list</a>
                 </div>
                 <div class="info-section">
-                    <h2>Connect to Internal Player</h2>
+                    <h2>Connect to Player</h2>
                     <p class="provider-text">Provider: <strong id="displayProvider"></strong></p>
                 </div>
                 <section class="section-card">
@@ -53,7 +53,7 @@
                         <div class="form-column" style="flex: 1;">
                             <div class="form-group">
                                 <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
-                                    <label>Internal Sport</label>
+                                    <label>Sport</label>
                                     <a href="../sports/create_sport.html" class="btn-secondary" style="padding: 6px 10px; text-decoration: none; display: inline-block;">New</a>
                                 </div>
                                 <select id="internalSportSelect">
@@ -64,7 +64,7 @@
                             </div>
                             <div class="form-group">
                                 <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
-                                    <label>Internal Competitor</label>
+                                    <label>Competitor</label>
                                 </div>
                                 <select id="internalCompetitorSelect" disabled>
                                     <option value="" disabled selected>Select sport first</option>
@@ -72,7 +72,7 @@
                             </div>
                             <div class="form-group" style="margin-bottom: 0;">
                                 <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
-                                    <label>Internal Player</label>
+                                    <label>Player</label>
                                 </div>
                                 <input type="text" id="internalPlayerSearch" placeholder="Search players..." style="margin-bottom: 8px;">
                                 <select id="internalPlayerSelect" disabled>
@@ -207,10 +207,10 @@
 
             document.getElementById('saveMappingBtn').addEventListener('click', () => {
                 if(!internalSportSelect.value || !internalCompetitorSelect.value || !internalPlayerSelect.value) {
-                    alert('Please select an internal sport, competitor and player before saving.');
+                    alert('Please select an sport, competitor and player before saving.');
                     return;
                 }
-                alert(`Mapping saved successfully! Provider player "${provName}" is now mapped to an internal player.`);
+                alert(`Mapping saved successfully! Provider player "${provName}" is now mapped to an player.`);
                 window.location.href = 'player.html';
             });
         });

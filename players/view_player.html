@@ -24,7 +24,7 @@
     <div class="main-content">
         <header class="main-header" style="background-color: #17a2b8; color: white;">
             <h1>Player Overview</h1>
-            <p class="page-subtitle">Inspect a player, its competitor relationship, and provider mappings.</p>
+            <p class="page-subtitle">Inspect a player and its provider mappings.</p>
         </header>
 
         <main class="split-layout">
@@ -40,7 +40,6 @@
                     <div style="display: flex; gap: 30px; border-top: 1px dashed #ccc; padding-top: 15px; flex-wrap: wrap;">
                         <p style="font-size: 16px; color: #555;">Player ID: <strong id="displayPlayerId" style="color: #333;"></strong></p>
                         <p style="font-size: 16px; color: #555;">Sport: <strong id="displaySport" style="color: #333;"></strong></p>
-                        <p style="font-size: 16px; color: #555;">Competitor: <strong id="displayCompetitor" style="color: #333;"></strong></p>
                     </div>
                 </section>
 
@@ -53,7 +52,7 @@
                         <button type="button" id="addMappingBtn" class="btn-primary">Add mapping</button>
                     </div>
                     <div class="lazy-section-body">
-                        <p style="margin-bottom: 15px; font-size: 14px; color: #666;">Provider player values currently connected to this internal player.</p>
+                        <p style="margin-bottom: 15px; font-size: 14px; color: #666;">Provider player values currently connected to this player.</p>
 
                         <table class="markets-table" style="margin-bottom: 25px;">
                             <thead>
@@ -85,8 +84,7 @@
                     <div class="filter-group">
                         <label for="providerFilter">Provider</label>
                         <select id="providerFilter">
-                            <option value="all" selected>All</option>
-                            <option value="ExeFeed">ExeFeed</option>
+                            <option value="ExeFeed" selected>ExeFeed</option>
                             <option value="SportRadar">SportRadar</option>
                             <option value="SportGenius">SportGenius</option>
                         </select>
@@ -145,7 +143,6 @@
             document.getElementById('displayPlayerId').textContent = playerId;
             document.getElementById('displayPlayerName').textContent = playerName;
             document.getElementById('displaySport').textContent = sportName;
-            document.getElementById('displayCompetitor').textContent = competitorName;
             document.getElementById('editPlayerLink').href = `create_player.html?edit=true&id=${encodeURIComponent(playerId)}&name=${encodeURIComponent(playerName)}&sport=${encodeURIComponent(sportName)}&competitor=${encodeURIComponent(competitorName)}`;
 
             const providerPlayerMappings = {
@@ -315,7 +312,7 @@
             }
 
             document.getElementById('addMappingBtn').addEventListener('click', () => {
-                providerFilter.value = 'all';
+                providerFilter.value = 'ExeFeed';
                 sportFilter.value = Array.from(sportFilter.options).some(option => option.value === sportName) ? sportName : 'all';
                 competitorFilter.value = Array.from(competitorFilter.options).some(option => option.value === competitorName) ? competitorName : 'all';
                 providerPlayerSearch.value = '';

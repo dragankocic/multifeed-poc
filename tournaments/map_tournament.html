@@ -16,7 +16,7 @@
     <div class="main-content">
         <header class="main-header">
             <h1>Map Provider Tournament</h1>
-            <p class="page-subtitle">Connect a provider tournament to the correct internal tournament.</p>
+            <p class="page-subtitle">Connect a provider tournament to the correct tournament.</p>
         </header>
 
         <main class="split-layout">
@@ -26,7 +26,7 @@
                 </div>
 
                 <div class="info-section">
-                    <h2>Connect to Internal Tournament</h2>
+                    <h2>Connect to Tournament</h2>
                     <p class="provider-text">Provider: <strong id="displayProvider"></strong></p>
                 </div>
 
@@ -62,7 +62,7 @@
                         <div class="form-column" style="flex: 1;">
                             <div class="form-group">
                                 <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
-                                    <label>Internal Sport</label>
+                                    <label>Sport</label>
                                     <a href="../sports/create_sport.html" class="btn-secondary" style="padding: 6px 10px; text-decoration: none; display: inline-block;">New</a>
                                 </div>
                                 <select id="internalSportSelect">
@@ -75,7 +75,7 @@
 
                             <div class="form-group">
                                 <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
-                                    <label>Internal Category</label>
+                                    <label>Category</label>
                                 </div>
                                 <select id="internalCategorySelect" disabled>
                                     <option value="" disabled selected>Select sport first</option>
@@ -84,7 +84,7 @@
 
                             <div class="form-group" style="margin-bottom: 0;">
                                 <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
-                                    <label>Internal Tournament</label>
+                                    <label>Tournament</label>
                                     <a href="create_tournament.html" class="btn-secondary" style="padding: 6px 10px; text-decoration: none; display: inline-block;">New</a>
                                 </div>
                                 <input type="text" id="internalTournamentSearch" placeholder="Search tournaments..." style="margin-bottom: 8px;">
@@ -234,10 +234,10 @@
 
             document.getElementById('saveMappingBtn').addEventListener('click', () => {
                 if(!internalSportSelect.value || !internalCategorySelect.value || !internalTournamentSelect.value) {
-                    alert('Please select an internal sport, category and tournament before saving.');
+                    alert('Please select an sport, category and tournament before saving.');
                     return;
                 }
-                alert(`Mapping saved successfully! Provider tournament "${provName}" is now mapped to an internal tournament.`);
+                alert(`Mapping saved successfully! Provider tournament "${provName}" is now mapped to an tournament.`);
                 window.location.href = 'tournament.html';
             });
         });

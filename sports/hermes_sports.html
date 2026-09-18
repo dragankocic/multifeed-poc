@@ -75,6 +75,22 @@
             white-space: nowrap;
         }
 
+        .activation-modal-actions .btn-secondary {
+            min-height: 42px;
+            padding: 10px 18px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            background: #fff;
+            color: #2c3e50;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .activation-modal-actions .btn-primary {
+            min-height: 42px;
+            padding: 10px 18px;
+        }
+
         @media (max-width: 1300px) {
             .workspace-toolbar {
                 align-items: stretch;
@@ -110,7 +126,7 @@
     <div class="main-content">
         <header class="main-header" style="background-color: #17a2b8;">
             <h1>Sports Management</h1>
-            <p class="page-subtitle">Create, inspect, and map sports from either the internal or provider perspective.</p>
+            <p class="page-subtitle">Create, inspect, and map sports from either the entity or provider perspective.</p>
         </header>
 
         <main class="split-layout">
@@ -120,7 +136,7 @@
                         <div class="filter-group">
                             <label>View</label>
                             <div class="workspace-tabs" aria-label="Sport mapping perspective">
-                                <button type="button" class="workspace-tab active" data-view="internal">Internal sports</button>
+                                <button type="button" class="workspace-tab active" data-view="internal">Sports</button>
                                 <button type="button" class="workspace-tab" data-view="provider">Provider sports</button>
                             </div>
                         </div>
@@ -128,8 +144,7 @@
                         <div class="filter-group" id="providerFilterGroup" style="display: none;">
                             <label for="providerSelect">Provider</label>
                             <select id="providerSelect">
-                                <option value="all" selected>All</option>
-                                <option value="ExeFeed">ExeFeed</option>
+                                <option value="ExeFeed" selected>ExeFeed</option>
                                 <option value="SportRadar">SportRadar</option>
                                 <option value="SportGenius">SportGenius</option>
                             </select>
@@ -162,15 +177,28 @@
         </main>
     </div>
 
+    <div id="activateSportModal" class="modal">
+        <div class="modal-content" style="width: min(520px, 92vw);">
+            <span class="close-modal" id="closeActivateSportModalBtn">&times;</span>
+            <h3>Activate Sport</h3>
+            <p id="activateSportModalText" style="font-size: 15px; line-height: 1.55; color: #555; margin-bottom: 20px;"></p>
+            <div class="activation-modal-actions" style="display: flex; justify-content: flex-end; gap: 10px;">
+                <button type="button" id="cancelActivateSportBtn" class="btn-secondary">Cancel</button>
+                <button type="button" id="confirmActivateSportBtn" class="btn-primary">Activate</button>
+            </div>
+        </div>
+    </div>
+
     <script src="../pagination.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const internalSports = [
-                { id: "S-001", name: "Soccer", abbr: "SOC", leadingFeed: "ExeFeed" },
-                { id: "S-002", name: "Basketball", abbr: "BKB", leadingFeed: "SportRadar" },
-                { id: "S-003", name: "Tennis", abbr: "TEN", leadingFeed: "Bet Genius" },
-                { id: "S-004", name: "Ice Hockey", abbr: "IHO", leadingFeed: "Inherited from Multifeed" },
-                { id: "S-005", name: "Baseball", abbr: "BBS", leadingFeed: "Inherited from Multifeed" }
+                { id: "S-001", name: "Soccer", abbr: "SOC", leadingFeed: "ExeFeed", active: true },
+                { id: "S-002", name: "Basketball", abbr: "BKB", leadingFeed: "SportRadar", active: false },
+                { id: "S-003", name: "Tennis", abbr: "TEN", leadingFeed: "Bet Genius", active: false },
+                { id: "S-004", name: "Ice Hockey", abbr: "IHO", leadingFeed: "Inherited from Multifeed", active: false },
+                { id: "S-005", name: "Baseball", abbr: "BBS", leadingFeed: "Inherited from Multifeed", active: false },
+                { id: "S-006", name: "Moto GP", abbr: "MGP", leadingFeed: "ExeFeed", active: false }
             ];
 
             const providerSports = [
@@ -178,6 +206,7 @@
                 { provider: "SportRadar", provId: "sr:sport:1", provName: "Football", internalId: "S-001", internalName: "Soccer", internalAbbr: "SOC", status: "Mapped" },
                 { provider: "ExeFeed", provId: "B", provName: "Košarka", internalId: "S-002", internalName: "Basketball", internalAbbr: "BKB", status: "Mapped" },
                 { provider: "ExeFeed", provId: "T", provName: "Tenis", internalId: "S-003", internalName: "Tennis", internalAbbr: "TEN", status: "Mapped" },
+                { provider: "ExeFeed", provId: "MGP", provName: "Moto GP", internalId: "S-006", internalName: "Moto GP", internalAbbr: "MGP", status: "Mapped" },
                 { provider: "SportGenius", provId: "sg-10", provName: "Ice Hockey", internalId: "-", internalName: "-", internalAbbr: "-", status: "Unmapped" },
                 { provider: "ExeFeed", provId: "IH", provName: "Hokej na ledu", internalId: "-", internalName: "-", internalAbbr: "-", status: "Unmapped" },
                 { provider: "ExeFeed", provId: "V", provName: "Odbojka", internalId: "-", internalName: "-", internalAbbr: "-", status: "Unmapped" },
@@ -192,7 +221,35 @@
             const searchInput = document.getElementById('searchInput');
             const workspaceHead = document.getElementById('workspaceHead');
             const workspaceBody = document.getElementById('workspaceBody');
+            const activateSportModal = document.getElementById('activateSportModal');
+            const activateSportModalText = document.getElementById('activateSportModalText');
+            let sportToActivate = null;
             let activeView = 'internal';
+
+            const activeSportIds = new Set(JSON.parse(localStorage.getItem('multifeedActiveSports') || '[]'));
+            internalSports.forEach(sport => {
+                sport.active = sport.active || activeSportIds.has(sport.id);
+            });
+
+            function closeActivateSportModal() {
+                sportToActivate = null;
+                activateSportModal.style.display = 'none';
+            }
+
+            function openActivateSportModal(sport) {
+                sportToActivate = sport;
+                activateSportModalText.textContent = `Activate ${sport.name}? Its categories, tournaments, competitors, and players will become available for feed processing and mapping.`;
+                activateSportModal.style.display = 'flex';
+            }
+
+            function activateSport() {
+                if (!sportToActivate) return;
+                sportToActivate.active = true;
+                activeSportIds.add(sportToActivate.id);
+                localStorage.setItem('multifeedActiveSports', JSON.stringify([...activeSportIds]));
+                closeActivateSportModal();
+                renderInternalView();
+            }
 
             function renderInternalView() {
                 workspaceHead.innerHTML = `
@@ -200,7 +257,7 @@
                         <th>ID</th>
                         <th>Name</th>
                         <th>Abbreviation</th>
-                        <th>Leading Feed Provider</th>
+                        <th>Status</th>
                         <th style="text-align: right;">Action</th>
                     </tr>
                 `;
@@ -213,7 +270,7 @@
                 });
 
                 if (rows.length === 0) {
-                    workspaceBody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #888; font-style: italic; padding: 20px;">No sports found.</td></tr>';
+                    workspaceBody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #888; font-style: italic; padding: 20px;">No sports found.</td></tr>';
                     return;
                 }
 
@@ -223,15 +280,24 @@
                         <td style="font-weight: 500; color: #6c757d;">${sport.id}</td>
                         <td class="market-name">${sport.name}</td>
                         <td><span style="background: #e9ecef; padding: 4px 10px; border-radius: 4px; font-size: 13px; font-weight: 600; border: 1px solid #ccc;">${sport.abbr}</span></td>
-                        <td>${sport.leadingFeed}</td>
+                        <td><span class="status-badge ${sport.active ? 'status-mapped' : 'status-unmapped'}">${sport.active ? 'Active' : 'Inactive'}</span></td>
                         <td style="text-align: right;">
                             <span class="row-actions">
-                                    <a href="view_hermes_sport.html?id=${encodeURIComponent(sport.id)}&name=${encodeURIComponent(sport.name)}&abbr=${encodeURIComponent(sport.abbr)}&leadingFeed=${encodeURIComponent(sport.leadingFeed)}" class="btn-action" style="background-color: #007bff; text-decoration: none; display: inline-block;">View</a>
-                                </span>
+                                <a href="view_hermes_sport.html?id=${encodeURIComponent(sport.id)}&name=${encodeURIComponent(sport.name)}&abbr=${encodeURIComponent(sport.abbr)}&leadingFeed=${encodeURIComponent(sport.leadingFeed)}" class="btn-action" style="background-color: #007bff; text-decoration: none; display: inline-block;">View</a>
+                                <a href="create_sport.html?edit=true&id=${encodeURIComponent(sport.id)}&name=${encodeURIComponent(sport.name)}&abbr=${encodeURIComponent(sport.abbr)}&leadingFeed=${encodeURIComponent(sport.leadingFeed)}" class="btn-action" style="background-color: #17a2b8; text-decoration: none; display: inline-block;">Edit</a>
+                                ${sport.active ? '' : `<button type="button" class="btn-action activate-sport-btn" data-id="${sport.id}" style="background-color: #28a745; border: none;">Activate</button>`}
+                            </span>
                             </td>
                         </tr>
                     `;
                 }).join('');
+
+                document.querySelectorAll('.activate-sport-btn').forEach(button => {
+                    button.addEventListener('click', () => {
+                        const sport = internalSports.find(item => item.id === button.dataset.id);
+                        if (sport) openActivateSportModal(sport);
+                    });
+                });
             }
 
             function renderProviderView() {
@@ -240,9 +306,9 @@
                         <th>Provider</th>
                         <th>Provider Sport ID</th>
                         <th>Provider Sport Name</th>
-                        <th>Internal Sport ID</th>
-                        <th>Internal Sport Name</th>
-                        <th>Internal Abbr.</th>
+                        <th>Sport ID</th>
+                        <th>Sport Name</th>
+                        <th>Abbreviation</th>
                         <th>Status</th>
                         <th style="text-align: right;">Action</th>
                     </tr>
@@ -313,6 +379,12 @@
             providerSelect.addEventListener('change', render);
             statusSelect.addEventListener('change', render);
             searchInput.addEventListener('input', render);
+            document.getElementById('closeActivateSportModalBtn').addEventListener('click', closeActivateSportModal);
+            document.getElementById('cancelActivateSportBtn').addEventListener('click', closeActivateSportModal);
+            document.getElementById('confirmActivateSportBtn').addEventListener('click', activateSport);
+            window.addEventListener('click', event => {
+                if (event.target === activateSportModal) closeActivateSportModal();
+            });
 
             render();
         });

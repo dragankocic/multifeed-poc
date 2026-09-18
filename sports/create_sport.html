@@ -39,7 +39,7 @@
                             <input type="text" id="sportName" placeholder="e.g. Volleyball">
                         </div>
 
-                        <div class="form-group">
+                        <div id="sportAbbrGroup" class="form-group">
                             <label for="sportAbbr">Abbreviation</label>
                             <input type="text" id="sportAbbr" placeholder="e.g. VLB" maxlength="3" style="text-transform: uppercase;">
                         </div>
@@ -70,7 +70,6 @@
             const urlParams = new URLSearchParams(window.location.search);
             const isEdit = urlParams.get('edit') === 'true';
             const editName = urlParams.get('name');
-            const editAbbr = urlParams.get('abbr');
             const editLeadingFeed = urlParams.get('leadingFeed');
 
             // Ako je Edit mod, popuni polja i promeni naslove
@@ -81,8 +80,12 @@
                 document.title = 'Edit Sport';
 
                 if (editName) document.getElementById('sportName').value = editName;
-                if (editAbbr) document.getElementById('sportAbbr').value = editAbbr;
-                if (editLeadingFeed) document.getElementById('leadingFeedSelect').value = editLeadingFeed;
+                document.getElementById('sportAbbrGroup').style.display = 'none';
+                const leadingFeedSelect = document.getElementById('leadingFeedSelect');
+                leadingFeedSelect.querySelector('option[value="Inherited from Multifeed"]')?.remove();
+                if (editLeadingFeed && Array.from(leadingFeedSelect.options).some(option => option.value === editLeadingFeed)) {
+                    leadingFeedSelect.value = editLeadingFeed;
+                }
             }
 
             // Logika za čuvanje
@@ -91,13 +94,14 @@
                 const abbr = document.getElementById('sportAbbr').value;
                 const leadingFeed = document.getElementById('leadingFeedSelect').value;
                 
-                if(!name || !abbr || !leadingFeed) {
+                if(!name || !leadingFeed || (!isEdit && !abbr)) {
                     alert("Please fill in all fields.");
                     return;
                 }
 
                 const actionText = isEdit ? "updated" : "created";
-                alert(`Sport "${name}" (${abbr.toUpperCase()}) successfully ${actionText}!`);
+                const sportLabel = isEdit ? `Sport "${name}"` : `Sport "${name}" (${abbr.toUpperCase()})`;
+                alert(`${sportLabel} successfully ${actionText}!`);
                 window.location.href = 'hermes_sports.html';
             });
         });

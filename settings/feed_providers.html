@@ -91,9 +91,76 @@
             gap: 14px;
         }
 
+        .edit-provider-modal {
+            width: min(760px, 92vw);
+        }
+
+        .edit-provider-form {
+            display: grid;
+            gap: 16px;
+        }
+
+        .edit-provider-form .form-row {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(180px, 1fr));
+            gap: 14px;
+        }
+
+        .edit-provider-form input {
+            width: 100%;
+            min-width: 0 !important;
+            height: 42px;
+            box-sizing: border-box;
+        }
+
+        .edit-provider-form input[readonly] {
+            background: #f1f3f5;
+            color: #667085;
+        }
+
+        .edit-feed-row {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 12px;
+            align-items: end;
+            padding: 12px;
+            border: 1px solid #e1e5ea;
+            border-radius: 8px;
+            background: #f8f9fa;
+        }
+
+        .provider-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .danger-button {
+            min-height: 42px;
+            padding: 10px 18px;
+            border: 0;
+            border-radius: 6px;
+            background: #dc3545;
+            color: #fff;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 18px;
+        }
+
         @media (max-width: 980px) {
             .provider-grid,
             .summary-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .edit-provider-form .form-row,
+            .edit-feed-row {
                 grid-template-columns: 1fr;
             }
         }
@@ -115,6 +182,9 @@
                     <section class="provider-card">
                         <div class="provider-card-header">
                             <h2 style="margin: 0;">SportRadar</h2>
+                            <div class="provider-actions">
+                                <button type="button" class="btn-action edit-provider-btn" data-provider="SportRadar">Edit</button>
+                            </div>
                         </div>
 
                         <div class="feed-card expandable expanded">
@@ -123,7 +193,6 @@
                                 <span class="feed-toggle">⌄</span>
                             </div>
                             <div class="feed-details">
-                                <div><div class="feed-label">Number of Groups</div><strong>12</strong></div>
                                 <div><div class="feed-label">Feed Status</div><strong style="color: #28a745;">Up</strong></div>
                                 <div><div class="feed-label">Time of Last Message Received</div><strong>10:42:15 AM</strong></div>
                                 <div><div class="feed-label">Uptime Since Last Failure</div><strong>2h 15m</strong></div>
@@ -136,7 +205,6 @@
                                 <span class="feed-toggle">⌄</span>
                             </div>
                             <div class="feed-details">
-                                <div><div class="feed-label">Number of Groups</div><strong>4</strong></div>
                                 <div><div class="feed-label">Feed Status</div><strong style="color: #ff5b62;">Error</strong></div>
                                 <div><div class="feed-label">Time of Last Message Received</div><strong>08:15:40 AM</strong></div>
                                 <div><div class="feed-label">Failure Reason</div><strong>Connection timeout</strong></div>
@@ -148,6 +216,9 @@
                     <section class="provider-card">
                         <div class="provider-card-header">
                             <h2 style="margin: 0;">ExeFeed</h2>
+                            <div class="provider-actions">
+                                <button type="button" class="btn-action edit-provider-btn" data-provider="ExeFeed">Edit</button>
+                            </div>
                         </div>
 
                         <div class="feed-card expandable expanded">
@@ -156,7 +227,6 @@
                                 <span class="feed-toggle">⌄</span>
                             </div>
                             <div class="feed-details">
-                                <div><div class="feed-label">Number of Groups</div><strong>8</strong></div>
                                 <div><div class="feed-label">Feed Status</div><strong style="color: #28a745;">Up</strong></div>
                                 <div><div class="feed-label">Time of Last Message Received</div><strong>10:41:52 AM</strong></div>
                             </div>
@@ -169,11 +239,56 @@
                     <div class="summary-grid">
                         <div class="feed-card" style="margin: 0;"><strong>Total Providers</strong><strong style="float: right;">2</strong></div>
                         <div class="feed-card" style="margin: 0;"><strong>Total Feeds</strong><strong style="float: right;">3</strong></div>
-                        <div class="feed-card" style="margin: 0;"><strong>Total Groups</strong><strong style="float: right;">24</strong></div>
                     </div>
                 </section>
             </div>
         </main>
+    </div>
+
+    <div id="editProviderModal" class="modal">
+        <div class="modal-content edit-provider-modal">
+            <span class="close-modal" id="closeEditProviderBtn">&times;</span>
+            <h3>Edit Feed Provider</h3>
+            <div class="edit-provider-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="providerNameInput">Provider Name</label>
+                        <input id="providerNameInput" type="text" readonly>
+                    </div>
+                </div>
+                <div>
+                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px;">
+                        <strong>Feeds</strong>
+                        <button type="button" id="addFeedRowBtn" class="btn-action">Add feed</button>
+                    </div>
+                    <div id="editFeedRows" style="display: grid; gap: 10px;">
+                        <div class="edit-feed-row">
+                            <div class="form-group">
+                                <label>Feed Name</label>
+                                <input type="text" placeholder="Feed name" value="Feed 1">
+                            </div>
+                            <button type="button" class="danger-button delete-feed-row-btn">Delete</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button type="button" id="cancelEditProviderBtn" class="btn-secondary">Cancel</button>
+                <button type="button" id="saveProviderBtn" class="btn-primary">Save changes</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="deleteFeedModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" id="closeDeleteFeedBtn">&times;</span>
+            <h3>Delete Feed</h3>
+            <p style="color: #666; margin: 0;">Are you sure you want to delete this feed from the provider form?</p>
+            <div class="modal-actions">
+                <button type="button" id="cancelDeleteFeedBtn" class="btn-secondary">Cancel</button>
+                <button type="button" id="confirmDeleteFeedBtn" class="danger-button">Delete feed</button>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -182,6 +297,95 @@
                 card.addEventListener('click', () => {
                     card.classList.toggle('expanded');
                 });
+            });
+
+            const providerFeeds = {
+                SportRadar: [
+                    { name: 'Feed 1' },
+                    { name: 'Feed 2' }
+                ],
+                ExeFeed: [
+                    { name: 'Feed 1' }
+                ]
+            };
+
+            const editProviderModal = document.getElementById('editProviderModal');
+            const deleteFeedModal = document.getElementById('deleteFeedModal');
+            const editFeedRows = document.getElementById('editFeedRows');
+            let feedRowPendingDelete = null;
+
+            function createFeedRow(feed = { name: '' }) {
+                const row = document.createElement('div');
+                row.className = 'edit-feed-row';
+                row.innerHTML = `
+                    <div class="form-group">
+                        <label>Feed Name</label>
+                        <input type="text" placeholder="Feed name" value="${feed.name}">
+                    </div>
+                    <button type="button" class="danger-button delete-feed-row-btn">Delete</button>
+                `;
+                return row;
+            }
+
+            function bindDeleteFeedButtons() {
+                document.querySelectorAll('.delete-feed-row-btn').forEach(button => {
+                    button.onclick = () => {
+                        feedRowPendingDelete = button.closest('.edit-feed-row');
+                        deleteFeedModal.style.display = 'flex';
+                    };
+                });
+            }
+
+            function openProviderModal(providerName) {
+                document.getElementById('providerNameInput').value = providerName;
+                editFeedRows.innerHTML = '';
+                providerFeeds[providerName].forEach(feed => {
+                    editFeedRows.appendChild(createFeedRow(feed));
+                });
+                editProviderModal.style.display = 'flex';
+                bindDeleteFeedButtons();
+            }
+
+            document.querySelectorAll('.edit-provider-btn').forEach(button => {
+                button.addEventListener('click', event => {
+                    event.stopPropagation();
+                    openProviderModal(button.dataset.provider);
+                });
+            });
+
+            document.getElementById('closeEditProviderBtn').addEventListener('click', () => {
+                editProviderModal.style.display = 'none';
+            });
+            document.getElementById('cancelEditProviderBtn').addEventListener('click', () => {
+                editProviderModal.style.display = 'none';
+            });
+            document.getElementById('saveProviderBtn').addEventListener('click', () => {
+                editProviderModal.style.display = 'none';
+            });
+            document.getElementById('addFeedRowBtn').addEventListener('click', () => {
+                editFeedRows.appendChild(createFeedRow());
+                bindDeleteFeedButtons();
+            });
+            document.getElementById('closeDeleteFeedBtn').addEventListener('click', () => {
+                deleteFeedModal.style.display = 'none';
+            });
+            document.getElementById('cancelDeleteFeedBtn').addEventListener('click', () => {
+                deleteFeedModal.style.display = 'none';
+            });
+            document.getElementById('confirmDeleteFeedBtn').addEventListener('click', () => {
+                if (feedRowPendingDelete && editFeedRows.children.length > 1) {
+                    feedRowPendingDelete.remove();
+                }
+                feedRowPendingDelete = null;
+                deleteFeedModal.style.display = 'none';
+            });
+            window.addEventListener('click', event => {
+                if (event.target === editProviderModal) {
+                    editProviderModal.style.display = 'none';
+                }
+                if (event.target === deleteFeedModal) {
+                    deleteFeedModal.style.display = 'none';
+                }
             });
         });
     </script>

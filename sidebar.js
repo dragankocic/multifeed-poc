@@ -33,12 +33,6 @@ document.addEventListener("DOMContentLoaded", () => {
         'competitors/view_competitor.html',
         'competitors/map_competitor.html'
     ];
-    const playerDataManagementPages = [
-        'players/player.html',
-        'players/create_player.html',
-        'players/view_player.html',
-        'players/map_player.html'
-    ];
     const marketDataManagementPages = [
         'hermes_markets.html',
         'create_market/create_market.html',
@@ -54,9 +48,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const eventPages = [
         'multifeed/messages/messages.html'
     ];
-    const multifeedSettingsPages = [
-        'settings/multifeed.html'
-    ];
     const feedProviderSettingsPages = [
         'settings/feed_providers.html'
     ];
@@ -68,7 +59,6 @@ document.addEventListener("DOMContentLoaded", () => {
         ...categoryDataManagementPages,
         ...tournamentDataManagementPages,
         ...competitorDataManagementPages,
-        ...playerDataManagementPages,
         ...marketDataManagementPages
     ];
     const mappingPages = [
@@ -78,7 +68,6 @@ document.addEventListener("DOMContentLoaded", () => {
         ...dataManagementPages,
         ...mappingPages,
         ...eventPages,
-        ...multifeedSettingsPages,
         ...feedProviderSettingsPages,
         ...consumerSettingsPages
     ];
@@ -103,7 +92,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     <li><a href="${link('categories/category.html')}" class="${activeClassFor(categoryDataManagementPages)}">Category</a></li>
                     <li><a href="${link('tournaments/tournament.html')}" class="${activeClassFor(tournamentDataManagementPages)}">Tournament</a></li>
                     <li><a href="${link('competitors/competitor.html')}" class="${activeClassFor(competitorDataManagementPages)}">Competitor</a></li>
-                    <li><a href="${link('players/player.html')}" class="${activeClassFor(playerDataManagementPages)}">Player</a></li>
                     <li><a href="${link('hermes_markets.html')}" class="${activeClassFor(marketDataManagementPages)}">Market</a></li>
                 </ul>
             </div>
@@ -114,11 +102,11 @@ document.addEventListener("DOMContentLoaded", () => {
                     <span class="sidebar-toggle-icon">▾</span>
                 </button>
                 <ul class="sidebar-menu">
-                    <li><a href="${link('settings/multifeed.html')}" class="${activeClassFor(multifeedSettingsPages)}">Multifeed</a></li>
                     <li><a href="${link('settings/feed_providers.html')}" class="${activeClassFor(feedProviderSettingsPages)}">Feed Providers</a></li>
                     <li><a href="${link('settings/consumers.html')}" class="${activeClassFor(consumerSettingsPages)}">Consumers</a></li>
                 </ul>
             </div>
+
     `;
     const sidebarHTML = `
         <aside class="sidebar">

@@ -44,7 +44,7 @@
 
         .workspace-toolbar .filters {
             display: grid;
-            grid-template-columns: minmax(250px, 330px) minmax(170px, 210px) minmax(190px, 240px) minmax(190px, 230px) minmax(210px, 250px) minmax(260px, 1fr);
+            grid-template-columns: minmax(250px, 330px) minmax(170px, 210px) minmax(190px, 240px) minmax(210px, 250px) minmax(260px, 1fr);
             align-items: flex-end;
             gap: 16px;
             flex: 1;
@@ -122,7 +122,7 @@
                         <div class="filter-group">
                             <label>View</label>
                             <div class="workspace-tabs" aria-label="Player mapping perspective">
-                                <button type="button" class="workspace-tab active" data-view="internal">Internal players</button>
+                                <button type="button" class="workspace-tab active" data-view="internal">Players</button>
                                 <button type="button" class="workspace-tab" data-view="provider">Provider players</button>
                             </div>
                         </div>
@@ -130,8 +130,7 @@
                         <div class="filter-group" id="providerFilterGroup" style="display: none;">
                             <label for="providerSelect">Provider</label>
                             <select id="providerSelect">
-                                <option value="all" selected>All</option>
-                                <option value="ExeFeed">ExeFeed</option>
+                                <option value="ExeFeed" selected>ExeFeed</option>
                                 <option value="SportRadar">SportRadar</option>
                                 <option value="SportGenius">SportGenius</option>
                             </select>
@@ -143,18 +142,6 @@
                                 <option value="all" selected>All</option>
                                 <option value="Soccer">Soccer</option>
                                 <option value="Basketball">Basketball</option>
-                            </select>
-                        </div>
-
-                        <div class="filter-group">
-                            <label for="competitorFilter">Competitor</label>
-                            <select id="competitorFilter">
-                                <option value="all" selected>All</option>
-                                <option value="Liverpool">Liverpool</option>
-                                <option value="Arsenal">Arsenal</option>
-                                <option value="Manchester City">Manchester City</option>
-                                <option value="Real Madrid">Real Madrid</option>
-                                <option value="Boston Celtics">Boston Celtics</option>
                             </select>
                         </div>
 
@@ -235,7 +222,6 @@
             const statusFilterGroup = document.getElementById('statusFilterGroup');
             const providerSelect = document.getElementById('providerSelect');
             const sportFilter = document.getElementById('sportFilter');
-            const competitorFilter = document.getElementById('competitorFilter');
             const statusSelect = document.getElementById('statusSelect');
             const searchInput = document.getElementById('searchInput');
             const workspaceHead = document.getElementById('workspaceHead');
@@ -269,22 +255,19 @@
                         <th>Player ID</th>
                         <th>Player Name</th>
                         <th>Sport</th>
-                        <th>Competitor</th>
                         <th style="text-align: right;">Action</th>
                     </tr>
                 `;
 
                 const searchVal = searchInput.value.toLowerCase();
                 const sportVal = sportFilter.value;
-                const competitorVal = competitorFilter.value;
                 const rows = internalPlayers.filter(player => {
                     const matchesSport = sportVal === 'all' || player.sport === sportVal;
-                    const matchesCompetitor = competitorVal === 'all' || player.competitor === competitorVal;
-                    return matchesSport && matchesCompetitor && commonMatch(player, searchVal);
+                    return matchesSport && commonMatch(player, searchVal);
                 });
 
                 if (rows.length === 0) {
-                    workspaceBody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #888; font-style: italic; padding: 20px;">No players found.</td></tr>';
+                    workspaceBody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #888; font-style: italic; padding: 20px;">No players found.</td></tr>';
                     return;
                 }
 
@@ -293,7 +276,6 @@
                         <td style="font-weight: 500; color: #6c757d;">${player.id}</td>
                         <td class="market-name">${player.name}</td>
                         <td>${player.sport}</td>
-                        <td>${player.competitor}</td>
                         <td style="text-align: right;">
                             <span class="row-actions">
                                 <a href="view_player.html?id=${encodeURIComponent(player.id)}&name=${encodeURIComponent(player.name)}&sport=${encodeURIComponent(player.sport)}&competitor=${encodeURIComponent(player.competitor)}" class="btn-action" style="background-color: #007bff; text-decoration: none; display: inline-block;">View</a>
@@ -317,11 +299,10 @@
                     <tr>
                         <th>Provider</th>
                         <th>Sport</th>
-                        <th>Competitor</th>
                         <th>Provider Player ID</th>
                         <th>Provider Player Name</th>
-                        <th>Internal Player ID</th>
-                        <th>Internal Player Name</th>
+                        <th>Player ID</th>
+                        <th>Player Name</th>
                         <th>Status</th>
                         <th style="text-align: right;">Action</th>
                     </tr>
@@ -329,13 +310,11 @@
 
                 const providerVal = providerSelect.value;
                 const sportVal = sportFilter.value;
-                const competitorVal = competitorFilter.value;
                 const statusVal = statusSelect.value;
                 const searchVal = searchInput.value.toLowerCase();
                 const rows = providerPlayers.filter(player => {
                     const matchesProvider = providerVal === 'all' || player.provider === providerVal;
                     const matchesSport = sportVal === 'all' || player.sport === sportVal;
-                    const matchesCompetitor = competitorVal === 'all' || player.competitor === competitorVal;
                     const matchesStatus = statusVal === 'all' || player.status.toLowerCase() === statusVal;
                     const matchesSearch = player.provider.toLowerCase().includes(searchVal) ||
                         player.sport.toLowerCase().includes(searchVal) ||
@@ -344,11 +323,11 @@
                         player.provName.toLowerCase().includes(searchVal) ||
                         player.internalId.toLowerCase().includes(searchVal) ||
                         player.internalName.toLowerCase().includes(searchVal);
-                    return matchesProvider && matchesSport && matchesCompetitor && matchesStatus && matchesSearch;
+                    return matchesProvider && matchesSport && matchesStatus && matchesSearch;
                 });
 
                 if (rows.length === 0) {
-                    workspaceBody.innerHTML = '<tr><td colspan="9" style="text-align: center; color: #888; font-style: italic; padding: 20px;">No provider players found.</td></tr>';
+                    workspaceBody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: #888; font-style: italic; padding: 20px;">No provider players found.</td></tr>';
                     return;
                 }
 
@@ -366,7 +345,6 @@
                         <tr>
                             <td style="font-weight: 500;">${player.provider}</td>
                             <td>${player.sport}</td>
-                            <td>${player.competitor}</td>
                             <td style="color: #6c757d;">${player.provId}</td>
                             <td class="market-name" style="color: #007bff;">${player.provName}</td>
                             <td style="color: #6c757d;">${player.internalId}</td>
@@ -387,7 +365,7 @@
                 const showProviderFilters = activeView === 'provider';
                 providerFilterGroup.style.display = showProviderFilters ? 'block' : 'none';
                 statusFilterGroup.style.display = showProviderFilters ? 'block' : 'none';
-                document.getElementById('workspaceTable').style.minWidth = activeView === 'provider' ? '1080px' : '760px';
+                document.getElementById('workspaceTable').style.minWidth = activeView === 'provider' ? '950px' : '680px';
                 if (activeView === 'internal') {
                     renderInternalView();
                 } else {
@@ -406,7 +384,6 @@
 
             providerSelect.addEventListener('change', render);
             sportFilter.addEventListener('change', render);
-            competitorFilter.addEventListener('change', render);
             statusSelect.addEventListener('change', render);
             searchInput.addEventListener('input', render);
             document.getElementById('closeDeleteModalBtn').addEventListener('click', closeDeleteModal);

@@ -3,401 +3,284 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Competitors</title>
+    <title>Competitor Workspace</title>
     <link rel="stylesheet" href="../style.css">
     <script src="../auth.js"></script>
     <style>
-        .workspace-tabs {
-            display: inline-flex;
-            gap: 4px;
-            padding: 4px;
-            background: #eef3f4;
-            border: 1px solid #d4dee1;
-            border-radius: 6px;
-            width: 100%;
-            box-sizing: border-box;
-        }
-
-        .workspace-tab {
-            flex: 1;
-            border: 0;
-            border-radius: 4px;
-            padding: 9px 14px;
-            background: transparent;
-            color: #566;
-            font-weight: 700;
-            cursor: pointer;
-        }
-
-        .workspace-tab.active {
-            background: #17a2b8;
-            color: white;
-            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
-        }
-
-        .row-actions {
-            display: inline-flex;
-            justify-content: flex-end;
-            gap: 6px;
-            white-space: nowrap;
-        }
-
-        .workspace-toolbar .filters {
-            display: grid;
-            grid-template-columns: minmax(270px, 350px) minmax(170px, 210px) minmax(170px, 210px) minmax(210px, 250px) minmax(260px, 1fr);
-            align-items: flex-end;
-            gap: 16px;
-            flex: 1;
-        }
-
-        .workspace-toolbar .filter-group {
-            min-height: 66px;
-            justify-content: flex-end;
-        }
-
-        .workspace-toolbar select,
-        .workspace-toolbar input {
-            width: 100%;
-            height: 41px;
-            min-width: 0 !important;
-            box-sizing: border-box;
-        }
-
-        .workspace-toolbar .actions {
-            display: flex;
-            align-items: flex-end;
-            min-height: 66px;
-            flex-shrink: 0;
-        }
-
-        .workspace-toolbar .btn-primary {
-            height: 41px;
-            display: inline-flex !important;
-            align-items: center;
-            justify-content: center;
-            white-space: nowrap;
-        }
-
-        @media (max-width: 1450px) {
-            .workspace-toolbar {
-                align-items: stretch;
-                gap: 16px;
-            }
-
-            .workspace-toolbar .filters {
-                grid-template-columns: repeat(2, minmax(220px, 1fr));
-            }
-        }
-
-        @media (max-width: 760px) {
-            .workspace-toolbar {
-                flex-direction: column;
-            }
-
-            .workspace-toolbar .filters {
-                grid-template-columns: 1fr;
-            }
-
-            .workspace-toolbar .actions,
-            .workspace-toolbar .btn-primary {
-                width: 100%;
-            }
-        }
+        .workspace-tabs { display: inline-flex; gap: 4px; padding: 4px; background: #eef3f4; border: 1px solid #d4dee1; border-radius: 6px; width: 100%; box-sizing: border-box; }
+        .workspace-tab { flex: 1; border: 0; border-radius: 4px; padding: 9px 14px; background: transparent; color: #566; font-weight: 700; cursor: pointer; }
+        .workspace-tab.active { background: #17a2b8; color: #fff; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12); }
+        .workspace-toolbar .filters { display: grid; grid-template-columns: minmax(240px, 300px) repeat(4, minmax(150px, 1fr)); gap: 14px; align-items: end; }
+        .workspace-toolbar .filter-group { min-width: 0; }
+        .workspace-toolbar select, .workspace-toolbar input { width: 100%; min-width: 0 !important; height: 41px; box-sizing: border-box; }
+        .row-actions { display: inline-flex; justify-content: flex-end; gap: 6px; white-space: nowrap; }
+        .detail-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 20px; }
+        .nav-button { min-height: 42px; padding: 10px 16px; border: 1px solid #d1d5db; border-radius: 6px; background: #fff; color: #2c3e50; font-weight: 600; cursor: pointer; }
+        .detail-grid { display: grid; grid-template-columns: repeat(3, minmax(180px, 1fr)); gap: 16px 28px; }
+        .detail-field { display: grid; gap: 4px; padding-bottom: 12px; border-bottom: 1px solid #e9ecef; }
+        .detail-field span { color: #667085; font-size: 13px; }
+        .detail-field strong { color: #344054; font-size: 15px; }
+        .detail-sections { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; margin-top: 20px; }
+        .section-heading { margin: 0; padding: 16px 20px; border-bottom: 1px solid #e9ecef; color: #2c3e50; font-size: 18px; }
+        .member-list { display: grid; gap: 0; }
+        .member-item { display: flex; justify-content: space-between; gap: 14px; padding: 13px 20px; border-bottom: 1px solid #edf0f2; }
+        .member-item:last-child { border-bottom: 0; }
+        .member-item span { color: #667085; font-size: 13px; }
+        .pager { display: flex; align-items: center; justify-content: flex-end; gap: 10px; padding: 14px 16px; color: #667085; font-size: 13px; }
+        .pager button { min-width: 68px; padding: 7px 10px; border: 1px solid #d1d5db; border-radius: 4px; background: #fff; color: #344054; cursor: pointer; font-weight: 600; }
+        .pager button:disabled { opacity: 0.5; cursor: default; }
+        .map-modal-content { width: min(900px, 94vw); padding: 24px; }
+        .map-modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+        .map-modal-actions .btn-secondary { min-height: 42px; padding: 10px 18px; border: 1px solid #d1d5db; border-radius: 6px; background: #fff; color: #2c3e50; font-weight: 600; cursor: pointer; }
+        .map-candidate-row { cursor: pointer; }
+        .map-candidate-row.selected td { background: #eef9fb !important; }
+        .mapping-meta { margin: 0 0 16px; color: #667085; line-height: 1.5; }
+        .mapping-section-header { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 12px 16px 12px 20px; border-bottom: 1px solid #e9ecef; }
+        .mapping-section-header .section-heading { padding: 0; border: 0; }
+        .add-mapping-filters { display: grid; grid-template-columns: minmax(180px, 240px) minmax(240px, 1fr); gap: 14px; margin-bottom: 16px; }
+        .add-mapping-filters input, .add-mapping-filters select, .edit-name-field input { width: 100%; min-width: 0; height: 41px; box-sizing: border-box; padding: 10px 12px; border: 1px solid #cfd5dc; border-radius: 4px; background: #fff; font-size: 15px; }
+        .edit-name-field label { display: block; margin-bottom: 5px; color: #555; font-size: 13px; font-weight: 600; text-transform: uppercase; }
+        @media (max-width: 1250px) { .workspace-toolbar .filters { grid-template-columns: repeat(3, minmax(180px, 1fr)); } }
+        @media (max-width: 900px) { .detail-grid, .detail-sections { grid-template-columns: 1fr; } .workspace-toolbar .filters { grid-template-columns: repeat(2, minmax(180px, 1fr)); } }
+        @media (max-width: 620px) { .workspace-toolbar .filters, .add-mapping-filters { grid-template-columns: 1fr; } .detail-header { align-items: flex-start; flex-direction: column; } }
     </style>
 </head>
 <body>
-    <div id="sidebar-container" data-root=".." data-active="competitor-management"></div>
+    <div id="sidebar-container" data-root=".."></div>
     <script src="../sidebar.js"></script>
-
     <div class="main-content">
         <header class="main-header" style="background-color: #17a2b8;">
-            <h1>Competitors</h1>
-            <p class="page-subtitle">Inspect and map competitors through Sport.</p>
+            <h1>Competitor Workspace</h1>
+            <p class="page-subtitle">Browse internal and provider competitors, including teams, players, drivers, riders, pairs, and crews.</p>
         </header>
-
-        <main class="split-layout">
-            <div class="form-side">
-                <div class="top-bar workspace-toolbar">
-                    <div class="filters">
-                        <div class="filter-group">
-                            <label>View</label>
-                            <div class="workspace-tabs" aria-label="Competitor mapping perspective">
-                                <button type="button" class="workspace-tab active" data-view="internal">Internal competitors</button>
-                                <button type="button" class="workspace-tab" data-view="provider">Provider competitors</button>
-                            </div>
-                        </div>
-
-                        <div class="filter-group" id="providerFilterGroup" style="display: none;">
-                            <label for="providerSelect">Provider</label>
-                            <select id="providerSelect">
-                                <option value="all" selected>All</option>
-                                <option value="ExeFeed">ExeFeed</option>
-                                <option value="SportRadar">SportRadar</option>
-                                <option value="SportGenius">SportGenius</option>
-                            </select>
-                        </div>
-
-                        <div class="filter-group">
-                            <label for="sportFilter">Sport</label>
-                            <select id="sportFilter">
-                                <option value="all" selected>All</option>
-                                <option value="Soccer">Soccer</option>
-                                <option value="Tennis">Tennis</option>
-                                <option value="Formula 1">Formula 1</option>
-                            </select>
-                        </div>
-
-                        <div class="filter-group" id="statusFilterGroup" style="display: none;">
-                            <label for="statusSelect">Mapping status</label>
-                            <select id="statusSelect">
-                                <option value="all" selected>All</option>
-                                <option value="mapped">Mapped</option>
-                                <option value="unmapped">Unmapped</option>
-                            </select>
-                        </div>
-
-                        <div class="filter-group">
-                            <label for="searchInput">Search</label>
-                            <input type="text" id="searchInput" placeholder="Search competitor..." style="padding: 10px 15px; border: 1px solid #ccc; border-radius: 4px; font-size: 15px; background-color: #fdfdfd;">
-                        </div>
-                    </div>
-
-                    <div class="actions">
-                    </div>
+        <main class="split-layout"><div class="form-side">
+            <div id="workspaceView">
+                <div class="top-bar workspace-toolbar"><div class="filters">
+                    <div class="filter-group"><label>View</label><div class="workspace-tabs" aria-label="Competitor perspective"><button type="button" class="workspace-tab active" data-view="internal">Competitors</button><button type="button" class="workspace-tab" data-view="provider">Provider Competitors</button></div></div>
+                    <div id="providerFilterGroup" class="filter-group" style="display: none;"><label for="providerFilter">Feed Provider</label><select id="providerFilter"><option value="ExeFeed" selected>ExeFeed</option><option value="SportRadar">SportRadar</option><option value="SportGenius">SportGenius</option></select></div>
+                    <div class="filter-group"><label for="sportFilter">Sport</label><select id="sportFilter"><option value="all">All</option><option value="Soccer">Soccer</option><option value="Tennis">Tennis</option><option value="Formula 1">Formula 1</option><option value="Moto GP">Moto GP</option></select></div>
+                    <div class="filter-group"><label for="typeFilter">Type</label><select id="typeFilter"></select></div>
+                    <div id="statusFilterGroup" class="filter-group" style="display: none;"><label for="statusFilter">Mapping Status</label><select id="statusFilter"><option value="all">All</option><option value="Mapped">Mapped</option><option value="Unmapped">Unmapped</option></select></div>
+                    <div class="filter-group"><label for="searchInput">Search</label><input id="searchInput" type="text" placeholder="Search by name or ID..."></div>
+                </div></div>
+                <section class="markets-section" style="overflow-x: auto;"><table id="workspaceTable" class="markets-table" style="min-width: 980px;"><thead id="workspaceHead"></thead><tbody id="workspaceBody"></tbody></table><div id="workspacePager" class="pager"></div></section>
+            </div>
+            <div id="detailView" style="display: none;">
+                <div class="detail-header"><div style="display: flex; align-items: center; gap: 12px;"><button type="button" id="backBtn" class="nav-button">&larr;</button><div><h2 id="detailTitle" style="margin: 0; color: #2c3e50; font-size: 28px;"></h2><p id="detailSubtitle" style="margin: 6px 0 0; color: #667085;"></p></div></div><div id="detailActions"></div></div>
+                <section class="markets-section" style="padding: 20px;"><div id="detailGrid" class="detail-grid"></div></section>
+                <div class="detail-sections">
+                    <section class="markets-section"><div class="mapping-section-header"><h3 class="section-heading">Mapped Provider Competitors</h3><button type="button" id="addMappingToCompetitorBtn" class="btn-primary">Add mapping</button></div><table class="markets-table"><thead><tr><th>Provider</th><th>Provider ID</th><th>Provider Name</th><th style="text-align: right;">Action</th></tr></thead><tbody id="mappedProvidersBody"></tbody></table></section>
+                    <section class="markets-section"><h3 id="membersTitle" class="section-heading">Members</h3><div id="membersBody" class="member-list"></div></section>
                 </div>
-
-                <section class="markets-section" style="overflow-x: auto;">
-                    <table class="markets-table" id="workspaceTable" style="min-width: 1080px;">
-                        <thead id="workspaceHead"></thead>
-                        <tbody id="workspaceBody"></tbody>
-                    </table>
-                </section>
             </div>
-        </main>
+        </div></main>
     </div>
-
-    <div id="deleteModal" class="modal">
-        <div class="modal-content">
-            <span class="close-modal" id="closeDeleteModalBtn">&times;</span>
-            <h3>Delete Competitor</h3>
-            <p id="deleteModalText" style="font-size: 14px; line-height: 1.5; color: #555; margin-bottom: 20px;"></p>
-            <div style="display: flex; justify-content: flex-end; gap: 10px;">
-                <button id="cancelDeleteBtn" class="btn-secondary">Cancel</button>
-                <button id="confirmDeleteBtn" class="btn-primary" style="background-color: #dc3545;">Delete</button>
-            </div>
-        </div>
-    </div>
-
-    <script src="../pagination.js"></script>
+    <div id="mapModal" class="modal"><div class="modal-content map-modal-content"><span id="closeMapModalBtn" class="close-modal">&times;</span><h3 style="font-size: 22px; margin: 0 0 8px;">Map Provider Competitor</h3><p id="mapModalSubtitle" class="mapping-meta"></p><table class="markets-table"><thead><tr><th style="width: 44px;">Select</th><th>Competitor ID</th><th>Name</th><th>Sport</th><th>Type</th></tr></thead><tbody id="mapCandidatesBody"></tbody></table><div class="map-modal-actions"><button type="button" id="cancelMapBtn" class="btn-secondary">Cancel</button><button type="button" id="confirmMapBtn" class="btn-primary" disabled>Map Competitor</button></div></div></div>
+    <div id="addMappingModal" class="modal"><div class="modal-content map-modal-content"><span id="closeAddMappingModalBtn" class="close-modal">&times;</span><h3 style="font-size: 22px; margin: 0 0 8px;">Add Provider Competitor Mapping</h3><p id="addMappingModalSubtitle" class="mapping-meta"></p><div class="add-mapping-filters"><div class="filter-group"><label for="addMappingProviderFilter">Feed Provider</label><select id="addMappingProviderFilter"><option value="ExeFeed" selected>ExeFeed</option><option value="SportRadar">SportRadar</option><option value="SportGenius">SportGenius</option></select></div><div class="filter-group"><label for="addMappingSearch">Search</label><input id="addMappingSearch" type="text" placeholder="Search provider competitor or ID..."></div></div><table class="markets-table"><thead><tr><th>Feed Provider</th><th>Provider ID</th><th>Provider Name</th><th>Sport</th><th style="text-align: right;">Action</th></tr></thead><tbody id="availableProviderMappingsBody"></tbody></table><div class="map-modal-actions"><button type="button" id="cancelAddMappingBtn" class="btn-secondary">Cancel</button></div></div></div>
+    <div id="editNameModal" class="modal"><div class="modal-content" style="width: min(480px, 92vw);"><span id="closeEditNameModalBtn" class="close-modal">&times;</span><h3 style="font-size: 22px; margin: 0 0 18px;">Edit Team Name</h3><div class="edit-name-field"><label for="editCompetitorName">Name</label><input id="editCompetitorName" type="text"></div><div class="map-modal-actions"><button type="button" id="cancelEditNameBtn" class="btn-secondary">Cancel</button><button type="button" id="saveEditNameBtn" class="btn-primary">Save Name</button></div></div></div>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            let internalCompetitors = [
-                { id: "CP-001", name: "Arsenal", sport: "Soccer" },
-                { id: "CP-002", name: "Manchester City", sport: "Soccer" },
-                { id: "CP-003", name: "Leeds United", sport: "Soccer" },
-                { id: "CP-004", name: "Real Madrid", sport: "Soccer" },
-                { id: "CP-005", name: "Barcelona", sport: "Soccer" },
-                { id: "CP-006", name: "Bayern Munich", sport: "Soccer" },
-                { id: "CP-007", name: "Carlos Alcaraz", sport: "Tennis" },
-                { id: "CP-008", name: "Novak Djokovic", sport: "Tennis" },
-                { id: "CP-009", name: "Max Verstappen", sport: "Formula 1" },
-                { id: "CP-010", name: "Lewis Hamilton", sport: "Formula 1" }
+            const competitors = [
+                { id: 'CMP-001', name: 'Liverpool', sport: 'Soccer', type: 'Team', subtype: '-', members: ['CMP-101', 'CMP-102', 'CMP-103'] },
+                { id: 'CMP-002', name: 'Arsenal', sport: 'Soccer', type: 'Team', subtype: '-', members: ['CMP-104', 'CMP-105'] },
+                { id: 'CMP-003', name: 'Manchester City', sport: 'Soccer', type: 'Team', subtype: '-', members: ['CMP-106'] },
+                { id: 'CMP-101', name: 'Mohamed Salah', sport: 'Soccer', type: 'Individual', subtype: 'Player' },
+                { id: 'CMP-102', name: 'Virgil van Dijk', sport: 'Soccer', type: 'Individual', subtype: 'Player' },
+                { id: 'CMP-103', name: 'Darwin Nunez', sport: 'Soccer', type: 'Individual', subtype: 'Player' },
+                { id: 'CMP-104', name: 'Bukayo Saka', sport: 'Soccer', type: 'Individual', subtype: 'Player' },
+                { id: 'CMP-105', name: 'Martin Odegaard', sport: 'Soccer', type: 'Individual', subtype: 'Player' },
+                { id: 'CMP-106', name: 'Erling Haaland', sport: 'Soccer', type: 'Individual', subtype: 'Player' },
+                { id: 'CMP-200', name: 'Red Bull Racing', sport: 'Formula 1', type: 'Team', subtype: '-' },
+                { id: 'CMP-201', name: 'Max Verstappen', sport: 'Formula 1', type: 'Individual', subtype: 'Driver' },
+                { id: 'CMP-202', name: 'Lewis Hamilton', sport: 'Formula 1', type: 'Individual', subtype: 'Driver' },
+                { id: 'CMP-301', name: 'Novak Djokovic', sport: 'Tennis', type: 'Individual', subtype: 'Player' },
+                { id: 'CMP-302', name: 'Carlos Alcaraz', sport: 'Tennis', type: 'Individual', subtype: 'Player' },
+                { id: 'CMP-401', name: 'Djokovic / Alcaraz', sport: 'Tennis', type: 'Composite', subtype: 'Pair', members: ['CMP-301', 'CMP-302'] },
+                { id: 'CMP-500', name: 'Ducati Lenovo Team', sport: 'Moto GP', type: 'Team', subtype: '-', members: ['CMP-501'] },
+                { id: 'CMP-501', name: 'Francesco Bagnaia', sport: 'Moto GP', type: 'Individual', subtype: 'Rider' }
             ];
-
             const providerCompetitors = [
-                { provider: "ExeFeed", sport: "Soccer", category: "England", tournament: "Premier League", provId: "1178653", provName: "Arsenal", internalId: "CP-001", internalName: "Arsenal", status: "Mapped" },
-                { provider: "ExeFeed", sport: "Soccer", category: "England", tournament: "Premier League", provId: "1178654", provName: "Manchester City", internalId: "CP-002", internalName: "Manchester City", status: "Mapped" },
-                { provider: "ExeFeed", sport: "Soccer", category: "England", tournament: "Premier League", provId: "1178655", provName: "Liverpool", internalId: "-", internalName: "-", status: "Unmapped" },
-                { provider: "SportRadar", sport: "Soccer", category: "England", tournament: "Premier League", provId: "sr:competitor:42", provName: "Arsenal FC", internalId: "CP-001", internalName: "Arsenal", status: "Mapped" },
-                { provider: "SportRadar", sport: "Soccer", category: "England", tournament: "Premier League", provId: "sr:competitor:17", provName: "Manchester City FC", internalId: "CP-002", internalName: "Manchester City", status: "Mapped" },
-                { provider: "SportRadar", sport: "Tennis", category: "France", tournament: "Roland Garros", provId: "sr:competitor:407573", provName: "Alcaraz, Carlos", internalId: "CP-007", internalName: "Carlos Alcaraz", status: "Mapped" },
-                { provider: "SportRadar", sport: "Formula 1", category: "International", tournament: "Formula 1", provId: "sr:competitor:7135", provName: "Max Verstappen", internalId: "CP-009", internalName: "Max Verstappen", status: "Mapped" },
-                { provider: "SportGenius", sport: "Soccer", category: "Spain", tournament: "LaLiga", provId: "sg-cmp-rma", provName: "Real Madrid CF", internalId: "CP-004", internalName: "Real Madrid", status: "Mapped" },
-                { provider: "SportGenius", sport: "Soccer", category: "Spain", tournament: "LaLiga", provId: "sg-cmp-fcb", provName: "FC Barcelona", internalId: "CP-005", internalName: "Barcelona", status: "Mapped" },
-                { provider: "SportGenius", sport: "Formula 1", category: "International", tournament: "Formula 1", provId: "sg-cmp-leclerc", provName: "Charles Leclerc", internalId: "-", internalName: "-", status: "Unmapped" }
+                { id: 'PC-001', provider: 'ExeFeed', providerId: '1178653', name: 'Arsenal', sport: 'Soccer', type: 'Team', subtype: '-', internalId: 'CMP-002' },
+                { id: 'PC-002', provider: 'SportRadar', providerId: 'sr:competitor:17', name: 'Manchester City FC', sport: 'Soccer', type: 'Team', subtype: '-', internalId: 'CMP-003' },
+                { id: 'PC-003', provider: 'ExeFeed', providerId: '1178655', name: 'Liverpool FC', sport: 'Soccer', type: 'Team', subtype: '-', internalId: 'CMP-001' },
+                { id: 'PC-004', provider: 'SportRadar', providerId: 'sr:player:99090', name: 'Salah, Mohamed', sport: 'Soccer', type: 'Individual', subtype: 'Player', internalId: 'CMP-101' },
+                { id: 'PC-005', provider: 'SportRadar', providerId: 'sr:player:839956', name: 'Haaland, Erling', sport: 'Soccer', type: 'Individual', subtype: 'Player', internalId: 'CMP-106' },
+                { id: 'PC-010', provider: 'ExeFeed', providerId: 'f1:team:1', name: 'Red Bull Racing', sport: 'Formula 1', type: 'Team', subtype: '-', internalId: 'CMP-200' },
+                { id: 'PC-006', provider: 'SportRadar', providerId: 'sr:competitor:7135', name: 'Max Verstappen', sport: 'Formula 1', type: 'Individual', subtype: 'Driver', internalId: 'CMP-201' },
+                { id: 'PC-007', provider: 'ExeFeed', providerId: 'tn:player:22791', name: 'Carlos Alcaraz', sport: 'Tennis', type: 'Individual', subtype: 'Player', internalId: 'CMP-302' },
+                { id: 'PC-008', provider: 'SportGenius', providerId: 'sg-pair-104', name: 'Djokovic-Alcaraz', sport: 'Tennis', type: 'Composite', subtype: 'Pair', internalId: 'CMP-401' },
+                { id: 'PC-009', provider: 'SportGenius', providerId: 'sg-rider-11', name: 'F. Bagnaia', sport: 'Moto GP', type: 'Individual', subtype: 'Rider', internalId: 'CMP-501' },
+                { id: 'PC-011', provider: 'ExeFeed', providerId: '2199002', name: 'Virgil van Dijk', sport: 'Soccer', type: 'Individual', subtype: 'Player', internalId: 'CMP-102' },
+                { id: 'PC-012', provider: 'ExeFeed', providerId: '2199003', name: 'Darwin Nunez', sport: 'Soccer', type: 'Individual', subtype: 'Player', internalId: 'CMP-103' },
+                { id: 'PC-013', provider: 'ExeFeed', providerId: '2199004', name: 'Bukayo Saka', sport: 'Soccer', type: 'Individual', subtype: 'Player', internalId: 'CMP-104' },
+                { id: 'PC-014', provider: 'ExeFeed', providerId: '2199005', name: 'Martin Odegaard', sport: 'Soccer', type: 'Individual', subtype: 'Player', internalId: 'CMP-105' },
+                { id: 'PC-015', provider: 'SportRadar', providerId: 'sr:competitor:52', name: 'Lewis Hamilton', sport: 'Formula 1', type: 'Individual', subtype: 'Driver', internalId: 'CMP-202' },
+                { id: 'PC-016', provider: 'ExeFeed', providerId: 'tn:player:22790', name: 'Novak Djokovic', sport: 'Tennis', type: 'Individual', subtype: 'Player', internalId: 'CMP-301' },
+                { id: 'PC-017', provider: 'SportRadar', providerId: 'sr:competitor:44', name: 'Liverpool', sport: 'Soccer', type: 'Team', subtype: '-', internalId: '' },
+                { id: 'PC-018', provider: 'ExeFeed', providerId: 'mgp:team:1', name: 'Ducati Lenovo Team', sport: 'Moto GP', type: 'Team', subtype: '-', internalId: 'CMP-500' }
             ];
-
             const tabs = document.querySelectorAll('.workspace-tab');
-            const providerFilterGroup = document.getElementById('providerFilterGroup');
-            const statusFilterGroup = document.getElementById('statusFilterGroup');
-            const providerSelect = document.getElementById('providerSelect');
-            const sportFilter = document.getElementById('sportFilter');
-            const statusSelect = document.getElementById('statusSelect');
-            const searchInput = document.getElementById('searchInput');
             const workspaceHead = document.getElementById('workspaceHead');
             const workspaceBody = document.getElementById('workspaceBody');
-            const deleteModal = document.getElementById('deleteModal');
-            const deleteModalText = document.getElementById('deleteModalText');
+            const workspacePager = document.getElementById('workspacePager');
+            const providerFilter = document.getElementById('providerFilter');
+            const sportFilter = document.getElementById('sportFilter');
+            const typeFilter = document.getElementById('typeFilter');
+            const statusFilter = document.getElementById('statusFilter');
+            const searchInput = document.getElementById('searchInput');
+            const mapModal = document.getElementById('mapModal');
             let activeView = 'internal';
-            let competitorToDelete = null;
+            let currentPage = 1;
+            let selectedProviderCompetitor = null;
+            let selectedMappingCandidateId = '';
+            let currentDetailCompetitorId = '';
+            const statusFor = item => item.internalId ? 'Mapped' : 'Unmapped';
+            const badgeClass = status => status === 'Mapped' ? 'status-mapped' : 'status-unmapped';
+            const entityById = id => competitors.find(item => item.id === id);
 
-            function openDeleteModal(competitor) {
-                competitorToDelete = competitor;
-                deleteModalText.textContent = `Are you sure you want to delete competitor "${competitor.name}" (${competitor.id})?`;
-                deleteModal.style.display = 'flex';
+            function displayType(item) {
+                if (item.type === 'Team') return 'Team';
+                if (item.subtype === 'Player') return 'Player';
+                return item.subtype;
             }
-
-            function closeDeleteModal() {
-                competitorToDelete = null;
-                deleteModal.style.display = 'none';
+            function renderTypeFilter() {
+                const items = activeView === 'internal' ? competitors : providerCompetitors;
+                const previous = typeFilter.value || 'Team';
+                const sportItems = sportFilter.value === 'all' ? items : items.filter(item => item.sport === sportFilter.value);
+                const values = [...new Set(sportItems.map(displayType))].sort();
+                typeFilter.innerHTML = '<option value="all">All</option>' + values.map(value => `<option value="${value}">${value === 'Player' ? 'Players' : value}</option>`).join('');
+                typeFilter.value = values.includes(previous) ? previous : 'all';
             }
-
+            function matchesCommon(item) {
+                const search = searchInput.value.trim().toLowerCase();
+                return (sportFilter.value === 'all' || item.sport === sportFilter.value) && (typeFilter.value === 'all' || displayType(item) === typeFilter.value) && (!search || Object.values(item).join(' ').toLowerCase().includes(search));
+            }
+            function pagedRows(rows) {
+                const perPage = 10;
+                const pages = Math.max(1, Math.ceil(rows.length / perPage));
+                currentPage = Math.min(currentPage, pages);
+                const pageRows = rows.slice((currentPage - 1) * perPage, currentPage * perPage);
+                workspacePager.innerHTML = `<span>Page ${currentPage} of ${pages} (${rows.length} items)</span><button type="button" id="previousPageBtn" ${currentPage === 1 ? 'disabled' : ''}>Previous</button><button type="button" id="nextPageBtn" ${currentPage === pages ? 'disabled' : ''}>Next</button>`;
+                document.getElementById('previousPageBtn').addEventListener('click', () => { currentPage--; render(); });
+                document.getElementById('nextPageBtn').addEventListener('click', () => { currentPage++; render(); });
+                return pageRows;
+            }
             function renderInternalView() {
-                workspaceHead.innerHTML = `
-                    <tr>
-                        <th>Competitor ID</th>
-                        <th>Competitor Name</th>
-                        <th>Sport</th>
-                        <th style="text-align: right;">Action</th>
-                    </tr>
-                `;
-
-                const searchVal = searchInput.value.toLowerCase();
-                const sportVal = sportFilter.value;
-                const rows = internalCompetitors.filter(competitor => {
-                    const matchesSport = sportVal === 'all' || competitor.sport === sportVal;
-                    const matchesSearch = competitor.id.toLowerCase().includes(searchVal) ||
-                        competitor.name.toLowerCase().includes(searchVal) ||
-                        competitor.sport.toLowerCase().includes(searchVal);
-                    return matchesSport && matchesSearch;
-                });
-
-                if (rows.length === 0) {
-                    workspaceBody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #888; font-style: italic; padding: 20px;">No competitors found.</td></tr>';
-                    return;
-                }
-
-                workspaceBody.innerHTML = rows.map(competitor => `
-                    <tr>
-                        <td style="font-weight: 500; color: #6c757d;">${competitor.id}</td>
-                        <td class="market-name">${competitor.name}</td>
-                        <td>${competitor.sport}</td>
-                        <td style="text-align: right;">
-                            <span class="row-actions">
-                                <a href="view_competitor.html?id=${encodeURIComponent(competitor.id)}&name=${encodeURIComponent(competitor.name)}&sport=${encodeURIComponent(competitor.sport)}" class="btn-action" style="background-color: #007bff; text-decoration: none; display: inline-block;">View</a>
-                                <button type="button" class="btn-action delete-competitor-btn" style="background-color: #dc3545; border: none;" data-id="${competitor.id}">Delete</button>
-                            </span>
-                        </td>
-                    </tr>
-                `).join('');
-
-                document.querySelectorAll('.delete-competitor-btn').forEach(button => {
-                    button.addEventListener('click', () => {
-                        const competitor = internalCompetitors.find(item => item.id === button.dataset.id);
-                        if (competitor) openDeleteModal(competitor);
-                    });
-                });
+                workspaceHead.innerHTML = '<tr><th>Competitor ID</th><th>Name</th><th>Sport</th><th>Type</th><th style="text-align: right;">Action</th></tr>';
+                const rows = pagedRows(competitors.filter(matchesCommon));
+                workspaceBody.innerHTML = rows.length ? rows.map(item => `<tr><td style="font-weight: 600; color: #6c757d;">${item.id}</td><td class="market-name">${item.name}</td><td>${item.sport}</td><td>${displayType(item)}</td><td style="text-align: right;"><button type="button" class="btn-action view-competitor-btn" data-id="${item.id}" style="background-color: #007bff;">View</button></td></tr>`).join('') : '<tr><td colspan="5" style="text-align: center; color: #888; padding: 20px;">No competitors found.</td></tr>';
+                workspaceBody.querySelectorAll('.view-competitor-btn').forEach(button => button.addEventListener('click', () => showDetail(button.dataset.id)));
             }
-
             function renderProviderView() {
-                workspaceHead.innerHTML = `
-                    <tr>
-                        <th>Provider</th>
-                        <th>Sport</th>
-                        <th>Category</th>
-                        <th>Tournament</th>
-                        <th>Provider Competitor ID</th>
-                        <th>Provider Competitor Name</th>
-                        <th>Internal Competitor ID</th>
-                        <th>Internal Competitor Name</th>
-                        <th>Status</th>
-                        <th style="text-align: right;">Action</th>
-                    </tr>
-                `;
-
-                const providerVal = providerSelect.value;
-                const sportVal = sportFilter.value;
-                const statusVal = statusSelect.value;
-                const searchVal = searchInput.value.toLowerCase();
-                const rows = providerCompetitors.filter(competitor => {
-                    const matchesProvider = providerVal === 'all' || competitor.provider === providerVal;
-                    const matchesSport = sportVal === 'all' || competitor.sport === sportVal;
-                    const matchesStatus = statusVal === 'all' || competitor.status.toLowerCase() === statusVal;
-                    const matchesSearch = competitor.provider.toLowerCase().includes(searchVal) ||
-                        competitor.sport.toLowerCase().includes(searchVal) ||
-                        competitor.category.toLowerCase().includes(searchVal) ||
-                        competitor.tournament.toLowerCase().includes(searchVal) ||
-                        competitor.provId.toLowerCase().includes(searchVal) ||
-                        competitor.provName.toLowerCase().includes(searchVal) ||
-                        competitor.internalId.toLowerCase().includes(searchVal) ||
-                        competitor.internalName.toLowerCase().includes(searchVal);
-                    return matchesProvider && matchesSport && matchesStatus && matchesSearch;
-                });
-
-                if (rows.length === 0) {
-                    workspaceBody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: #888; font-style: italic; padding: 20px;">No provider competitors found.</td></tr>';
-                    return;
-                }
-
-                workspaceBody.innerHTML = rows.map(competitor => {
-                    const badgeClass = competitor.status === 'Mapped' ? 'status-mapped' : 'status-unmapped';
-                    const mapUrl = competitor.status === 'Mapped'
-                        ? `map_competitor.html?provider=${encodeURIComponent(competitor.provider)}&sport=${encodeURIComponent(competitor.sport)}&provId=${encodeURIComponent(competitor.provId)}&provName=${encodeURIComponent(competitor.provName)}&internalId=${encodeURIComponent(competitor.internalId)}`
-                        : `map_competitor.html?provider=${encodeURIComponent(competitor.provider)}&sport=${encodeURIComponent(competitor.sport)}&provId=${encodeURIComponent(competitor.provId)}&provName=${encodeURIComponent(competitor.provName)}`;
-                    const mapLabel = competitor.status === 'Mapped' ? 'Edit mapping' : 'Map';
-                    const viewButton = competitor.status === 'Mapped'
-                        ? `<a href="view_competitor.html?id=${encodeURIComponent(competitor.internalId)}&name=${encodeURIComponent(competitor.internalName)}&sport=${encodeURIComponent(competitor.sport)}" class="btn-action" style="background-color: #007bff; text-decoration: none; display: inline-block;">View</a>`
-                        : '';
-
-                    return `
-                        <tr>
-                            <td style="font-weight: 500;">${competitor.provider}</td>
-                            <td>${competitor.sport}</td>
-                            <td>${competitor.category}</td>
-                            <td>${competitor.tournament}</td>
-                            <td style="color: #6c757d;">${competitor.provId}</td>
-                            <td class="market-name" style="color: #007bff;">${competitor.provName}</td>
-                            <td style="color: #6c757d;">${competitor.internalId}</td>
-                            <td style="font-weight: 500;">${competitor.internalName}</td>
-                            <td><span class="status-badge ${badgeClass}">${competitor.status}</span></td>
-                            <td style="text-align: right;">
-                                <span class="row-actions">
-                                    ${viewButton}
-                                    <a href="${mapUrl}" class="btn-action" style="text-decoration: none; display: inline-block;">${mapLabel}</a>
-                                </span>
-                            </td>
-                        </tr>
-                    `;
-                }).join('');
+                workspaceHead.innerHTML = '<tr><th>Feed Provider</th><th>Provider ID</th><th>Provider Name</th><th>Sport</th><th>Type</th><th>Mapping Status</th><th style="text-align: right;">Action</th></tr>';
+                const rows = pagedRows(providerCompetitors.filter(item => (providerFilter.value === 'all' || item.provider === providerFilter.value) && (statusFilter.value === 'all' || statusFor(item) === statusFilter.value) && matchesCommon(item)));
+                workspaceBody.innerHTML = rows.length ? rows.map(item => { const mapped = entityById(item.internalId); const status = statusFor(item); return `<tr><td>${item.provider}</td><td style="color: #6c757d;">${item.providerId}</td><td class="market-name">${item.name}</td><td>${item.sport}</td><td>${displayType(item)}</td><td><span class="status-badge ${badgeClass(status)}">${status}</span></td><td style="text-align: right;"><span class="row-actions">${mapped ? `<button type="button" class="btn-action view-competitor-btn" data-id="${mapped.id}" style="background-color: #007bff;">View</button>` : ''}<button type="button" class="btn-action map-provider-btn" data-id="${item.id}">${status === 'Mapped' ? 'Edit mapping' : 'Map'}</button></span></td></tr>`; }).join('') : '<tr><td colspan="7" style="text-align: center; color: #888; padding: 20px;">No provider competitors found.</td></tr>';
+                workspaceBody.querySelectorAll('.view-competitor-btn').forEach(button => button.addEventListener('click', () => showDetail(button.dataset.id)));
+                workspaceBody.querySelectorAll('.map-provider-btn').forEach(button => button.addEventListener('click', () => openMapModal(button.dataset.id)));
             }
-
             function render() {
-                const showProviderFilters = activeView === 'provider';
-                providerFilterGroup.style.display = showProviderFilters ? 'block' : 'none';
-                statusFilterGroup.style.display = showProviderFilters ? 'block' : 'none';
-                document.getElementById('workspaceTable').style.minWidth = activeView === 'provider' ? '1080px' : '760px';
-                if (activeView === 'internal') {
-                    renderInternalView();
-                } else {
-                    renderProviderView();
-                }
+                document.getElementById('providerFilterGroup').style.display = activeView === 'provider' ? 'block' : 'none';
+                document.getElementById('statusFilterGroup').style.display = activeView === 'provider' ? 'block' : 'none';
+                document.getElementById('workspaceTable').style.minWidth = activeView === 'provider' ? '1100px' : '800px';
+                renderTypeFilter();
+                activeView === 'internal' ? renderInternalView() : renderProviderView();
             }
-
-            tabs.forEach(tab => {
-                tab.addEventListener('click', () => {
-                    activeView = tab.dataset.view;
-                    tabs.forEach(item => item.classList.toggle('active', item === tab));
-                    searchInput.value = '';
-                    render();
-                });
-            });
-
-            providerSelect.addEventListener('change', render);
-            sportFilter.addEventListener('change', render);
-            statusSelect.addEventListener('change', render);
-            searchInput.addEventListener('input', render);
-            document.getElementById('closeDeleteModalBtn').addEventListener('click', closeDeleteModal);
-            document.getElementById('cancelDeleteBtn').addEventListener('click', closeDeleteModal);
-            document.getElementById('confirmDeleteBtn').addEventListener('click', () => {
-                if (!competitorToDelete) return;
-                internalCompetitors = internalCompetitors.filter(competitor => competitor.id !== competitorToDelete.id);
-                closeDeleteModal();
-                render();
-            });
-            window.addEventListener('click', event => {
-                if (event.target === deleteModal) closeDeleteModal();
-            });
-
+            function showDetail(id) {
+                const competitor = entityById(id);
+                if (!competitor) return;
+                currentDetailCompetitorId = competitor.id;
+                document.getElementById('detailTitle').textContent = competitor.name;
+                document.getElementById('detailSubtitle').textContent = displayType(competitor);
+                document.getElementById('detailActions').innerHTML = competitor.type === 'Team' ? '<button type="button" id="editCompetitorNameBtn" class="btn-primary">Edit name</button>' : '';
+                document.getElementById('editCompetitorNameBtn')?.addEventListener('click', openEditNameModal);
+                document.getElementById('detailGrid').innerHTML = [['Competitor ID', competitor.id], ['Sport', competitor.sport], ['Type', displayType(competitor)]].map(([label, value]) => `<div class="detail-field"><span>${label}</span><strong>${value}</strong></div>`).join('');
+                const providers = providerCompetitors.filter(item => item.internalId === competitor.id);
+                document.getElementById('mappedProvidersBody').innerHTML = providers.length ? providers.map(item => `<tr><td>${item.provider}</td><td style="color: #6c757d;">${item.providerId}</td><td>${item.name}</td><td style="text-align: right;">${providers.length > 1 ? `<button type="button" class="btn-action delete-competitor-mapping-btn" data-id="${item.id}" style="background-color: #dc3545; border: none;">Delete mapping</button>` : '<button type="button" class="btn-action" disabled title="A competitor must have at least one provider mapping." style="background-color: #98a2b3; border: none; cursor: not-allowed;">Delete mapping</button>'}</td></tr>`).join('') : '<tr><td colspan="4" style="text-align: center; color: #888;">No provider competitors mapped.</td></tr>';
+                document.querySelectorAll('.delete-competitor-mapping-btn').forEach(button => button.addEventListener('click', () => {
+                    const providerCompetitor = providerCompetitors.find(item => item.id === button.dataset.id);
+                    if (!providerCompetitor) return;
+                    if (providerCompetitors.filter(item => item.internalId === competitor.id).length <= 1) return;
+                    providerCompetitor.internalId = '';
+                    showDetail(competitor.id);
+                }));
+                const members = (competitor.members || []).map(entityById).filter(Boolean);
+                document.getElementById('membersTitle').textContent = competitor.type === 'Team' ? 'Team Members' : 'Members';
+                document.getElementById('membersBody').innerHTML = members.length ? members.map(member => `<div class="member-item"><div><strong>${member.name}</strong><br><span>${displayType(member)}</span></div><button type="button" class="btn-action detail-member-btn" data-id="${member.id}" style="background-color: #007bff;">View</button></div>`).join('') : '<div class="member-item"><span>No members for this competitor.</span></div>';
+                document.querySelectorAll('.detail-member-btn').forEach(button => button.addEventListener('click', () => showDetail(button.dataset.id)));
+                document.getElementById('workspaceView').style.display = 'none';
+                document.getElementById('detailView').style.display = 'block';
+            }
+            function openMapModal(providerId) {
+                selectedProviderCompetitor = providerCompetitors.find(item => item.id === providerId);
+                if (!selectedProviderCompetitor) return;
+                selectedMappingCandidateId = selectedProviderCompetitor.internalId;
+                document.getElementById('mapModalSubtitle').textContent = `${selectedProviderCompetitor.provider}: ${selectedProviderCompetitor.name} (${selectedProviderCompetitor.providerId})`;
+                renderMapCandidates();
+                mapModal.style.display = 'flex';
+            }
+            function renderMapCandidates() {
+                const candidates = competitors.filter(item => item.sport === selectedProviderCompetitor.sport && item.type === selectedProviderCompetitor.type && (item.subtype === selectedProviderCompetitor.subtype || selectedProviderCompetitor.subtype === '-'));
+                document.getElementById('confirmMapBtn').disabled = !selectedMappingCandidateId;
+                document.getElementById('mapCandidatesBody').innerHTML = candidates.length ? candidates.map(item => `<tr class="map-candidate-row ${item.id === selectedMappingCandidateId ? 'selected' : ''}" data-id="${item.id}"><td><input type="radio" name="mapCandidate" ${item.id === selectedMappingCandidateId ? 'checked' : ''}></td><td>${item.id}</td><td class="market-name">${item.name}</td><td>${item.sport}</td><td>${displayType(item)}</td></tr>`).join('') : '<tr><td colspan="5" style="text-align: center; color: #888; padding: 20px;">No compatible competitors found.</td></tr>';
+                document.querySelectorAll('.map-candidate-row').forEach(row => row.addEventListener('click', () => { selectedMappingCandidateId = row.dataset.id; renderMapCandidates(); }));
+            }
+            function closeMapModal() { mapModal.style.display = 'none'; selectedProviderCompetitor = null; selectedMappingCandidateId = ''; }
+            function openAddMappingModal() {
+                const competitor = entityById(currentDetailCompetitorId);
+                if (!competitor) return;
+                document.getElementById('addMappingModalSubtitle').textContent = `Select a provider competitor to map to ${competitor.name}.`;
+                document.getElementById('addMappingProviderFilter').value = 'ExeFeed';
+                document.getElementById('addMappingSearch').value = '';
+                renderAvailableProviderMappings();
+                document.getElementById('addMappingModal').style.display = 'flex';
+            }
+            function renderAvailableProviderMappings() {
+                const competitor = entityById(currentDetailCompetitorId);
+                if (!competitor) return;
+                const selectedProvider = document.getElementById('addMappingProviderFilter').value;
+                const search = document.getElementById('addMappingSearch').value.trim().toLowerCase();
+                const rows = providerCompetitors.filter(item => !item.internalId && item.provider === selectedProvider && item.sport === competitor.sport && item.type === competitor.type && (item.subtype === competitor.subtype || competitor.subtype === '-') && (!search || item.name.toLowerCase().includes(search) || item.providerId.toLowerCase().includes(search)));
+                document.getElementById('availableProviderMappingsBody').innerHTML = rows.length ? rows.map(item => `<tr><td>${item.provider}</td><td style="color: #6c757d;">${item.providerId}</td><td class="market-name">${item.name}</td><td>${item.sport}</td><td style="text-align: right;"><button type="button" class="btn-action add-competitor-mapping-btn" data-id="${item.id}">Map</button></td></tr>`).join('') : '<tr><td colspan="5" style="text-align: center; color: #888; padding: 20px;">No compatible unmapped provider competitors found.</td></tr>';
+                document.querySelectorAll('.add-competitor-mapping-btn').forEach(button => button.addEventListener('click', () => {
+                    const providerCompetitor = providerCompetitors.find(item => item.id === button.dataset.id);
+                    if (!providerCompetitor) return;
+                    providerCompetitor.internalId = competitor.id;
+                    document.getElementById('addMappingModal').style.display = 'none';
+                    showDetail(competitor.id);
+                }));
+            }
+            function closeAddMappingModal() { document.getElementById('addMappingModal').style.display = 'none'; }
+            function openEditNameModal() {
+                const competitor = entityById(currentDetailCompetitorId);
+                if (!competitor || competitor.type !== 'Team') return;
+                document.getElementById('editCompetitorName').value = competitor.name;
+                document.getElementById('editNameModal').style.display = 'flex';
+            }
+            function closeEditNameModal() { document.getElementById('editNameModal').style.display = 'none'; }
+            function saveCompetitorName() {
+                const competitor = entityById(currentDetailCompetitorId);
+                const name = document.getElementById('editCompetitorName').value.trim();
+                if (!competitor || competitor.type !== 'Team' || !name) return;
+                competitor.name = name;
+                closeEditNameModal();
+                showDetail(competitor.id);
+            }
+            tabs.forEach(tab => tab.addEventListener('click', () => { activeView = tab.dataset.view; currentPage = 1; tabs.forEach(item => item.classList.toggle('active', item === tab)); render(); }));
+            [providerFilter, sportFilter, typeFilter, statusFilter].forEach(field => field.addEventListener('change', () => { currentPage = 1; render(); }));
+            searchInput.addEventListener('input', () => { currentPage = 1; render(); });
+            document.getElementById('backBtn').addEventListener('click', () => { document.getElementById('detailView').style.display = 'none'; document.getElementById('workspaceView').style.display = 'block'; });
+            document.getElementById('addMappingToCompetitorBtn').addEventListener('click', openAddMappingModal);
+            document.getElementById('confirmMapBtn').addEventListener('click', () => { if (!selectedProviderCompetitor || !selectedMappingCandidateId) return; selectedProviderCompetitor.internalId = selectedMappingCandidateId; closeMapModal(); render(); });
+            document.getElementById('closeMapModalBtn').addEventListener('click', closeMapModal);
+            document.getElementById('cancelMapBtn').addEventListener('click', closeMapModal);
+            document.getElementById('addMappingProviderFilter').addEventListener('change', renderAvailableProviderMappings);
+            document.getElementById('closeAddMappingModalBtn').addEventListener('click', closeAddMappingModal);
+            document.getElementById('cancelAddMappingBtn').addEventListener('click', closeAddMappingModal);
+            document.getElementById('addMappingSearch').addEventListener('input', renderAvailableProviderMappings);
+            document.getElementById('closeEditNameModalBtn').addEventListener('click', closeEditNameModal);
+            document.getElementById('cancelEditNameBtn').addEventListener('click', closeEditNameModal);
+            document.getElementById('saveEditNameBtn').addEventListener('click', saveCompetitorName);
+            window.addEventListener('click', event => { if (event.target === mapModal) closeMapModal(); if (event.target === document.getElementById('addMappingModal')) closeAddMappingModal(); if (event.target === document.getElementById('editNameModal')) closeEditNameModal(); });
             render();
         });
     </script>

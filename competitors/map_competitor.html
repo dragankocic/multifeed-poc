@@ -16,7 +16,7 @@
     <div class="main-content">
         <header class="main-header">
             <h1>Map Provider Competitor</h1>
-            <p class="page-subtitle">Connect a provider competitor to the correct internal competitor.</p>
+            <p class="page-subtitle">Connect a provider competitor to the correct competitor.</p>
         </header>
 
         <main class="split-layout">
@@ -25,7 +25,7 @@
                     <a href="competitor.html" class="btn-secondary" style="text-decoration: none; display: inline-block;">&larr; Back to list</a>
                 </div>
                 <div class="info-section">
-                    <h2>Connect to Internal Competitor</h2>
+                    <h2>Connect to Competitor</h2>
                     <p class="provider-text">Provider: <strong id="displayProvider"></strong></p>
                 </div>
                 <section class="section-card">
@@ -49,7 +49,7 @@
                         <div class="form-column" style="flex: 1;">
                             <div class="form-group">
                                 <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
-                                    <label>Internal Sport</label>
+                                    <label>Sport</label>
                                     <a href="../sports/create_sport.html" class="btn-secondary" style="padding: 6px 10px; text-decoration: none; display: inline-block;">New</a>
                                 </div>
                                 <select id="internalSportSelect">
@@ -61,7 +61,7 @@
                             </div>
                             <div class="form-group" style="margin-bottom: 0;">
                                 <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
-                                    <label>Internal Competitor</label>
+                                    <label>Competitor</label>
                                 </div>
                                 <input type="text" id="internalCompetitorSearch" placeholder="Search competitors..." style="margin-bottom: 8px;">
                                 <select id="internalCompetitorSelect" disabled>
@@ -158,10 +158,10 @@
 
             document.getElementById('saveMappingBtn').addEventListener('click', () => {
                 if(!internalSportSelect.value || !internalCompetitorSelect.value) {
-                    alert('Please select an internal sport and competitor before saving.');
+                    alert('Please select an sport and competitor before saving.');
                     return;
                 }
-                alert(`Mapping saved successfully! Provider competitor "${provName}" is now mapped to an internal competitor.`);
+                alert(`Mapping saved successfully! Provider competitor "${provName}" is now mapped to an competitor.`);
                 window.location.href = 'competitor.html';
             });
         });

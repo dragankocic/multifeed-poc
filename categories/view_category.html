@@ -24,7 +24,7 @@
     <div class="main-content">
         <header class="main-header" style="background-color: #17a2b8; color: white;">
             <h1>Category Overview</h1>
-            <p class="page-subtitle">Inspect a category, its provider mappings, and tournaments.</p>
+            <p class="page-subtitle">Inspect a category and its provider mappings.</p>
         </header>
 
         <main class="split-layout">
@@ -52,7 +52,7 @@
                         <button type="button" id="addMappingBtn" class="btn-primary">Add mapping</button>
                     </div>
                     <div class="lazy-section-body">
-                        <p style="margin-bottom: 15px; font-size: 14px; color: #666;">Provider category values currently connected to this internal category.</p>
+                        <p style="margin-bottom: 15px; font-size: 14px; color: #666;">Provider category values currently connected to this category.</p>
 
                         <table class="markets-table" style="margin-bottom: 25px;">
                             <thead>
@@ -68,33 +68,9 @@
                     </div>
                 </section>
 
-                <section class="markets-section lazy-section" id="childEntitySection" style="margin-top: 25px; padding: 25px; background: white; border-radius: 8px; border: 1px solid #e0e0e0;">
-                    <div class="section-header" style="border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 15px;">
-                        <button type="button" class="lazy-section-toggle" data-target="childEntitySection">
-                            <h3>Tournaments</h3>
-                            <span class="lazy-section-icon">⌄</span>
-                        </button>
-                    </div>
-                    <div class="lazy-section-body">
-                        <p style="margin-bottom: 15px; font-size: 14px; color: #666;">Tournaments available under this category.</p>
-
-                        <table class="markets-table">
-                            <thead>
-                                <tr>
-                                    <th>Tournament ID</th>
-                                    <th>Tournament Name</th>
-                                    <th>Sport</th>
-                                    <th>Leading Feed Provider</th>
-                                    <th style="text-align: right;">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody id="childTournamentsList"></tbody>
-                        </table>
-                    </div>
-                </section>
-
-                <div style="margin-top: 25px;">
+                <div style="margin-top: 25px; display: flex; gap: 10px;">
                     <a id="editCategoryLink" href="#" class="btn-primary" style="text-decoration: none; display: inline-block;">Edit Category</a>
+                    <button type="button" id="deleteCategoryBtn" class="btn-secondary" style="border-color: #dc3545; color: #dc3545;">Delete Category</button>
                 </div>
             </div>
         </main>
@@ -109,8 +85,7 @@
                     <div class="filter-group">
                         <label for="providerFilter">Provider</label>
                         <select id="providerFilter">
-                            <option value="all" selected>All</option>
-                            <option value="ExeFeed">ExeFeed</option>
+                            <option value="ExeFeed" selected>ExeFeed</option>
                             <option value="SportRadar">SportRadar</option>
                             <option value="SportGenius">SportGenius</option>
                         </select>
@@ -133,6 +108,18 @@
                 </thead>
                 <tbody id="availableProviderCategoriesList" data-page-size="10"></tbody>
             </table>
+        </div>
+    </div>
+
+    <div id="deleteCategoryModal" class="modal">
+        <div class="modal-content" style="width: min(520px, 92vw);">
+            <span class="close-modal" id="closeDeleteCategoryModalBtn">&times;</span>
+            <h3>Delete Category</h3>
+            <p id="deleteCategoryModalText" style="font-size: 15px; line-height: 1.55; color: #555; margin-bottom: 20px;"></p>
+            <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                <button type="button" id="cancelDeleteCategoryBtn" class="btn-secondary">Cancel</button>
+                <button type="button" id="confirmDeleteCategoryBtn" class="btn-primary" style="background-color: #dc3545;">Delete Category</button>
+            </div>
         </div>
     </div>
 
@@ -196,55 +183,41 @@
                 { provider: "SportGenius", providerId: "sg-cat-rs", providerName: "Serbia" }
             ];
 
-            const childTournamentsByCategory = {
-                "England": [
-                    { id: "T-001", name: "Premier League", sport: "Soccer", primaryFeed: "EXE" },
-                    { id: "T-002", name: "Championship", sport: "Soccer", primaryFeed: "SR" },
-                    { id: "T-003", name: "League One", sport: "Soccer", primaryFeed: "BG" },
-                    { id: "T-004", name: "League Two", sport: "Soccer", primaryFeed: "SR" },
-                    { id: "T-014", name: "EFL Cup", sport: "Soccer", primaryFeed: "EXE" }
-                ],
-                "Spain": [
-                    { id: "T-005", name: "LaLiga", sport: "Soccer", primaryFeed: "SR" },
-                    { id: "T-006", name: "LaLiga 2", sport: "Soccer", primaryFeed: "EXE" },
-                    { id: "T-007", name: "Copa del Rey", sport: "Soccer", primaryFeed: "BG" },
-                    { id: "T-008", name: "Primera Federacion", sport: "Soccer", primaryFeed: "SR" }
-                ],
-                "Germany": [
-                    { id: "T-009", name: "Bundesliga", sport: "Soccer", primaryFeed: "EXE" },
-                    { id: "T-010", name: "BBL", sport: "Basketball", primaryFeed: "SR" }
-                ],
-                "Italy": [
-                    { id: "T-011", name: "Serie A", sport: "Soccer", primaryFeed: "BG" }
-                ],
-                "France": [
-                    { id: "T-012", name: "Ligue 1", sport: "Soccer", primaryFeed: "EXE" },
-                    { id: "T-013", name: "Roland Garros", sport: "Tennis", primaryFeed: "SR" }
-                ],
-                "Serbia": [
-                    { id: "T-015", name: "SuperLiga", sport: "Soccer", primaryFeed: "EXE" }
-                ],
-                "United States": [
-                    { id: "T-016", name: "NBA", sport: "Basketball", primaryFeed: "SR" }
-                ]
-            };
-
             let mappedList = [...(providerCategoryMappings[categoryName] || [])];
             const listContainer = document.getElementById('providerCategoriesList');
-            const childTournamentsList = document.getElementById('childTournamentsList');
             const addMappingModal = document.getElementById('addMappingModal');
             const providerFilter = document.getElementById('providerFilter');
             const providerCategorySearch = document.getElementById('providerCategorySearch');
             const mappingCategoryName = document.getElementById('mappingCategoryName');
             const availableProviderCategoriesList = document.getElementById('availableProviderCategoriesList');
+            const deleteCategoryModal = document.getElementById('deleteCategoryModal');
+            const deleteCategoryModalText = document.getElementById('deleteCategoryModalText');
+            const confirmDeleteCategoryBtn = document.getElementById('confirmDeleteCategoryBtn');
             const loadedSections = new Set();
+
+            function closeDeleteCategoryModal() {
+                deleteCategoryModal.style.display = 'none';
+            }
+
+            function openDeleteCategoryModal() {
+                const mappingCount = mappedList.length;
+                if (mappingCount > 0) {
+                    deleteCategoryModalText.textContent = `Category "${categoryName}" cannot be deleted because it has ${mappingCount} provider mapping${mappingCount === 1 ? '' : 's'}. Remove all mappings before deleting this category.`;
+                    confirmDeleteCategoryBtn.style.display = 'none';
+                    document.getElementById('cancelDeleteCategoryBtn').textContent = 'Close';
+                } else {
+                    deleteCategoryModalText.textContent = `Are you sure you want to delete category "${categoryName}" (${categoryId})? This action cannot be undone.`;
+                    confirmDeleteCategoryBtn.style.display = 'inline-flex';
+                    document.getElementById('cancelDeleteCategoryBtn').textContent = 'Cancel';
+                }
+                deleteCategoryModal.style.display = 'flex';
+            }
 
             function openLazySection(sectionId) {
                 const section = document.getElementById(sectionId);
                 section.classList.toggle('open');
                 if (loadedSections.has(sectionId)) return;
                 if (sectionId === 'mappedProviderSection') renderMappedCategories();
-                if (sectionId === 'childEntitySection') renderChildTournaments();
                 loadedSections.add(sectionId);
             }
 
@@ -314,28 +287,8 @@
                 });
             }
 
-            function renderChildTournaments() {
-                const tournaments = childTournamentsByCategory[categoryName] || [];
-                if (tournaments.length === 0) {
-                    childTournamentsList.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #888; font-style: italic;">No tournaments found for this category.</td></tr>';
-                    return;
-                }
-
-                childTournamentsList.innerHTML = tournaments.map(tournament => `
-                    <tr>
-                        <td style="font-weight: 500; color: #6c757d;">${tournament.id}</td>
-                        <td class="market-name">${tournament.name}</td>
-                        <td>${tournament.sport}</td>
-                        <td><span class="status-badge status-mapped">${tournament.primaryFeed}</span></td>
-                        <td style="text-align: right;">
-                            <a href="../tournaments/view_tournament.html?id=${encodeURIComponent(tournament.id)}&name=${encodeURIComponent(tournament.name)}&sport=${encodeURIComponent(tournament.sport)}&category=${encodeURIComponent(categoryName)}&primaryFeed=${encodeURIComponent(tournament.primaryFeed)}" class="btn-action" style="background-color: #007bff; text-decoration: none; display: inline-block;">View</a>
-                        </td>
-                    </tr>
-                `).join('');
-            }
-
             document.getElementById('addMappingBtn').addEventListener('click', () => {
-                providerFilter.value = 'all';
+                providerFilter.value = 'ExeFeed';
                 providerCategorySearch.value = '';
                 mappingCategoryName.textContent = categoryName;
                 renderAvailableProviderCategories();
@@ -344,6 +297,13 @@
             document.getElementById('closeAddMappingModalBtn').addEventListener('click', () => {
                 addMappingModal.style.display = 'none';
             });
+            document.getElementById('deleteCategoryBtn').addEventListener('click', openDeleteCategoryModal);
+            document.getElementById('closeDeleteCategoryModalBtn').addEventListener('click', closeDeleteCategoryModal);
+            document.getElementById('cancelDeleteCategoryBtn').addEventListener('click', closeDeleteCategoryModal);
+            confirmDeleteCategoryBtn.addEventListener('click', () => {
+                if (mappedList.length > 0) return;
+                window.location.href = 'category.html';
+            });
             providerFilter.addEventListener('change', renderAvailableProviderCategories);
             providerCategorySearch.addEventListener('input', renderAvailableProviderCategories);
             document.querySelectorAll('.lazy-section-toggle').forEach(button => {
@@ -351,6 +311,7 @@
             });
             window.addEventListener('click', event => {
                 if (event.target === addMappingModal) addMappingModal.style.display = 'none';
+                if (event.target === deleteCategoryModal) closeDeleteCategoryModal();
             });
         });
     </script>

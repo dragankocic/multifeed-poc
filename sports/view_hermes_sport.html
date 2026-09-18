@@ -57,7 +57,7 @@
     <div class="main-content">
         <header class="main-header" style="background-color: #17a2b8; color: white;">
             <h1>Sport Overview</h1>
-            <p class="page-subtitle">Inspect a sport, its provider mappings, and categories.</p>
+            <p class="page-subtitle">Inspect a sport and its provider mappings.</p>
         </header>
 
         <main class="split-layout">
@@ -106,28 +106,6 @@
                     </div>
                 </section>
 
-                <section class="markets-section lazy-section" id="childEntitySection" style="margin-top: 25px; padding: 25px; background: white; border-radius: 8px; border: 1px solid #e0e0e0;">
-                    <div class="section-header" style="border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 15px;">
-                        <button type="button" class="lazy-section-toggle" data-target="childEntitySection">
-                            <h3>Categories</h3>
-                            <span class="lazy-section-icon">⌄</span>
-                        </button>
-                    </div>
-                    <div class="lazy-section-body">
-                        <p style="margin-bottom: 15px; font-size: 14px; color: #666;">Categories available under this sport.</p>
-
-                        <table class="markets-table">
-                            <thead>
-                                <tr>
-                                    <th>Category ID</th>
-                                    <th>Category Name</th>
-                                    <th style="text-align: right;">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody id="childCategoriesList"></tbody>
-                        </table>
-                    </div>
-                </section>
             </div>
         </main>
     </div>
@@ -141,8 +119,7 @@
                     <div class="filter-group">
                         <label for="providerFilter">Provider</label>
                         <select id="providerFilter">
-                            <option value="all" selected>All</option>
-                            <option value="ExeFeed">ExeFeed</option>
+                            <option value="ExeFeed" selected>ExeFeed</option>
                             <option value="SportRadar">SportRadar</option>
                             <option value="SportGenius">SportGenius</option>
                         </select>
@@ -211,33 +188,8 @@
                 { provider: "ExeFeed", provId: "H", provName: "Rukomet" }
             ];
 
-            const childCategoriesBySport = {
-                "Soccer": [
-                    { id: "C-001", name: "England" },
-                    { id: "C-002", name: "Spain" },
-                    { id: "C-003", name: "Germany" },
-                    { id: "C-004", name: "Italy" },
-                    { id: "C-005", name: "France" },
-                    { id: "C-006", name: "Serbia" }
-                ],
-                "Basketball": [
-                    { id: "C-007", name: "United States" },
-                    { id: "C-003", name: "Germany" },
-                    { id: "C-005", name: "France" }
-                ],
-                "Tennis": [
-                    { id: "C-005", name: "France" },
-                    { id: "C-002", name: "Spain" },
-                    { id: "C-001", name: "England" }
-                ],
-                "Formula 1": [
-                    { id: "C-008", name: "International" }
-                ]
-            };
-
             let mappedList = [...(reverseMappings[sportName] || [])];
             const listContainer = document.getElementById('providerSportsList');
-            const childCategoriesList = document.getElementById('childCategoriesList');
             const addMappingModal = document.getElementById('addMappingModal');
             const providerFilter = document.getElementById('providerFilter');
             const providerSportSearch = document.getElementById('providerSportSearch');
@@ -250,7 +202,6 @@
                 section.classList.toggle('open');
                 if (loadedSections.has(sectionId)) return;
                 if (sectionId === 'mappedProviderSection') renderMappedSports();
-                if (sectionId === 'childEntitySection') renderChildCategories();
                 loadedSections.add(sectionId);
             }
 
@@ -320,26 +271,8 @@
                 });
             }
 
-            function renderChildCategories() {
-                const categories = childCategoriesBySport[sportName] || [];
-                if (categories.length === 0) {
-                    childCategoriesList.innerHTML = '<tr><td colspan="3" style="text-align: center; color: #888; font-style: italic;">No categories found for this sport.</td></tr>';
-                    return;
-                }
-
-                childCategoriesList.innerHTML = categories.map(category => `
-                    <tr>
-                        <td style="font-weight: 500; color: #6c757d;">${category.id}</td>
-                        <td class="market-name">${category.name}</td>
-                        <td style="text-align: right;">
-                            <a href="../categories/view_category.html?id=${encodeURIComponent(category.id)}&name=${encodeURIComponent(category.name)}" class="btn-action" style="background-color: #007bff; text-decoration: none; display: inline-block;">View</a>
-                        </td>
-                    </tr>
-                `).join('');
-            }
-
             document.getElementById('addMappingBtn').addEventListener('click', () => {
-                providerFilter.value = 'all';
+                providerFilter.value = 'ExeFeed';
                 providerSportSearch.value = '';
                 mappingSportName.textContent = sportName;
                 renderAvailableProviderSports();
