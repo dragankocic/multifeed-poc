@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Feed Providers</title>
+    <title>Settings</title>
     <link rel="stylesheet" href="../style.css">
     <script src="../auth.js"></script>
     <style>
@@ -172,12 +172,16 @@
 
     <div class="main-content">
         <header class="main-header">
-            <h1>Feed Providers</h1>
-            <p class="page-subtitle">Monitor provider status and inspect feeds connected to the multifeed service.</p>
+            <h1>Settings</h1>
+            <p class="page-subtitle">Configure feed providers and outgoing consumers.</p>
         </header>
 
         <main class="split-layout">
             <div class="form-side">
+                <nav class="settings-tabs" aria-label="Settings sections">
+                    <a href="feed_providers.html" class="settings-tab active">Feed Providers</a>
+                    <a href="consumers.html" class="settings-tab">Consumers</a>
+                </nav>
                 <div class="provider-grid">
                     <section class="provider-card">
                         <div class="provider-card-header">

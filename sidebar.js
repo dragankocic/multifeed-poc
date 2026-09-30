@@ -96,22 +96,14 @@ document.addEventListener("DOMContentLoaded", () => {
                 </ul>
             </div>
 
-            <div class="sidebar-nav-group" data-section="settings">
-                <button type="button" class="sidebar-section-toggle" aria-expanded="true">
-                    <span>Settings</span>
-                    <span class="sidebar-toggle-icon">▾</span>
-                </button>
-                <ul class="sidebar-menu">
-                    <li><a href="${link('settings/feed_providers.html')}" class="${activeClassFor(feedProviderSettingsPages)}">Feed Providers</a></li>
-                    <li><a href="${link('settings/consumers.html')}" class="${activeClassFor(consumerSettingsPages)}">Consumers</a></li>
-                </ul>
-            </div>
-
     `;
     const sidebarHTML = `
         <aside class="sidebar">
             <div class="sidebar-brand">MULTIFEED</div>
             ${primaryNav}
+            <div class="sidebar-settings-entry">
+                <a href="${link('settings/feed_providers.html')}" class="${activeClassFor([...feedProviderSettingsPages, ...consumerSettingsPages])}">Settings</a>
+            </div>
         </aside>
     `;
 

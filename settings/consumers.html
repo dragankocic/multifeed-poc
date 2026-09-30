@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Consumers</title>
+    <title>Settings</title>
     <link rel="stylesheet" href="../style.css">
     <script src="../auth.js"></script>
     <style>
@@ -94,8 +94,8 @@
         <header class="main-header">
             <div class="page-title-row">
                 <div>
-                    <h1>Consumers</h1>
-                    <p class="page-subtitle">Configure outgoing multifeed consumers and assign one or more provider feeds to each consumer.</p>
+                    <h1>Settings</h1>
+                    <p class="page-subtitle">Configure feed providers and outgoing consumers.</p>
                 </div>
                 <button type="button" id="openCreateConsumerBtn" class="btn-primary">Create</button>
             </div>
@@ -103,6 +103,10 @@
 
         <main class="split-layout">
             <div class="form-side">
+                <nav class="settings-tabs" aria-label="Settings sections">
+                    <a href="feed_providers.html" class="settings-tab">Feed Providers</a>
+                    <a href="consumers.html" class="settings-tab active">Consumers</a>
+                </nav>
                 <section class="markets-section">
                     <table class="markets-table">
                         <thead>

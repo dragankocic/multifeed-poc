@@ -14,6 +14,33 @@
             flex-wrap: wrap;
         }
 
+        .event-tabs {
+            display: inline-flex;
+            gap: 4px;
+            padding: 4px;
+            margin-bottom: 16px;
+            background: #eef3f4;
+            border: 1px solid #d4dee1;
+            border-radius: 6px;
+        }
+
+        .event-tab {
+            min-width: 150px;
+            border: 0;
+            border-radius: 4px;
+            padding: 9px 16px;
+            background: transparent;
+            color: #566;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .event-tab.active {
+            background: #17a2b8;
+            color: #fff;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+        }
+
         .event-toolbar .filter-group {
             flex: 0 0 160px;
         }
@@ -284,12 +311,16 @@
     <div class="main-content">
         <header class="main-header">
             <h1>View Events</h1>
-            <p class="page-subtitle">Browse Hermes events and inspect event details, markets, and messages.</p>
+            <p class="page-subtitle">Browse master and provider events, then inspect their details, markets, and messages.</p>
         </header>
 
         <main class="split-layout">
             <div class="form-side">
                 <div id="eventsListView">
+                    <div class="event-tabs" aria-label="Event perspective">
+                        <button type="button" class="event-tab active" data-view="master">Events</button>
+                        <button type="button" class="event-tab" data-view="provider">Provider events</button>
+                    </div>
                     <div class="top-bar event-toolbar">
                         <div class="filters">
                             <div class="filter-group">
@@ -312,11 +343,17 @@
                                     <option value="Soccer">Soccer</option>
                                     <option value="Basketball">Basketball</option>
                                     <option value="Tennis">Tennis</option>
+                                    <option value="Volleyball">Volleyball</option>
+                                    <option value="Handball">Handball</option>
+                                    <option value="Moto GP">Moto GP</option>
+                                    <option value="Baseball">Baseball</option>
+                                    <option value="Cricket">Cricket</option>
+                                    <option value="Ice Hockey">Ice Hockey</option>
                                     <option value="Motorsport">Motorsport</option>
                                 </select>
                             </div>
 
-                            <div class="filter-group">
+                            <div class="filter-group" id="eventStatusFilterGroup">
                                 <label for="statusSelect">Status</label>
                                 <select id="statusSelect">
                                     <option value="all" selected>All</option>
@@ -326,6 +363,15 @@
                                     <option value="Cancelled">Cancelled</option>
                                     <option value="Delayed">Delayed</option>
                                     <option value="Suspended">Suspended</option>
+                                </select>
+                            </div>
+
+                            <div class="filter-group" id="linkStatusFilterGroup" style="display: none;">
+                                <label for="linkStatusSelect">Link status</label>
+                                <select id="linkStatusSelect">
+                                    <option value="all" selected>All</option>
+                                    <option value="linked">Linked</option>
+                                    <option value="not-linked">Not linked</option>
                                 </select>
                             </div>
 
@@ -398,6 +444,44 @@
                                 </tr>
                             </thead>
                             <tbody id="eventMarketsBody"></tbody>
+                        </table>
+                    </section>
+                </div>
+
+                <div id="providerEventDetailView" style="display: none;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 20px;">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <button type="button" id="backToProviderEventsBtn" class="nav-button">&larr;</button>
+                            <div>
+                                <h2 id="providerEventDetailTitle" style="font-size: 28px; color: #111; margin: 0;"></h2>
+                                <p id="providerEventDetailSubtitle" style="font-size: 15px; color: #777; margin-top: 6px;"></p>
+                            </div>
+                        </div>
+                        <div class="actions detail-actions" style="display: flex; gap: 10px; justify-content: flex-end;">
+                            <button type="button" id="linkProviderEventFromDetailBtn" class="btn-secondary">Link to master event</button>
+                            <button type="button" id="viewMasterEventBtn" class="btn-secondary" style="display: none;">View master event</button>
+                        </div>
+                    </div>
+
+                    <section class="markets-section" style="padding: 20px; margin-bottom: 20px;">
+                        <div class="event-detail-grid" id="providerEventDetailGrid"></div>
+                    </section>
+
+                    <section class="markets-section" style="margin-bottom: 20px;">
+                        <div style="padding: 16px 20px; border-bottom: 1px solid #e9ecef;">
+                            <h3 style="margin: 0;">Provider markets</h3>
+                        </div>
+                        <table class="markets-table event-markets-table">
+                            <thead>
+                                <tr>
+                                    <th>Market ID</th>
+                                    <th>Provider Market</th>
+                                    <th>Status</th>
+                                    <th>Mapped Market</th>
+                                    <th style="text-align: right;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="providerEventMarketsBody"></tbody>
                         </table>
                     </section>
                 </div>
@@ -510,7 +594,7 @@
             </div>
             <div class="link-events-list">
                 <table class="markets-table">
-                    <thead>
+                    <thead id="linkEventsHead">
                         <tr>
                             <th style="width: 44px;">Select</th>
                             <th>Event</th>
@@ -535,13 +619,40 @@
             const providerEvents = [
                 { id: "EV-001", internalId: "event:56418719", providerId: "sr:match:61300621", provider: "SportRadar", sport: "Soccer", category: "England", competition: "Premier League", season: "2025/26", stage: "-", startTime: "17.03.2026. 16:00", venue: "Old Trafford", status: "Not started", desc: "Manchester United vs Liverpool", updatedAt: "04:46:32 PM", group: "G-001", mappingStatus: "Mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Mapped" },
                 { id: "EV-011", internalId: "event:56418719", providerId: "6569588", provider: "ExeFeed", sport: "Soccer", category: "England", competition: "Premier League", season: "2025/26", stage: "-", startTime: "17.03.2026. 16:00", venue: "Old Trafford", status: "Not started", desc: "Manchester United - Liverpool", updatedAt: "04:45:10 PM", group: "G-001", mappingStatus: "Mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Mapped" },
-                { id: "EV-002", internalId: "event:56418720", providerId: "61310022", provider: "ExeFeed", sport: "Basketball", category: "United States", competition: "NBA", season: "2025/26", stage: "Regular season", startTime: "09.06.2026. 12:28", venue: "Madison Square Garden", status: "Live", desc: "New York Knicks - San Antonio Spurs", updatedAt: "12:28:10 PM", group: "G-002", mappingStatus: "Partially mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Unmapped" },
+                { id: "EV-002", internalId: "event:56418720", providerId: "61310022", provider: "Bet Genius", sport: "Basketball", category: "United States", competition: "NBA", season: "2025/26", stage: "Regular season", startTime: "09.06.2026. 12:28", venue: "Madison Square Garden", status: "Live", desc: "New York Knicks - San Antonio Spurs", updatedAt: "12:28:10 PM", group: "G-002", mappingStatus: "Partially mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Unmapped" },
                 { id: "EV-003", internalId: "event:56418721", providerId: "bg:match:33000033", provider: "Bet Genius", sport: "Tennis", category: "France", competition: "Roland Garros", season: "2026", stage: "Final", startTime: "09.06.2026. 11:00", venue: "Court Philippe-Chatrier", status: "Ended", desc: "Novak Djokovic - Carlos Alcaraz", updatedAt: "11:00:00 AM", group: "G-003", mappingStatus: "Mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Mapped" },
                 { id: "EV-004", internalId: "event:56418722", providerId: "sr:match:61300622", provider: "SportRadar", sport: "Soccer", category: "England", competition: "Premier League", season: "2025/26", stage: "-", startTime: "10.06.2026. 20:45", venue: "Etihad Stadium", status: "Not started", desc: "Manchester City FC - Arsenal FC", updatedAt: "03:00:00 PM", group: "G-004", mappingStatus: "Partially mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Unmapped" },
-                { id: "EV-012", internalId: "event:56418725", providerId: "61310622", provider: "ExeFeed", sport: "Soccer", category: "England", competition: "Premier League", season: "2025/26", stage: "-", startTime: "10.06.2026. 20:45", venue: "Etihad Stadium", status: "Not started", desc: "Man Cit - Ars", updatedAt: "03:02:14 PM", group: "G-012", mappingStatus: "Partially mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Unmapped" },
+                { id: "EV-012", internalId: "event:56418722", providerId: "61310622", provider: "ExeFeed", sport: "Soccer", category: "England", competition: "Premier League", season: "2025/26", stage: "-", startTime: "10.06.2026. 20:45", venue: "Etihad Stadium", status: "Not started", desc: "Man Cit - Ars", updatedAt: "03:02:14 PM", group: "G-004", mappingStatus: "Partially mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Unmapped" },
                 { id: "EV-005", internalId: "event:56418723", providerId: "61310055", provider: "ExeFeed", sport: "Soccer", category: "Germany", competition: "Bundesliga", season: "2025/26", stage: "-", startTime: "09.06.2026. 10:15", venue: "Allianz Arena", status: "Cancelled", desc: "Bayern Munich - BVB", updatedAt: "10:15:00 AM", group: "G-005", mappingStatus: "Unmapped", sportMapping: "Mapped", categoryMapping: "Unmapped", tournamentMapping: "Unmapped" },
                 { id: "EV-013", internalId: "event:56418723", providerId: "sr:match:61310055", provider: "SportRadar", sport: "Soccer", category: "Germany", competition: "Bundesliga", season: "2025/26", stage: "-", startTime: "09.06.2026. 10:15", venue: "Allianz Arena", status: "Cancelled", desc: "FC Bayern Munich vs Borussia Dortmund", updatedAt: "10:16:22 AM", group: "G-005", mappingStatus: "Unmapped", sportMapping: "Mapped", categoryMapping: "Unmapped", tournamentMapping: "Unmapped" },
-                { id: "EV-008", internalId: "event:56418724", providerId: "sr:race:1", provider: "IMG Arena", sport: "Motorsport", category: "International", competition: "Formula 1", season: "2026", stage: "Race", startTime: "14.06.2026. 15:00", venue: "Monaco", status: "Delayed", desc: "Monaco GP", updatedAt: "02:00:00 PM", group: "G-008", mappingStatus: "Unmapped", sportMapping: "Unmapped", categoryMapping: "Unmapped", tournamentMapping: "Unmapped" }
+                { id: "EV-008", internalId: "event:56418724", providerId: "sr:race:1", provider: "IMG Arena", sport: "Motorsport", category: "International", competition: "Formula 1", season: "2026", stage: "Race", startTime: "14.06.2026. 15:00", venue: "Monaco", status: "Delayed", desc: "Monaco GP", updatedAt: "02:00:00 PM", group: "G-008", mappingStatus: "Unmapped", sportMapping: "Unmapped", categoryMapping: "Unmapped", tournamentMapping: "Unmapped" },
+                { id: "EV-006", internalId: "event:56418726", providerId: "61310831", provider: "ExeFeed", sport: "Volleyball", category: "Italy", competition: "SuperLega", season: "2025/26", stage: "Quarter-final", startTime: "11.06.2026. 18:30", venue: "Pala Barton", status: "Not started", desc: "Sir Susa Vim Perugia - Lube Civitanova", updatedAt: "01:20:00 PM", group: "G-006", mappingStatus: "Mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Mapped" },
+                { id: "EV-007", internalId: "event:56418727", providerId: "sr:match:61310832", provider: "SportRadar", sport: "Handball", category: "Germany", competition: "Bundesliga", season: "2025/26", stage: "Regular season", startTime: "11.06.2026. 19:00", venue: "Sparkassen-Arena", status: "Not started", desc: "THW Kiel - SC Magdeburg", updatedAt: "01:22:00 PM", group: "G-007", mappingStatus: "Mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Mapped" },
+                { id: "EV-009", internalId: "event:56418728", providerId: "mgp:race:2026:07", provider: "ExeFeed", sport: "Moto GP", category: "Italy", competition: "MotoGP World Championship", season: "2026", stage: "Race", startTime: "12.06.2026. 14:00", venue: "Mugello Circuit", status: "Not started", desc: "Italian Grand Prix", updatedAt: "01:25:00 PM", group: "G-009", mappingStatus: "Partially mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Unmapped" },
+                { id: "EV-010", internalId: "event:56418729", providerId: "ls:match:882091", provider: "LSports", sport: "Baseball", category: "United States", competition: "MLB", season: "2026", stage: "Regular season", startTime: "12.06.2026. 01:10", venue: "Yankee Stadium", status: "Not started", desc: "New York Yankees - Boston Red Sox", updatedAt: "01:28:00 PM", group: "G-010", mappingStatus: "Mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Mapped" },
+                { id: "EV-014", internalId: "event:56418730", providerId: "sr:match:61310833", provider: "SportRadar", sport: "Cricket", category: "England", competition: "County Championship", season: "2026", stage: "Round 8", startTime: "12.06.2026. 11:00", venue: "The Oval", status: "Live", desc: "Surrey - Lancashire", updatedAt: "01:30:00 PM", group: "G-014", mappingStatus: "Unmapped", sportMapping: "Unmapped", categoryMapping: "Unmapped", tournamentMapping: "Unmapped" },
+                { id: "EV-015", internalId: "event:56418731", providerId: "bc:match:441208", provider: "Bet Construct", sport: "Ice Hockey", category: "Sweden", competition: "SHL", season: "2025/26", stage: "Final", startTime: "13.06.2026. 20:00", venue: "Avicii Arena", status: "Not started", desc: "Frolunda HC - Lulea HF", updatedAt: "01:34:00 PM", group: "G-015", mappingStatus: "Partially mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Unmapped" },
+                { id: "EV-016", internalId: "event:56418720", providerId: "sr:match:61310022", provider: "SportRadar", sport: "Basketball", category: "United States", competition: "NBA", season: "2025/26", stage: "Regular season", startTime: "09.06.2026. 12:28", venue: "Madison Square Garden", status: "Live", desc: "New York Knicks vs San Antonio Spurs", updatedAt: "12:28:14 PM", group: "G-002", mappingStatus: "Partially mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Unmapped" },
+                { id: "EV-017", internalId: "event:56418721", providerId: "61310033", provider: "ExeFeed", sport: "Tennis", category: "France", competition: "Roland Garros", season: "2026", stage: "Final", startTime: "09.06.2026. 11:00", venue: "Court Philippe-Chatrier", status: "Ended", desc: "N. Djokovic - C. Alcaraz", updatedAt: "11:00:04 AM", group: "G-003", mappingStatus: "Mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Mapped" },
+                { id: "EV-018", internalId: "event:56418724", providerId: "f1:race:2026:monaco", provider: "ExeFeed", sport: "Motorsport", category: "International", competition: "Formula 1", season: "2026", stage: "Race", startTime: "14.06.2026. 15:00", venue: "Monaco", status: "Delayed", desc: "Monaco Grand Prix", updatedAt: "02:01:00 PM", group: "G-008", mappingStatus: "Unmapped", sportMapping: "Unmapped", categoryMapping: "Unmapped", tournamentMapping: "Unmapped" },
+                { id: "EV-019", internalId: "event:56418726", providerId: "sr:match:61310831", provider: "SportRadar", sport: "Volleyball", category: "Italy", competition: "SuperLega", season: "2025/26", stage: "Quarter-final", startTime: "11.06.2026. 18:30", venue: "Pala Barton", status: "Not started", desc: "Perugia vs Lube Civitanova", updatedAt: "01:21:00 PM", group: "G-006", mappingStatus: "Mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Mapped" },
+                { id: "EV-020", internalId: "event:56418727", providerId: "61310832", provider: "ExeFeed", sport: "Handball", category: "Germany", competition: "Bundesliga", season: "2025/26", stage: "Regular season", startTime: "11.06.2026. 19:00", venue: "Sparkassen-Arena", status: "Not started", desc: "Kiel - Magdeburg", updatedAt: "01:23:00 PM", group: "G-007", mappingStatus: "Mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Mapped" },
+                { id: "EV-021", internalId: "event:56418728", providerId: "img:race:motogp:07", provider: "IMG Arena", sport: "Moto GP", category: "Italy", competition: "MotoGP World Championship", season: "2026", stage: "Race", startTime: "12.06.2026. 14:00", venue: "Mugello Circuit", status: "Not started", desc: "Italian GP", updatedAt: "01:26:00 PM", group: "G-009", mappingStatus: "Partially mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Unmapped" },
+                { id: "EV-022", internalId: "event:56418729", providerId: "bb:match:882091", provider: "ExeFeed", sport: "Baseball", category: "United States", competition: "MLB", season: "2026", stage: "Regular season", startTime: "12.06.2026. 01:10", venue: "Yankee Stadium", status: "Not started", desc: "NY Yankees - Boston Red Sox", updatedAt: "01:29:00 PM", group: "G-010", mappingStatus: "Mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Mapped" },
+                { id: "EV-023", internalId: "event:56418730", providerId: "61310833", provider: "ExeFeed", sport: "Cricket", category: "England", competition: "County Championship", season: "2026", stage: "Round 8", startTime: "12.06.2026. 11:00", venue: "The Oval", status: "Live", desc: "Surrey vs Lancashire", updatedAt: "01:31:00 PM", group: "G-014", mappingStatus: "Unmapped", sportMapping: "Unmapped", categoryMapping: "Unmapped", tournamentMapping: "Unmapped" },
+                { id: "EV-024", internalId: "event:56418731", providerId: "sr:match:441208", provider: "SportRadar", sport: "Ice Hockey", category: "Sweden", competition: "SHL", season: "2025/26", stage: "Final", startTime: "13.06.2026. 20:00", venue: "Avicii Arena", status: "Not started", desc: "Frolunda - Lulea", updatedAt: "01:35:00 PM", group: "G-015", mappingStatus: "Partially mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Unmapped" },
+                { id: "EV-025", internalId: "", providerId: "bg:match:33000052", provider: "Bet Genius", sport: "Soccer", category: "Spain", competition: "La Liga", season: "2025/26", stage: "Regular season", startTime: "14.06.2026. 21:00", venue: "Santiago Bernabeu", status: "Not started", desc: "Real Madrid - Atletico Madrid", updatedAt: "01:40:00 PM", group: "G-025", mappingStatus: "Mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Mapped" },
+                { id: "EV-026", internalId: "", providerId: "sr:match:61310911", provider: "SportRadar", sport: "Basketball", category: "United States", competition: "NBA", season: "2025/26", stage: "Playoffs", startTime: "14.06.2026. 02:30", venue: "Chase Center", status: "Not started", desc: "Golden State Warriors - Los Angeles Lakers", updatedAt: "01:42:00 PM", group: "G-026", mappingStatus: "Mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Unmapped" },
+                { id: "EV-027", internalId: "", providerId: "tn:match:752901", provider: "ExeFeed", sport: "Tennis", category: "England", competition: "Wimbledon", season: "2026", stage: "First round", startTime: "15.06.2026. 13:30", venue: "Centre Court", status: "Not started", desc: "Jannik Sinner - Daniil Medvedev", updatedAt: "01:44:00 PM", group: "G-027", mappingStatus: "Mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Mapped" },
+                { id: "EV-028", internalId: "", providerId: "sr:race:2", provider: "SportRadar", sport: "Motorsport", category: "Canada", competition: "Formula 1", season: "2026", stage: "Race", startTime: "15.06.2026. 20:00", venue: "Circuit Gilles-Villeneuve", status: "Not started", desc: "Canadian Grand Prix", updatedAt: "01:46:00 PM", group: "G-028", mappingStatus: "Unmapped", sportMapping: "Unmapped", categoryMapping: "Unmapped", tournamentMapping: "Unmapped" },
+                { id: "EV-029", internalId: "", providerId: "61310912", provider: "ExeFeed", sport: "Volleyball", category: "Poland", competition: "PlusLiga", season: "2025/26", stage: "Semi-final", startTime: "15.06.2026. 18:00", venue: "Spodek", status: "Not started", desc: "ZAKSA Kedzierzyn-Kozle - Jastrzebski Wegiel", updatedAt: "01:48:00 PM", group: "G-029", mappingStatus: "Mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Mapped" },
+                { id: "EV-030", internalId: "", providerId: "sr:match:61310913", provider: "SportRadar", sport: "Handball", category: "France", competition: "LNH Division 1", season: "2025/26", stage: "Regular season", startTime: "15.06.2026. 20:45", venue: "Stade Pierre de Coubertin", status: "Not started", desc: "Paris Saint-Germain - Nantes", updatedAt: "01:50:00 PM", group: "G-030", mappingStatus: "Mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Mapped" },
+                { id: "EV-031", internalId: "", providerId: "mgp:race:2026:08", provider: "ExeFeed", sport: "Moto GP", category: "Netherlands", competition: "MotoGP World Championship", season: "2026", stage: "Race", startTime: "16.06.2026. 14:00", venue: "TT Circuit Assen", status: "Not started", desc: "Dutch Grand Prix", updatedAt: "01:52:00 PM", group: "G-031", mappingStatus: "Partially mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Unmapped" },
+                { id: "EV-032", internalId: "", providerId: "ls:match:882117", provider: "LSports", sport: "Baseball", category: "United States", competition: "MLB", season: "2026", stage: "Regular season", startTime: "16.06.2026. 03:10", venue: "Dodger Stadium", status: "Not started", desc: "Los Angeles Dodgers - Chicago Cubs", updatedAt: "01:54:00 PM", group: "G-032", mappingStatus: "Mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Mapped" },
+                { id: "EV-033", internalId: "", providerId: "cr:match:99171", provider: "Bet Genius", sport: "Cricket", category: "India", competition: "Indian Premier League", season: "2026", stage: "League stage", startTime: "16.06.2026. 16:00", venue: "Wankhede Stadium", status: "Not started", desc: "Mumbai Indians - Chennai Super Kings", updatedAt: "01:56:00 PM", group: "G-033", mappingStatus: "Unmapped", sportMapping: "Unmapped", categoryMapping: "Unmapped", tournamentMapping: "Unmapped" },
+                { id: "EV-034", internalId: "", providerId: "bc:match:441244", provider: "Bet Construct", sport: "Ice Hockey", category: "Finland", competition: "Liiga", season: "2025/26", stage: "Semi-final", startTime: "16.06.2026. 19:30", venue: "Nokia Arena", status: "Not started", desc: "Tappara - Ilves", updatedAt: "01:58:00 PM", group: "G-034", mappingStatus: "Partially mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Unmapped" },
+                { id: "EV-035", internalId: "event:56418742", providerId: "61310940", provider: "ExeFeed", sport: "Soccer", category: "Italy", competition: "Serie A", season: "2025/26", stage: "Regular season", startTime: "17.06.2026. 20:45", venue: "San Siro", status: "Not started", desc: "Inter Milan - Napoli", updatedAt: "02:00:00 PM", group: "G-035", mappingStatus: "Mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Mapped" },
+                { id: "EV-036", internalId: "", providerId: "sr:match:61310940", provider: "SportRadar", sport: "Soccer", category: "Italy", competition: "Serie A", season: "2025/26", stage: "Regular season", startTime: "17.06.2026. 20:45", venue: "Stadio Giuseppe Meazza", status: "Not started", desc: "Internazionale Milano vs SSC Napoli", updatedAt: "02:02:00 PM", group: "G-036", mappingStatus: "Mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Mapped" }
             ];
 
             const messages = [
@@ -553,7 +664,7 @@
                 { eventId: "EV-001", messageId: "event:56418724", time: "07/10/2025 10:45:00 PM", type: "odds change", provider: "SportRadar", sourceRef: "sr:message:61300621:market" },
                 { eventId: "EV-011", messageId: "event:56418725", time: "07/10/2025 10:45:08 PM", type: "fixture", provider: "ExeFeed", sourceRef: "6569588:fixture" },
                 { eventId: "EV-011", messageId: "event:56418726", time: "07/10/2025 10:45:12 PM", type: "odds change", provider: "ExeFeed", sourceRef: "6569588:odds" },
-                { eventId: "EV-002", messageId: "event:56418801", time: "06/09/2026 12:28:10 PM", type: "period update", provider: "ExeFeed", sourceRef: "61310022:period" },
+                { eventId: "EV-002", messageId: "event:56418801", time: "06/09/2026 12:28:10 PM", type: "period update", provider: "Bet Genius", sourceRef: "61310022:period" },
                 { eventId: "EV-003", messageId: "event:56418802", time: "06/09/2026 11:00:00 AM", type: "status update", provider: "Bet Genius", sourceRef: "bg:message:33000033:status" },
                 { eventId: "EV-005", messageId: "event:56418810", time: "06/09/2026 09:58:00 AM", type: "fixture", provider: "ExeFeed", sourceRef: "61310055:fixture" },
                 { eventId: "EV-005", messageId: "event:56418811", time: "06/09/2026 10:01:42 AM", type: "odds change", provider: "ExeFeed", sourceRef: "61310055:odds:pre" },
@@ -602,12 +713,15 @@
 
             const eventsListView = document.getElementById('eventsListView');
             const eventDetailView = document.getElementById('eventDetailView');
+            const providerEventDetailView = document.getElementById('providerEventDetailView');
             const messageFilterView = document.getElementById('messageFilterView');
+            const eventTabs = document.querySelectorAll('.event-tab');
             const tableHead = document.getElementById('eventsTableHead');
             const tableBody = document.getElementById('eventsTableBody');
             const providerSelect = document.getElementById('providerSelect');
             const sportSelect = document.getElementById('sportSelect');
             const statusSelect = document.getElementById('statusSelect');
+            const linkStatusSelect = document.getElementById('linkStatusSelect');
             const tournamentInput = document.getElementById('tournamentInput');
             const tournamentOptions = document.getElementById('tournamentOptions');
             const searchInput = document.getElementById('searchInput');
@@ -625,8 +739,11 @@
             const sourceMessagePayload = document.getElementById('sourceMessagePayload');
             let events = buildMasterEvents(providerEvents);
             let currentEvent = events[0];
+            let currentProviderEvent = null;
+            let activeEventsView = 'master';
             let selectedLinkGroupId = '';
             let selectedProviderEventId = '';
+            let linkSourceProviderEventId = '';
 
             function uniqueValues(values) {
                 return [...new Set(values.filter(Boolean))].sort();
@@ -638,7 +755,7 @@
                     if (!groups.has(event.group)) groups.set(event.group, []);
                     groups.get(event.group).push(event);
                 });
-                return [...groups.values()].map(groupEvents => {
+                return [...groups.values()].filter(groupEvents => groupEvents[0].internalId).map(groupEvents => {
                     const leadEvent = groupEvents[0];
                     const providers = uniqueValues(groupEvents.map(event => event.provider));
                     const leadingFeedProvider = providers.includes('ExeFeed') ? 'ExeFeed' : providers[0];
@@ -655,6 +772,10 @@
                 });
             }
 
+            function providerEventLinkStatus(event) {
+                return event.internalId ? 'Linked' : 'Not linked';
+            }
+
             function populateTournamentOptions() {
                 tournamentOptions.innerHTML = uniqueValues(events.map(event => event.competition))
                     .map(tournament => `<option value="${tournament}"></option>`)
@@ -669,6 +790,22 @@
             }
 
             function linkEvents(targetGroupId) {
+                if (linkSourceProviderEventId) {
+                    const sourceEvent = providerEvents.find(event => event.id === linkSourceProviderEventId);
+                    const targetMasterEvent = events.find(event => event.id === targetGroupId);
+                    if (!sourceEvent || !targetMasterEvent) return;
+
+                    sourceEvent.linkOrigin = { group: sourceEvent.group, internalId: sourceEvent.internalId };
+                    sourceEvent.group = targetMasterEvent.id;
+                    sourceEvent.internalId = targetMasterEvent.internalId;
+                    linkSourceProviderEventId = '';
+                    events = buildMasterEvents(providerEvents);
+                    currentEvent = events.find(event => event.id === targetMasterEvent.id) || events[0];
+                    renderTable();
+                    showProviderEventDetail(sourceEvent.id);
+                    return;
+                }
+
                 providerEvents
                     .filter(event => event.group === targetGroupId)
                     .forEach(event => {
@@ -692,7 +829,7 @@
                 if (!providerEvent || providerEvent.group !== currentEvent.id || currentEvent.providerEvents.length < 2) return;
 
                 const originalGroup = providerEvent.linkOrigin?.group || `G-${providerEvent.id}`;
-                const originalInternalId = providerEvent.linkOrigin?.internalId || `event:${providerEvent.providerId}`;
+                const originalInternalId = providerEvent.linkOrigin?.internalId || '';
                 providerEvent.group = originalGroup;
                 providerEvent.internalId = originalInternalId;
                 delete providerEvent.linkOrigin;
@@ -707,6 +844,21 @@
                 const providerVal = linkProviderFilter.value;
                 const tournamentVal = linkTournamentInput.value.trim().toLowerCase();
                 const searchVal = linkEventSearch.value.trim().toLowerCase();
+                if (linkSourceProviderEventId) {
+                    const sourceEvent = providerEvents.find(event => event.id === linkSourceProviderEventId);
+                    if (!sourceEvent) return [];
+                    return events.filter(event => {
+                        const providerMatch = providerVal === 'all' || event.providerEvents.some(item => item.provider === providerVal);
+                        const sportMatch = event.sport === sourceEvent.sport;
+                        const tournamentMatch = !tournamentVal || event.competition.toLowerCase().includes(tournamentVal);
+                        const searchMatch = !searchVal ||
+                            event.internalId.toLowerCase().includes(searchVal) ||
+                            event.providerId.toLowerCase().includes(searchVal) ||
+                            event.desc.toLowerCase().includes(searchVal) ||
+                            event.competition.toLowerCase().includes(searchVal);
+                        return event.id !== sourceEvent.group && providerMatch && sportMatch && tournamentMatch && searchMatch;
+                    });
+                }
                 return events.filter(event => {
                     const providerMatch = providerVal === 'all' || event.providerEvents.some(source => source.provider === providerVal);
                     const sportMatch = event.sport === currentEvent.sport;
@@ -755,10 +907,27 @@
                 document.getElementById('linkEventsSubtitle').textContent = `Select an event to link with ${currentEvent.desc}.`;
                 linkTournamentInput.value = '';
                 linkEventSearch.value = '';
+                document.getElementById('linkEventsHead').innerHTML = `
+                    <tr>
+                        <th style="width: 44px;">Select</th>
+                        <th>Event</th>
+                        <th>Event ID</th>
+                        <th>Start Time</th>
+                        <th>Tournament</th>
+                    </tr>
+                `;
                 populateLinkProviderFilter();
                 populateLinkTournamentOptions();
                 renderLinkEventRows();
                 linkEventsModal.style.display = 'flex';
+            }
+
+            function openProviderEventLink(providerEventId) {
+                const providerEvent = providerEvents.find(event => event.id === providerEventId);
+                if (!providerEvent) return;
+                linkSourceProviderEventId = providerEvent.id;
+                currentEvent = providerEvent;
+                openLinkEventsModal();
             }
 
             function statusClass(status) {
@@ -870,6 +1039,34 @@
                 return rows.sort((a, b) => a.startTime.localeCompare(b.startTime));
             }
 
+            function filteredProviderRows() {
+                const providerVal = providerSelect.value;
+                const sportVal = sportSelect.value;
+                const linkStatusVal = linkStatusSelect.value;
+                const tournamentVal = tournamentInput.value.trim().toLowerCase();
+                const searchVal = searchInput.value.toLowerCase();
+                const startFrom = eventStartFrom.value;
+                const startTo = eventStartTo.value;
+
+                return providerEvents.filter(event => {
+                    const eventStartTime = parseEventStartTime(event.startTime);
+                    const providerMatch = providerVal === 'all' || event.provider === providerVal;
+                    const sportMatch = sportVal === 'all' || event.sport === sportVal;
+                    const linkStatusMatch = linkStatusVal === 'all' ||
+                        (linkStatusVal === 'linked' && providerEventLinkStatus(event) === 'Linked') ||
+                        (linkStatusVal === 'not-linked' && providerEventLinkStatus(event) === 'Not linked');
+                    const tournamentMatch = !tournamentVal || event.competition.toLowerCase().includes(tournamentVal);
+                    const startFromMatch = !startFrom || eventStartTime >= new Date(`${startFrom}T00:00:00`);
+                    const startToMatch = !startTo || eventStartTime <= new Date(`${startTo}T23:59:59`);
+                    const searchMatch = event.id.toLowerCase().includes(searchVal) ||
+                        event.internalId.toLowerCase().includes(searchVal) ||
+                        event.providerId.toLowerCase().includes(searchVal) ||
+                        event.desc.toLowerCase().includes(searchVal) ||
+                        event.competition.toLowerCase().includes(searchVal);
+                    return providerMatch && sportMatch && linkStatusMatch && tournamentMatch && startFromMatch && startToMatch && searchMatch;
+                }).sort((a, b) => a.startTime.localeCompare(b.startTime));
+            }
+
             function parseEventStartTime(value) {
                 const match = value.match(/^(\d{2})\.(\d{2})\.(\d{4})\.\s+(\d{2}):(\d{2})$/);
                 if (!match) return new Date(0);
@@ -878,6 +1075,10 @@
             }
 
             function renderTable() {
+                if (activeEventsView === 'provider') {
+                    renderProviderEventsTable();
+                    return;
+                }
                 tableHead.innerHTML = `
                     <tr>
                         <th>Event ID</th>
@@ -915,8 +1116,61 @@
                 });
             }
 
+            function renderProviderEventsTable() {
+                tableHead.innerHTML = `
+                    <tr>
+                        <th>Feed Provider</th>
+                        <th>Source ID</th>
+                        <th>Event ID</th>
+                        <th>Start Time</th>
+                        <th>Sport</th>
+                        <th>Tournament</th>
+                        <th>Description</th>
+                        <th>Link Status</th>
+                        <th style="text-align: right;">Action</th>
+                    </tr>
+                `;
+
+                const rows = filteredProviderRows();
+                if (rows.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="9" style="text-align: center; color: #888; font-style: italic; padding: 20px;">No provider events found.</td></tr>';
+                    return;
+                }
+
+                tableBody.innerHTML = rows.map(event => {
+                    const linkStatus = providerEventLinkStatus(event);
+                    const linkClass = linkStatus === 'Linked' ? 'status-mapped' : 'status-unmapped';
+                    return `
+                        <tr>
+                            <td>${event.provider}</td>
+                            <td style="font-weight: 600; color: #6c757d;">${event.providerId}</td>
+                            <td style="font-weight: 600; color: #007bff;">${linkStatus === 'Linked' ? event.internalId : '<span style="color: #98a2b3;">-</span>'}</td>
+                            <td>${event.startTime}</td>
+                            <td>${event.sport}</td>
+                            <td>${event.competition}</td>
+                            <td class="market-name">${event.desc}</td>
+                            <td><span class="status-badge ${linkClass}">${linkStatus}</span></td>
+                            <td style="text-align: right;">
+                                <span class="row-actions">
+                                    <button type="button" class="btn-action view-provider-event-btn" data-provider-event-id="${event.id}" style="background-color: #007bff;">View</button>
+                                    ${linkStatus === 'Not linked' ? `<button type="button" class="btn-action link-provider-event-btn" data-provider-event-id="${event.id}">Link</button>` : ''}
+                                </span>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+
+                document.querySelectorAll('.view-provider-event-btn').forEach(button => {
+                    button.addEventListener('click', () => showProviderEventDetail(button.dataset.providerEventId));
+                });
+                document.querySelectorAll('.link-provider-event-btn').forEach(button => {
+                    button.addEventListener('click', () => openProviderEventLink(button.dataset.providerEventId));
+                });
+            }
+
             function showEventDetail(eventId) {
                 currentEvent = events.find(event => event.id === eventId) || events[0];
+                if (!currentEvent) return;
                 if (!currentEvent.providerEvents.some(event => event.id === selectedProviderEventId)) {
                     selectedProviderEventId = currentEvent.providerEvents[0]?.id || '';
                 }
@@ -944,8 +1198,61 @@
                 renderLinkedEvents();
                 renderEventMarkets();
                 eventsListView.style.display = 'none';
+                providerEventDetailView.style.display = 'none';
                 messageFilterView.style.display = 'none';
                 eventDetailView.style.display = 'block';
+            }
+
+            function showProviderEventDetail(providerEventId) {
+                currentProviderEvent = providerEvents.find(event => event.id === providerEventId) || null;
+                if (!currentProviderEvent) return;
+                const isLinked = providerEventLinkStatus(currentProviderEvent) === 'Linked';
+                document.getElementById('providerEventDetailTitle').textContent = currentProviderEvent.desc.replace(' - ', ' vs ');
+                document.getElementById('providerEventDetailSubtitle').textContent = `${currentProviderEvent.provider} · Source ID: ${currentProviderEvent.providerId}`;
+                document.getElementById('providerEventDetailGrid').innerHTML = `
+                    <div>
+                        <div class="detail-row"><strong>Feed Provider:</strong><span>${currentProviderEvent.provider}</span></div>
+                        <div class="detail-row"><strong>Source ID:</strong><span>${currentProviderEvent.providerId}</span></div>
+                        <div class="detail-row"><strong>Event ID:</strong><span>${isLinked ? currentProviderEvent.internalId : '-'}</span></div>
+                        <div class="detail-row"><strong>Link status:</strong><span class="status-badge ${isLinked ? 'status-mapped' : 'status-unmapped'}">${isLinked ? 'Linked' : 'Not linked'}</span></div>
+                    </div>
+                    <div>
+                        <div class="detail-row"><strong>Sport:</strong><span>${currentProviderEvent.sport}</span></div>
+                        <div class="detail-row"><strong>Category:</strong><span>${currentProviderEvent.category}</span></div>
+                        <div class="detail-row"><strong>Tournament:</strong><span>${currentProviderEvent.competition}</span></div>
+                        <div class="detail-row"><strong>Season:</strong><span>${currentProviderEvent.season}</span></div>
+                    </div>
+                    <div>
+                        <div class="detail-row"><strong>Start time:</strong><span>${currentProviderEvent.startTime}</span></div>
+                        <div class="detail-row"><strong>Venue:</strong><span>${currentProviderEvent.venue}</span></div>
+                        <div class="detail-row"><strong>Status:</strong><span>${currentProviderEvent.status}</span></div>
+                        <div class="detail-row"><strong>Last updated:</strong><span>${currentProviderEvent.updatedAt}</span></div>
+                    </div>
+                `;
+                const linkButton = document.getElementById('linkProviderEventFromDetailBtn');
+                const masterButton = document.getElementById('viewMasterEventBtn');
+                linkButton.style.display = isLinked ? 'none' : 'inline-flex';
+                masterButton.style.display = isLinked ? 'inline-flex' : 'none';
+                renderProviderEventMarkets();
+                eventsListView.style.display = 'none';
+                eventDetailView.style.display = 'none';
+                messageFilterView.style.display = 'none';
+                providerEventDetailView.style.display = 'block';
+            }
+
+            function renderProviderEventMarkets() {
+                const rows = eventMarkets.filter(market => market.eventId === currentProviderEvent.id);
+                document.getElementById('providerEventMarketsBody').innerHTML = rows.length ? rows.map(market => `
+                    <tr>
+                        <td style="font-weight: 600; color: #6c757d;">${market.marketId}</td>
+                        <td class="market-name">${market.providerMarket}</td>
+                        <td><span class="status-badge ${mappingStatusClass(market.status)}">${market.status}</span></td>
+                        <td>${market.internalId && market.internalId !== '-' ? market.internalMarket : '<span style="color: #98a2b3;">-</span>'}</td>
+                        <td style="text-align: right;">${market.internalId && market.internalId !== '-'
+                            ? `<a href="../../view_hermes_market.html?id=${encodeURIComponent(market.internalId)}&market=${encodeURIComponent(market.internalMarket)}&sport=${encodeURIComponent(currentProviderEvent.sport)}" class="btn-action" style="background-color: #007bff; text-decoration: none; display: inline-block;">View</a>`
+                            : '<span style="color: #98a2b3;">-</span>'}</td>
+                    </tr>
+                `).join('') : '<tr><td colspan="5" style="text-align: center; color: #888; font-style: italic;">No markets found for this provider event.</td></tr>';
             }
 
             function renderLinkedEvents() {
@@ -1029,6 +1336,7 @@
                 renderFilteredEventMessages();
                 eventsListView.style.display = 'none';
                 eventDetailView.style.display = 'none';
+                providerEventDetailView.style.display = 'none';
                 messageFilterView.style.display = 'block';
             }
 
@@ -1043,17 +1351,32 @@
             }
 
             [providerSelect, sportSelect, statusSelect].forEach(field => field.addEventListener('change', renderTable));
+            linkStatusSelect.addEventListener('change', renderTable);
             tournamentInput.addEventListener('input', renderTable);
             searchInput.addEventListener('input', renderTable);
             eventStartFrom.addEventListener('change', renderTable);
             eventStartTo.addEventListener('change', renderTable);
             document.getElementById('backToEventsBtn').addEventListener('click', () => {
                 eventDetailView.style.display = 'none';
+                providerEventDetailView.style.display = 'none';
                 messageFilterView.style.display = 'none';
                 eventsListView.style.display = 'block';
             });
+            document.getElementById('backToProviderEventsBtn').addEventListener('click', () => {
+                providerEventDetailView.style.display = 'none';
+                eventsListView.style.display = 'block';
+            });
+            document.getElementById('linkProviderEventFromDetailBtn').addEventListener('click', () => {
+                if (currentProviderEvent) openProviderEventLink(currentProviderEvent.id);
+            });
+            document.getElementById('viewMasterEventBtn').addEventListener('click', () => {
+                if (currentProviderEvent?.internalId) showEventDetail(currentProviderEvent.group);
+            });
             document.getElementById('openMessageFiltersBtn').addEventListener('click', showMessageFilters);
-            document.getElementById('openLinkEventsBtn').addEventListener('click', openLinkEventsModal);
+            document.getElementById('openLinkEventsBtn').addEventListener('click', () => {
+                linkSourceProviderEventId = '';
+                openLinkEventsModal();
+            });
             document.getElementById('backToEventDetailBtn').addEventListener('click', () => {
                 messageFilterView.style.display = 'none';
                 eventDetailView.style.display = 'block';
@@ -1102,6 +1425,16 @@
             window.addEventListener('click', event => {
                 if (event.target === messageDetailsModal) messageDetailsModal.style.display = 'none';
                 if (event.target === linkEventsModal) linkEventsModal.style.display = 'none';
+            });
+
+            eventTabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    activeEventsView = tab.dataset.view;
+                    eventTabs.forEach(item => item.classList.toggle('active', item === tab));
+                    document.getElementById('eventStatusFilterGroup').style.display = activeEventsView === 'master' ? 'block' : 'none';
+                    document.getElementById('linkStatusFilterGroup').style.display = activeEventsView === 'provider' ? 'block' : 'none';
+                    renderTable();
+                });
             });
 
             populateTournamentOptions();
