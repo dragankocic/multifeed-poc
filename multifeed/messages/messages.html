@@ -65,6 +65,36 @@
             box-sizing: border-box;
         }
 
+        #promoteEventModal .modal-content { width: min(860px, calc(100vw - 48px)); max-height: 85vh; overflow-y: auto; box-sizing: border-box; }
+        #promoteEventBody { padding: 20px 0 0 !important; }
+        .reactivation-intro { margin: 0 0 20px; color: #666; font-size: 14px; line-height: 1.6; }
+        .reactivation-source-description { margin-top: 4px; color: #777; font-size: 12px; line-height: 1.5; }
+        .reactivation-candidate { cursor: pointer; }
+        .reactivation-candidate:hover { background: #f4f9fc; }
+        .reactivation-candidate.selected { background: #eef9fb; }
+        .reactivation-unavailable { background: #fafafa; color: #888; }
+        #promoteEventModal input[type=radio] { accent-color: #17a2b8; width: 16px; height: 16px; }
+        #promoteEventModal .btn-primary:disabled { opacity: .5; cursor: not-allowed; }
+
+        .correlation-result { grid-column: 1 / -1; margin: 0; padding: 14px 16px; background: #eef9fb; border: 1px solid #c9e6eb; border-radius: 6px; color: #2c3e50; font-size: 14px; line-height: 1.6; }
+        .event-lifecycle-panel { grid-column: 1 / -1; border-top: 1px solid #e1e5ea; padding-top: 24px; min-width: 0; }
+        .event-lifecycle-header { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 18px; flex-wrap: wrap; }
+        .event-lifecycle-panel h3 { margin: 0; font-size: 20px; color: #2c3e50; }
+        .event-lifecycle-panel h4 { margin: 24px 0 12px; font-size: 16px; color: #2c3e50; }
+        .event-lifecycle-facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 28px; }
+        .event-lifecycle-panel p { margin: 0; font-size: 14px; line-height: 1.6; }
+        .event-lifecycle-reason { margin: 16px 0 !important; padding: 12px 16px; border-left: 3px solid #e0a800; background: #fff8e6; color: #735c16; border-radius: 4px; }
+        .event-lifecycle-table { overflow-x: auto; }
+        .event-lifecycle-table table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        .event-lifecycle-table th { text-align: left; background: #f8f9fa; color: #666; font-weight: 600; }
+        .event-lifecycle-table th, .event-lifecycle-table td { padding: 12px; border-bottom: 1px solid #e1e5ea; vertical-align: top; overflow-wrap: anywhere; }
+        .event-lifecycle-history { margin: 0; padding-left: 20px; color: #666; font-size: 14px; line-height: 1.6; }
+        .event-lifecycle-history li { padding: 6px 0; }
+        .event-detail-grid > div { min-width: 0; }
+        .detail-row span { overflow-wrap: anywhere; }
+        @media (max-width: 1100px) { .event-detail-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; } }
+        @media (max-width: 700px) { .event-detail-grid, .event-lifecycle-facts { grid-template-columns: minmax(0, 1fr) !important; } .detail-row { grid-template-columns: minmax(100px, 140px) minmax(0, 1fr); } }
+
         .event-detail-grid {
             display: grid;
             grid-template-columns: repeat(3, minmax(220px, 1fr));
@@ -360,6 +390,7 @@
                                     <option value="Not started">Not started</option>
                                     <option value="Live">Live</option>
                                     <option value="Ended">Ended</option>
+                                    <option value="Inactive">Inactive</option>
                                     <option value="Cancelled">Cancelled</option>
                                     <option value="Delayed">Delayed</option>
                                     <option value="Suspended">Suspended</option>
@@ -459,6 +490,9 @@
                         </div>
                         <div class="actions detail-actions" style="display: flex; gap: 10px; justify-content: flex-end;">
                             <button type="button" id="linkProviderEventFromDetailBtn" class="btn-secondary">Link to master event</button>
+                            <button type="button" id="createMasterFromDetailBtn" class="btn-primary">Create event</button>
+                            <button type="button" id="excludeSourceFromDetailBtn" class="btn-secondary">Unlink &amp; exclude</button>
+                            <button type="button" id="resumeSourceFromDetailBtn" class="btn-primary">Resume automatic linking</button>
                             <button type="button" id="viewMasterEventBtn" class="btn-secondary" style="display: none;">View master event</button>
                         </div>
                     </div>
@@ -613,6 +647,22 @@
         </div>
     </div>
 
+    <div id="promoteEventModal" class="modal">
+        <div class="modal-content">
+            <button type="button" id="closePromoteEventBtn" class="close-modal" aria-label="Close" style="border: 0; background: transparent; padding: 0;">&times;</button>
+            <h3 id="promoteEventTitle" style="font-size: 24px; margin: 0 0 8px;">Create event</h3>
+            <div id="promoteEventBody" style="padding: 20px;"></div>
+            <div class="modal-actions"><button type="button" id="cancelPromoteEventBtn" class="btn-secondary">Cancel</button><button type="button" id="confirmPromoteEventBtn" class="btn-primary">Create event</button></div>
+        </div>
+    </div>
+    <div id="unlinkEventModal" class="modal">
+        <div class="modal-content link-event-modal-content">
+            <button type="button" id="closeUnlinkEventBtn" class="close-modal" aria-label="Close" style="border:0;background:transparent;padding:0;">&times;</button>
+            <h3 id="unlinkEventTitle" style="font-size:24px;margin:0 0 18px;">Unlink &amp; exclude</h3>
+            <div id="unlinkEventBody" class="event-lifecycle-table"></div>
+            <div class="modal-actions"><button type="button" id="cancelUnlinkEventBtn" class="btn-secondary">Cancel</button><button type="button" id="confirmUnlinkEventBtn" class="btn-primary">Unlink &amp; exclude</button></div>
+        </div>
+    </div>
     <script src="../../pagination.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -651,8 +701,14 @@
                 { id: "EV-032", internalId: "", providerId: "ls:match:882117", provider: "LSports", sport: "Baseball", category: "United States", competition: "MLB", season: "2026", stage: "Regular season", startTime: "16.06.2026. 03:10", venue: "Dodger Stadium", status: "Not started", desc: "Los Angeles Dodgers - Chicago Cubs", updatedAt: "01:54:00 PM", group: "G-032", mappingStatus: "Mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Mapped" },
                 { id: "EV-033", internalId: "", providerId: "cr:match:99171", provider: "Bet Genius", sport: "Cricket", category: "India", competition: "Indian Premier League", season: "2026", stage: "League stage", startTime: "16.06.2026. 16:00", venue: "Wankhede Stadium", status: "Not started", desc: "Mumbai Indians - Chennai Super Kings", updatedAt: "01:56:00 PM", group: "G-033", mappingStatus: "Unmapped", sportMapping: "Unmapped", categoryMapping: "Unmapped", tournamentMapping: "Unmapped" },
                 { id: "EV-034", internalId: "", providerId: "bc:match:441244", provider: "Bet Construct", sport: "Ice Hockey", category: "Finland", competition: "Liiga", season: "2025/26", stage: "Semi-final", startTime: "16.06.2026. 19:30", venue: "Nokia Arena", status: "Not started", desc: "Tappara - Ilves", updatedAt: "01:58:00 PM", group: "G-034", mappingStatus: "Partially mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Unmapped" },
-                { id: "EV-035", internalId: "event:56418742", providerId: "61310940", provider: "ExeFeed", sport: "Soccer", category: "Italy", competition: "Serie A", season: "2025/26", stage: "Regular season", startTime: "17.06.2026. 20:45", venue: "San Siro", status: "Not started", desc: "Inter Milan - Napoli", updatedAt: "02:00:00 PM", group: "G-035", mappingStatus: "Mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Mapped" },
-                { id: "EV-036", internalId: "", providerId: "sr:match:61310940", provider: "SportRadar", sport: "Soccer", category: "Italy", competition: "Serie A", season: "2025/26", stage: "Regular season", startTime: "17.06.2026. 20:45", venue: "Stadio Giuseppe Meazza", status: "Not started", desc: "Internazionale Milano vs SSC Napoli", updatedAt: "02:02:00 PM", group: "G-036", mappingStatus: "Mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Mapped" }
+                { id: "EV-035", feedId: "exefeed-live", mappedTournamentId: "T-SERIE-A", mappedHomeId: "C-INT", mappedAwayId: "C-NAP", internalId: "event:56418742", providerId: "61310940", provider: "ExeFeed", sport: "Soccer", category: "Italy", competition: "Serie A", season: "2025/26", stage: "Regular season", startTime: "17.06.2026. 20:45", venue: "San Siro", status: "Not started", desc: "Inter Milan - Napoli", updatedAt: "02:00:00 PM", group: "G-035", mappingStatus: "Mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Mapped" },
+                { id: "EV-036", feedId: "sportradar-live", mappedTournamentId: "T-SERIE-A", mappedHomeId: "C-INT", mappedAwayId: "C-NAP", internalId: "", providerId: "sr:match:61310940", provider: "SportRadar", sport: "Soccer", category: "Italy", competition: "Serie A", season: "2025/26", stage: "Regular season", startTime: "17.06.2026. 18:45", venue: "Stadio Giuseppe Meazza", status: "Not started", desc: "Internazionale Milano vs SSC Napoli", updatedAt: "02:02:00 PM", group: "G-036", mappingStatus: "Mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Mapped" },
+                { id: "EV-037", internalId: "event:56418743", providerId: "61310941", provider: "ExeFeed", feedId: "exefeed-live", sport: "Soccer", category: "Italy", competition: "Serie A", mappedTournamentId: "T-SERIE-A", mappedHomeId: "C-JUV", mappedAwayId: "C-MIL", season: "2025/26", stage: "Regular season", startTime: "18.06.2026. 20:45", venue: "Allianz Stadium", status: "Not started", desc: "Juventus - Milan", updatedAt: "02:03:00 PM", group: "G-037", mappingStatus: "Mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Mapped", automaticCorrelationExcluded: false },
+                { id: "EV-038", internalId: "", providerId: "sr:match:61310941", provider: "SportRadar", feedId: "sportradar-live", sport: "Soccer", category: "Italy", competition: "Serie A", mappedTournamentId: "T-SERIE-A", mappedHomeId: "C-JUV", mappedAwayId: "C-MIL", season: "2025/26", stage: "Regular season", startTime: "18.06.2026. 20:45", venue: "Allianz Stadium", status: "Not started", desc: "Juventus vs AC Milan", updatedAt: "02:03:00 PM", group: "G-038", mappingStatus: "Mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Mapped", automaticCorrelationExcluded: false },
+                { id: "EV-039", internalId: "", providerId: "sr:match:61310942", provider: "SportRadar", feedId: "sportradar-live", sport: "Soccer", category: "Italy", competition: "Serie A", mappedTournamentId: "T-SERIE-A", mappedHomeId: "C-ROM", mappedAwayId: "C-LAZ", season: "2025/26", stage: "Regular season", startTime: "19.06.2026. 20:45", venue: "Stadio Olimpico", status: "Not started", desc: "Roma - Lazio", updatedAt: "02:03:00 PM", group: "G-039", mappingStatus: "Mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Mapped", automaticCorrelationExcluded: false },
+                { id: "EV-040", internalId: "", providerId: "61310943", provider: "ExeFeed", feedId: "exefeed-live", mappedTournamentId: "T-LA-LIGA", mappedHomeId: "C-BAR", mappedAwayId: "C-RMA", sport: "Soccer", category: "Spain", competition: "La Liga", season: "2025/26", stage: "Regular season", startTime: "", venue: "Camp Nou", status: "Not started", desc: "Barcelona - Real Madrid", updatedAt: "02:05:00 PM", group: "G-040", mappingStatus: "Mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Mapped", decisionRevision: 0 },
+                { id: "EV-041", internalId: "", providerId: "sr:match:61310943", provider: "SportRadar", feedId: "sportradar-live", mappedTournamentId: "T-LA-LIGA", mappedHomeId: "C-BAR", mappedAwayId: "C-RMA", sport: "Soccer", category: "Spain", competition: "La Liga", season: "2025/26", stage: "Regular season", startTime: "20.06.2026. 20:50", venue: "Camp Nou", status: "Not started", desc: "Barcelona - Real Madrid", updatedAt: "02:05:00 PM", group: "G-041", mappingStatus: "Mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Mapped", decisionRevision: 0 },
+                { id: "EV-042", internalId: "", providerId: "bg:match:61310943", provider: "Bet Genius", feedId: "bet-genius-live", mappedTournamentId: "T-LA-LIGA", mappedHomeId: "C-BAR", mappedAwayId: "C-RMA", sport: "Soccer", category: "Spain", competition: "La Liga", season: "2025/26", stage: "Regular season", startTime: "20.06.2026. 20:55", venue: "Camp Nou", status: "Not started", desc: "Barcelona - Real Madrid", updatedAt: "02:05:00 PM", group: "G-042", mappingStatus: "Mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Mapped", decisionRevision: 0 }
             ];
 
             const messages = [
@@ -708,6 +764,27 @@
                 { eventId: "EV-013", marketId: "sr:market:65", providerMarket: "Halftime/Fulltime", internalId: "HRM-010", internalMarket: "HALFTIME_FULLTIME", status: "Mapped" },
                 { eventId: "EV-013", marketId: "sr:market:147", providerMarket: "Asian Handicap", internalId: "-", internalMarket: "-", status: "Unmapped" },
                 { eventId: "EV-013", marketId: "sr:market:190", providerMarket: "First Team To Score", internalId: "-", internalMarket: "-", status: "Unmapped" },
+                { eventId: "EV-035", marketId: "101", providerMarket: "1X2", internalId: "HRM-001", internalMarket: "1x2", status: "Mapped" },
+                { eventId: "EV-035", marketId: "102", providerMarket: "TOTAL_GOALS", internalId: "HRM-002", internalMarket: "TOTAL_GOALS", status: "Mapped" },
+                { eventId: "EV-035", marketId: "103", providerMarket: "BOTH_TEAMS_TO_SCORE", internalId: "HRM-003", internalMarket: "BTTS", status: "Mapped" },
+                { eventId: "EV-037", marketId: "101", providerMarket: "1X2", internalId: "HRM-001", internalMarket: "1x2", status: "Mapped" },
+                { eventId: "EV-037", marketId: "102", providerMarket: "TOTAL_GOALS", internalId: "HRM-002", internalMarket: "TOTAL_GOALS", status: "Mapped" },
+                { eventId: "EV-037", marketId: "103", providerMarket: "BOTH_TEAMS_TO_SCORE", internalId: "HRM-003", internalMarket: "BTTS", status: "Mapped" },
+                { eventId: "EV-036", marketId: "sr:market:1", providerMarket: "1x2", internalId: "HRM-001", internalMarket: "1x2", status: "Mapped" },
+                { eventId: "EV-036", marketId: "sr:market:18", providerMarket: "Total Goals", internalId: "HRM-002", internalMarket: "TOTAL_GOALS", status: "Mapped" },
+                { eventId: "EV-036", marketId: "sr:market:10", providerMarket: "Double Chance", internalId: "HRM-007", internalMarket: "DOUBLE_CHANCE", status: "Mapped" },
+                { eventId: "EV-036", marketId: "sr:market:147", providerMarket: "Asian Handicap", internalId: "-", internalMarket: "-", status: "Unmapped" },
+                { eventId: "EV-038", marketId: "sr:market:1", providerMarket: "1x2", internalId: "HRM-001", internalMarket: "1x2", status: "Mapped" },
+                { eventId: "EV-038", marketId: "sr:market:18", providerMarket: "Total Goals", internalId: "HRM-002", internalMarket: "TOTAL_GOALS", status: "Mapped" },
+                { eventId: "EV-038", marketId: "sr:market:10", providerMarket: "Double Chance", internalId: "HRM-007", internalMarket: "DOUBLE_CHANCE", status: "Mapped" },
+                { eventId: "EV-038", marketId: "sr:market:147", providerMarket: "Asian Handicap", internalId: "-", internalMarket: "-", status: "Unmapped" },
+                { eventId: "EV-039", marketId: "sr:market:1", providerMarket: "1x2", internalId: "HRM-001", internalMarket: "1x2", status: "Mapped" },
+                { eventId: "EV-039", marketId: "sr:market:18", providerMarket: "Total Goals", internalId: "HRM-002", internalMarket: "TOTAL_GOALS", status: "Mapped" },
+                { eventId: "EV-039", marketId: "sr:market:10", providerMarket: "Double Chance", internalId: "HRM-007", internalMarket: "DOUBLE_CHANCE", status: "Mapped" },
+                { eventId: "EV-039", marketId: "sr:market:147", providerMarket: "Asian Handicap", internalId: "-", internalMarket: "-", status: "Unmapped" },
+                { eventId: "EV-040", marketId: "101", providerMarket: "1X2", internalId: "HRM-001", internalMarket: "1x2", status: "Mapped" },
+                { eventId: "EV-041", marketId: "sr:market:18", providerMarket: "Total Goals", internalId: "HRM-002", internalMarket: "TOTAL_GOALS", status: "Mapped" },
+                { eventId: "EV-042", marketId: "bg:market:10", providerMarket: "Double Chance", internalId: "HRM-007", internalMarket: "DOUBLE_CHANCE", status: "Mapped" },
                 { eventId: "EV-008", marketId: "img:market:race-winner", providerMarket: "Race Winner", internalId: "-", internalMarket: "-", status: "Unmapped" }
             ];
 
@@ -737,6 +814,23 @@
             const confirmLinkEventsBtn = document.getElementById('confirmLinkEventsBtn');
             const internalMessagePayload = document.getElementById('internalMessagePayload');
             const sourceMessagePayload = document.getElementById('sourceMessagePayload');
+            // Creation provenance is retained independently of subsequently linked feeds.
+            const eventCreationSources = new Map();
+            providerEvents.filter(source => source.internalId).forEach(source => {
+                const existing = eventCreationSources.get(source.internalId);
+                if (!existing || source.provider === 'ExeFeed') eventCreationSources.set(source.internalId, source);
+            });
+            const retainedEvents = new Map();
+            const originalBarcelonaSource = providerEvents.find(source => source.id === 'EV-040');
+            eventCreationSources.set('event:56418744', originalBarcelonaSource);
+            retainedEvents.set('event:56418744', {
+                ...originalBarcelonaSource, id: 'G-BARCELONA', internalId: 'event:56418744', startTime: '20.06.2026. 20:45',
+                masterActive: false, referenceSourceId: '',
+                inactiveReason: 'The reference ExeFeed source no longer has a start time. All previous links were closed.',
+                formerLinks: ['EV-040', 'EV-041', 'EV-042'].map(id => ({id, revision: 0})),
+                history: ['ExeFeed reference start time removed. Event made inactive; all three source links closed.'],
+                restorationOutcomes: []
+            });
             let events = buildMasterEvents(providerEvents);
             let currentEvent = events[0];
             let currentProviderEvent = null;
@@ -755,21 +849,37 @@
                     if (!groups.has(event.group)) groups.set(event.group, []);
                     groups.get(event.group).push(event);
                 });
-                return [...groups.values()].filter(groupEvents => groupEvents[0].internalId).map(groupEvents => {
-                    const leadEvent = groupEvents[0];
+                const active = [...groups.values()].filter(groupEvents => groupEvents[0].internalId).map(groupEvents => {
+                    const retained = retainedEvents.get(groupEvents[0].internalId);
+                    const leadEvent = groupEvents.find(source => source.id === retained?.referenceSourceId) || groupEvents[0];
                     const providers = uniqueValues(groupEvents.map(event => event.provider));
                     const leadingFeedProvider = providers.includes('ExeFeed') ? 'ExeFeed' : providers[0];
                     const providerIds = groupEvents.map(event => `${event.provider}: ${event.providerId}`);
                     return {
                         ...leadEvent,
-                        id: leadEvent.group,
+                        ...retained,
+                        startTime: leadEvent.startTime,
+                        masterActive: retained ? retained.masterActive : true,
+                        referenceSourceId: retained?.referenceSourceId || leadEvent.id,
+                        id: retained?.id || leadEvent.group,
                         providerId: providerIds.join(', '),
                         provider: providers.join(', '),
                         leadingFeedProvider,
+                        creationSourceFeed: eventFeed(eventCreationSources.get(leadEvent.internalId) || leadEvent),
+                        creationSourceProvider: (eventCreationSources.get(leadEvent.internalId) || leadEvent).provider,
+                        creationSourceId: (eventCreationSources.get(leadEvent.internalId) || leadEvent).providerId,
                         providerEvents: groupEvents,
                         sourceEventIds: groupEvents.map(event => event.id)
                     };
                 });
+                retainedEvents.forEach(retained => {
+                    if (active.some(event => event.internalId === retained.internalId)) return;
+                    const source = eventCreationSources.get(retained.internalId);
+                    active.push({...retained, status: retained.masterActive ? retained.status : 'Inactive', provider: source.provider,
+                        providerId: source.providerId, leadingFeedProvider: 'ExeFeed', creationSourceFeed: eventFeed(source),
+                        creationSourceProvider: source.provider, creationSourceId: source.providerId, providerEvents: [], sourceEventIds: []});
+                });
+                return active;
             }
 
             function providerEventLinkStatus(event) {
@@ -789,15 +899,173 @@
                     providers.map(provider => `<option value="${provider}">${provider}</option>`).join('');
             }
 
+            const promotionToleranceMinutes = 30;
+            let promotionSourceId = '';
+            let reactivationTargetId = '';
+            let reactivationSourceId = '';
+            const promoteEventModal = document.getElementById('promoteEventModal');
+            function eventFeed(event) { return event.feedId || event.provider; }
+            function eventStartMillis(event) {
+                const match = event.startTime.match(/^(\d{2})\.(\d{2})\.(\d{4})\. (\d{2}):(\d{2})$/);
+                return match ? Date.UTC(+match[3], +match[2] - 1, +match[1], +match[4], +match[5]) : NaN;
+            }
+            function manualLinkEligible(source, master) {
+                return !source.internalId && master.masterActive !== false &&
+                    source.mappedTournamentId && source.mappedHomeId && source.mappedAwayId &&
+                    source.mappedTournamentId === master.mappedTournamentId &&
+                    source.mappedHomeId === master.mappedHomeId && source.mappedAwayId === master.mappedAwayId && Number.isFinite(eventStartMillis(source)) &&
+                    !master.providerEvents.some(peer => eventFeed(peer) === eventFeed(source));
+            }
+            function promotionCandidates(source) {
+                return events.filter(master => manualLinkEligible(source, master) &&
+                    Math.abs(eventStartMillis(source) - eventStartMillis(master)) <= promotionToleranceMinutes * 60000);
+            }
+            function promotionReady(source) {
+                return source && !source.internalId && source.mappedTournamentId && source.mappedHomeId &&
+                    source.mappedAwayId && Number.isFinite(eventStartMillis(source));
+            }
+            function openPromotion(sourceId) {
+                const source = providerEvents.find(event => event.id === sourceId);
+                if (!promotionReady(source)) { alert('Create event requires an unlinked source with mapped tournament, home and away teams and a valid start time.'); return; }
+                promotionSourceId = source.id;
+                reactivationTargetId = '';
+                const confirmButton = document.getElementById('confirmPromoteEventBtn'); confirmButton.textContent = 'Create event'; confirmButton.disabled = false;
+                const candidates = promotionCandidates(source);
+                document.getElementById('promoteEventTitle').textContent = candidates.length ? 'Matching event already exists' : 'Create event';
+                const body = document.getElementById('promoteEventBody');
+                body.replaceChildren();
+                const text = document.createElement('p');
+                text.textContent = candidates.length ?
+                    (candidates.length === 1 ? 'A matching event already exists. No new event will be created. You can link this source to the existing event.' : 'Several matching events already exist. No new event will be created. Review and select the correct event.') :
+                    `No matching master exists. Create a master from ${source.provider}: ${source.desc}, ${source.startTime}? Manual creation is allowed from a non-leading feed. Other eligible waiting sources may also be linked.`;
+                body.appendChild(text);
+                candidates.forEach(master => {
+                    const row = document.createElement('div'); row.style.marginBottom = '12px';
+                    const label = document.createElement('p'); label.textContent = `${master.desc} · ${master.internalId} · ${master.startTime} · ${master.competition}`;
+                    const button = document.createElement('button'); button.className = 'btn-primary'; button.textContent = 'Link to event';
+                    button.addEventListener('click', () => { promoteEventModal.style.display = 'none'; linkSourceProviderEventId = source.id; linkEvents(master.id); });
+                    row.append(label, button); body.appendChild(row);
+                });
+                document.getElementById('confirmPromoteEventBtn').style.display = candidates.length ? 'none' : 'inline-flex';
+                promoteEventModal.style.display = 'flex';
+            }
+            function promoteSource(sourceId) {
+                const source = providerEvents.find(event => event.id === sourceId);
+                if (!promotionReady(source)) return false;
+                if (promotionCandidates(source).length) { openPromotion(source.id); return false; }
+                source.linkOrigin = { group: source.group, internalId: source.internalId };
+                source.internalId = `event:demo-${source.id}`;
+                eventCreationSources.set(source.internalId, source);
+                source.automaticCorrelationExcluded = false;
+                events = buildMasterEvents(providerEvents);
+                let master = events.find(event => event.internalId === source.internalId);
+                providerEvents.filter(peer => !peer.internalId && !peer.automaticCorrelationExcluded && !peer.waitExpired && peer.autoAllowed !== false)
+                    .sort((a, b) => Number(b.provider === 'ExeFeed') - Number(a.provider === 'ExeFeed'))
+                    .forEach(peer => {
+                        if (!manualLinkEligible(peer, master) || Math.abs(eventStartMillis(peer) - eventStartMillis(master)) > promotionToleranceMinutes * 60000) return;
+                        peer.linkOrigin = { group: peer.group, internalId: peer.internalId };
+                        peer.group = master.id; peer.internalId = master.internalId;
+                        events = buildMasterEvents(providerEvents); master = events.find(event => event.internalId === source.internalId);
+                    });
+                currentEvent = master; populateTournamentOptions(); renderTable(); showEventDetail(master.id);
+                return true;
+            }
+            document.getElementById('confirmPromoteEventBtn').addEventListener('click', () => {
+                if (reactivationTargetId) { if (!reactivationSourceId) return; if (reactivateEvent(reactivationTargetId, reactivationSourceId)) promoteEventModal.style.display = 'none'; }
+                else { promoteEventModal.style.display = 'none'; promoteSource(promotionSourceId); }
+            });
+            ['closePromoteEventBtn', 'cancelPromoteEventBtn'].forEach(id => document.getElementById(id).addEventListener('click', () => promoteEventModal.style.display = 'none'));
+            document.getElementById('createMasterFromDetailBtn').addEventListener('click', () => openPromotion(currentProviderEvent.id));
+            tableBody.addEventListener('click', event => { const button = event.target.closest('.create-master-btn'); if (button) openPromotion(button.dataset.providerEventId); });
+
+            function reactivationReason(source, target) {
+                if (!source || source.internalId) return 'Source is already linked.';
+                if (source.withdrawn) return 'Source was withdrawn.';
+                if (!Number.isFinite(eventStartMillis(source))) return 'No start time.';
+                if (!source.mappedTournamentId || !source.mappedHomeId || !source.mappedAwayId ||
+                    source.mappedTournamentId !== target.mappedTournamentId || source.mappedHomeId !== target.mappedHomeId || source.mappedAwayId !== target.mappedAwayId) return 'Mapped tournament or teams do not match.';
+                return '';
+            }
+            function reactivateEvent(eventId, sourceId) {
+                const target = retainedEvents.get(eventId), source = providerEvents.find(item => item.id === sourceId);
+                if (!target || target.masterActive || reactivationReason(source, target)) return false;
+                target.masterActive = true; target.referenceSourceId = source.id; target.startTime = source.startTime;
+                source.group = target.id; source.internalId = target.internalId; source.automaticCorrelationExcluded = false;
+                source.decisionRevision = (source.decisionRevision || 0) + 1;
+                const outcomes = [{id: source.id, text: 'Selected for reactivation; linked as initial reference.'}];
+                const previous = [...target.formerLinks].sort((a,b) => Number(providerEvents.find(x => x.id === b.id).provider === 'ExeFeed') - Number(providerEvents.find(x => x.id === a.id).provider === 'ExeFeed'));
+                previous.forEach(old => {
+                    if (old.id === source.id) return;
+                    const peer = providerEvents.find(item => item.id === old.id);
+                    const reason = reactivationReason(peer, target) ||
+                        ((peer.decisionRevision || 0) !== old.revision ? 'A newer decision exists.' : '') ||
+                        (peer.automaticCorrelationExcluded ? 'Excluded from automatic correlation.' : '') ||
+                        (peer.autoAllowed === false ? 'Automatic linking is not permitted.' : '') ||
+                        (peer.waitExpired ? 'Waiting deadline expired.' : '') ||
+                        (Math.abs(eventStartMillis(peer) - eventStartMillis(providerEvents.find(item => item.id === target.referenceSourceId))) > promotionToleranceMinutes * 60000 ? 'Start time outside tolerance.' : '') ||
+                        (providerEvents.some(item => item.internalId === target.internalId && eventFeed(item) === eventFeed(peer)) ? 'Feed slot is occupied.' : '');
+                    if (reason) outcomes.push({id: peer.id, text: 'Skipped: ' + reason});
+                    else {
+                        peer.group = target.id; peer.internalId = target.internalId;
+                        peer.decisionRevision = (peer.decisionRevision || 0) + 1;
+                        if (peer.provider === 'ExeFeed') target.referenceSourceId = peer.id;
+                        outcomes.push({id: peer.id, text: 'Previous link restored.'});
+                    }
+                });
+                target.restorationOutcomes = outcomes; target.formerLinks = [];
+                target.history.push('Event reactivated using ' + source.provider + ' at ' + source.startTime + '.');
+                events = buildMasterEvents(providerEvents); renderTable(); showEventDetail(target.id); return true;
+            }
+            function openReactivation() {
+                const target = retainedEvents.get(currentEvent.internalId);
+                if (!target || target.masterActive) return;
+                reactivationTargetId = target.internalId; reactivationSourceId = '';
+                document.getElementById('promoteEventTitle').textContent = 'Reactivate event';
+                const body = document.getElementById('promoteEventBody'); body.replaceChildren();
+                const intro = document.createElement('p'); intro.className = 'reactivation-intro'; intro.textContent = 'Select an unlinked source as the initial reference. Previous links will be evaluated for restoration.'; body.appendChild(intro);
+                const wrapper = document.createElement('div'); wrapper.className = 'event-lifecycle-table';
+                const table = document.createElement('table'); const head = document.createElement('thead'); const headRow = document.createElement('tr');
+                ['Select', 'Feed provider / Event', 'Start time', 'Availability'].forEach(label => { const cell = document.createElement('th'); cell.scope = 'col'; cell.textContent = label; headRow.appendChild(cell); }); head.appendChild(headRow); table.appendChild(head);
+                const rows = document.createElement('tbody');
+                const confirm = document.getElementById('confirmPromoteEventBtn'); confirm.textContent = 'Reactivate event'; confirm.disabled = true; confirm.style.display = 'inline-flex';
+                providerEvents.filter(source => source.mappedTournamentId === target.mappedTournamentId).forEach(source => {
+                    const row = document.createElement('tr'); const reason = reactivationReason(source, target); row.className = reason ? 'reactivation-unavailable' : 'reactivation-candidate';
+                    const selectCell = document.createElement('td'); const radio = document.createElement('input'); radio.type = 'radio'; radio.name = 'reactivationSource'; radio.value = source.id; radio.disabled = !!reason; radio.setAttribute('aria-label', 'Select ' + source.provider + ' ' + source.providerId); selectCell.appendChild(radio);
+                    const identity = document.createElement('td'); const provider = document.createElement('strong'); provider.textContent = source.provider;
+                    const description = document.createElement('div'); description.className = 'reactivation-source-description'; description.textContent = source.desc;
+                    const sourceId = document.createElement('div'); sourceId.className = 'reactivation-source-description'; sourceId.textContent = source.providerId; identity.append(provider, description, sourceId);
+                    const time = document.createElement('td'); time.textContent = source.startTime || 'No start time';
+                    const availability = document.createElement('td'); const badge = document.createElement('span'); badge.className = 'status-badge ' + (reason ? 'status-unmapped' : 'status-mapped'); badge.textContent = reason ? 'Unavailable' : 'Eligible'; availability.appendChild(badge);
+                    if (reason) { const explanation = document.createElement('div'); explanation.className = 'reactivation-source-description'; explanation.textContent = reason; availability.appendChild(explanation); }
+                    const select = () => { if (reason) return; reactivationSourceId = source.id; radio.checked = true; confirm.disabled = false; rows.querySelectorAll('tr').forEach(item => item.classList.toggle('selected', item === row)); };
+                    radio.addEventListener('change', select); row.addEventListener('click', select); row.append(selectCell, identity, time, availability); rows.appendChild(row);
+                });
+                table.appendChild(rows); wrapper.appendChild(table); body.appendChild(wrapper); promoteEventModal.style.display = 'flex';
+            }
+            function restoreLeadingSourceTime() {
+                const source = providerEvents.find(item => item.id === 'EV-040');
+                source.startTime = '20.06.2026. 20:45';
+                const target = events.find(item => item.internalId === 'event:56418744');
+                if (target?.masterActive && manualLinkEligible(source, target) && Math.abs(eventStartMillis(source) - eventStartMillis(target)) <= promotionToleranceMinutes * 60000) {
+                    linkSourceProviderEventId = source.id; linkEvents(target.id); showEventDetail(target.id);
+                } else { events = buildMasterEvents(providerEvents); showProviderEventDetail(source.id); }
+            }
             function linkEvents(targetGroupId) {
                 if (linkSourceProviderEventId) {
                     const sourceEvent = providerEvents.find(event => event.id === linkSourceProviderEventId);
                     const targetMasterEvent = events.find(event => event.id === targetGroupId);
                     if (!sourceEvent || !targetMasterEvent) return;
 
+                    if (sourceEvent.mappedTournamentId && !manualLinkEligible(sourceEvent, targetMasterEvent)) { alert('The source cannot be linked: check mapped teams, tournament, active master and feed availability.'); return; }
+                    sourceEvent.automaticCorrelationExcluded = false;
                     sourceEvent.linkOrigin = { group: sourceEvent.group, internalId: sourceEvent.internalId };
                     sourceEvent.group = targetMasterEvent.id;
                     sourceEvent.internalId = targetMasterEvent.internalId;
+                    const retained = retainedEvents.get(targetMasterEvent.internalId);
+                    if (retained && sourceEvent.provider === 'ExeFeed') {
+                        retained.referenceSourceId = sourceEvent.id;
+                        retained.history.push('ExeFeed linked and took over as reference because it is the leading feed.');
+                    }
                     linkSourceProviderEventId = '';
                     events = buildMasterEvents(providerEvents);
                     currentEvent = events.find(event => event.id === targetMasterEvent.id) || events[0];
@@ -824,21 +1092,87 @@
                 showEventDetail(currentEvent.id);
             }
 
-            function unlinkProviderEvent(providerEventId) {
-                const providerEvent = providerEvents.find(event => event.id === providerEventId);
-                if (!providerEvent || providerEvent.group !== currentEvent.id || currentEvent.providerEvents.length < 2) return;
-
-                const originalGroup = providerEvent.linkOrigin?.group || `G-${providerEvent.id}`;
-                const originalInternalId = providerEvent.linkOrigin?.internalId || '';
-                providerEvent.group = originalGroup;
-                providerEvent.internalId = originalInternalId;
-                delete providerEvent.linkOrigin;
-
-                events = buildMasterEvents(providerEvents);
-                currentEvent = events.find(event => event.id === currentEvent.id) || events[0];
-                renderTable();
-                showEventDetail(currentEvent.id);
+            let unlinkSourceId = '';
+            const unlinkEventModal = document.getElementById('unlinkEventModal');
+            function resumeSourceCorrelation(sourceId) {
+                const source = providerEvents.find(item => item.id === sourceId);
+                if (!source || source.internalId) return {success: false, message: 'The source must be unlinked before resuming automatic linking.'};
+                source.automaticCorrelationExcluded = false;
+                source.decisionRevision = (source.decisionRevision || 0) + 1;
+                let message;
+                if (source.withdrawn) message = 'Automatic linking enabled; source remains unlinked because it was withdrawn.';
+                else if (!promotionReady(source)) message = 'Automatic linking enabled; source remains unlinked. Mapped tournament, home and away teams and a valid start time are required.';
+                else if (source.autoAllowed === false) message = 'Automatic linking enabled; source remains unlinked because automatic correlation is not permitted by the current policy.';
+                else if (source.waitExpired) message = 'Automatic linking enabled; source remains unlinked because the waiting deadline has expired.';
+                else {
+                    const candidates = promotionCandidates(source);
+                    if (candidates.length === 1) {
+                        linkSourceProviderEventId = source.id; linkEvents(candidates[0].id);
+                        message = 'Automatic linking enabled. Source linked to ' + candidates[0].internalId + '.';
+                    } else if (candidates.length > 1) message = 'Automatic linking enabled; source remains unlinked because several matching events exist. Review the candidates and use Link to select the correct event.';
+                    else if (source.provider === 'ExeFeed') {
+                        if (promoteSource(source.id)) message = 'Automatic linking enabled. A new event was created from the leading ExeFeed source: ' + source.internalId + '.';
+                        else message = 'Automatic linking enabled; source remains unlinked. Recheck current data and matching events.';
+                    } else message = 'Automatic linking enabled; source remains unlinked because no matching event exists. A non-leading feed cannot create an event automatically. Manual Create event remains available.';
+                }
+                source.correlationResult = message;
+                renderTable(); showProviderEventDetail(source.id);
+                return {success: true, linked: !!source.internalId, message};
             }
+            tableBody.addEventListener('click', event => { const button = event.target.closest('.resume-source-btn'); if (button) resumeSourceCorrelation(button.dataset.providerEventId); });
+            document.getElementById('resumeSourceFromDetailBtn').addEventListener('click', () => resumeSourceCorrelation(currentProviderEvent.id));
+
+            function unlinkImpact(sourceId) {
+                const source = providerEvents.find(item => item.id === sourceId);
+                if (!source) return null;
+                const target = source.internalId ? events.find(item => item.internalId === source.internalId) : null;
+                const reference = target && target.referenceSourceId === source.id;
+                return {source, target, reference, peers: reference ? target.providerEvents.filter(item => item.id !== source.id) : []};
+            }
+            function unlinkProviderEvent(sourceId) {
+                const impact = unlinkImpact(sourceId); if (!impact) return;
+                unlinkSourceId = sourceId;
+                document.getElementById('unlinkEventTitle').textContent = impact.target ? 'Unlink & exclude' : 'Exclude automatic linking';
+                document.getElementById('confirmUnlinkEventBtn').textContent = impact.target ? 'Unlink & exclude' : 'Exclude automatic linking';
+                const body = document.getElementById('unlinkEventBody'); body.replaceChildren();
+                const summary = document.createElement('p'); summary.className = 'reactivation-intro';
+                summary.textContent = impact.source.provider + ' · ' + impact.source.desc + ': ' + (impact.target ? 'The link will be closed and automatic linking disabled for this source.' : 'This source is already unlinked. Automatic linking will be disabled.'); body.appendChild(summary);
+                if (impact.reference) {
+                    const warning = document.createElement('p'); warning.className = 'event-lifecycle-reason';
+                    warning.textContent = impact.peers.length ? 'This is the reference source. The event will become inactive and all other links listed below will also close. The event and previous links are retained. No replacement reference is selected automatically.' : 'This is the only linked reference source. The event will be removed; it cannot be reactivated. The source remains in Provider events.'; body.appendChild(warning);
+                    if (impact.peers.length) {
+                        const table = document.createElement('table'); const head = document.createElement('thead'); const hr = document.createElement('tr');
+                        ['Other affected source', 'Source event ID', 'Consequence'].forEach(text => { const th = document.createElement('th'); th.textContent = text; hr.appendChild(th); }); head.appendChild(hr); table.appendChild(head);
+                        const rows = document.createElement('tbody'); impact.peers.forEach(peer => { const row = document.createElement('tr'); [peer.provider, peer.providerId, 'Link closes; automatic-link setting is preserved'].forEach(text => {const cell=document.createElement('td');cell.textContent=text;row.appendChild(cell);});rows.appendChild(row); });table.appendChild(rows);body.appendChild(table);
+                    }
+                }
+                const note = document.createElement('p'); note.className = 'reactivation-intro'; note.style.marginTop = '18px'; note.textContent = 'To move this source to another event, confirm unlinking first, then use Link as a separate action. Manual linking clears the automatic-link exclusion.'; body.appendChild(note);
+                unlinkEventModal.style.display = 'flex';
+            }
+            function applyUnlink(sourceId) {
+                const impact = unlinkImpact(sourceId); if (!impact) return false;
+                const {source, target, reference, peers} = impact;
+                if (reference && peers.length) {
+                    const retained = retainedEvents.get(target.internalId) || {...target, history: [], restorationOutcomes: []};
+                    retained.masterActive = false; retained.referenceSourceId = '';
+                    retained.inactiveReason = 'The operator unlinked the reference source. All previous links were closed.';
+                    retained.restorationOutcomes = [];
+                    retained.history.push(source.provider + ' reference unlinked and excluded from automatic linking; event made inactive.');
+                    retained.formerLinks = [source, ...peers].map(peer => ({id: peer.id, revision: (peer.decisionRevision || 0) + 1}));
+                    retainedEvents.set(target.internalId, retained);
+                } else if (reference && target) retainedEvents.delete(target.internalId);
+                const closing = reference ? [source, ...peers] : [source];
+                closing.forEach(peer => { peer.internalId = ''; peer.group = peer.linkOrigin?.group || 'G-SOURCE-' + peer.id; delete peer.linkOrigin; peer.decisionRevision = (peer.decisionRevision || 0) + 1; });
+                source.automaticCorrelationExcluded = true;
+                source.correlationResult = '';
+                if (target && !reference && retainedEvents.has(target.internalId)) retainedEvents.get(target.internalId).history.push(source.provider + ' source unlinked and excluded from automatic linking.');
+                events = buildMasterEvents(providerEvents); renderTable();
+                if (reference && peers.length) showEventDetail(target.id); else showProviderEventDetail(source.id);
+                return true;
+            }
+            document.getElementById('confirmUnlinkEventBtn').addEventListener('click', () => { if (applyUnlink(unlinkSourceId)) unlinkEventModal.style.display = 'none'; });
+            ['closeUnlinkEventBtn','cancelUnlinkEventBtn'].forEach(id => document.getElementById(id).addEventListener('click', () => unlinkEventModal.style.display = 'none'));
+            tableBody.addEventListener('click', event => { const button = event.target.closest('.exclude-source-btn'); if (button) unlinkProviderEvent(button.dataset.providerEventId); });
 
             function linkEventCandidates() {
                 const providerVal = linkProviderFilter.value;
@@ -856,7 +1190,7 @@
                             event.providerId.toLowerCase().includes(searchVal) ||
                             event.desc.toLowerCase().includes(searchVal) ||
                             event.competition.toLowerCase().includes(searchVal);
-                        return event.id !== sourceEvent.group && providerMatch && sportMatch && tournamentMatch && searchMatch;
+                        return event.id !== sourceEvent.group && providerMatch && sportMatch && tournamentMatch && searchMatch && (!sourceEvent.mappedTournamentId || manualLinkEligible(sourceEvent, event));
                     });
                 }
                 return events.filter(event => {
@@ -1102,7 +1436,7 @@
                         <td>${event.startTime}</td>
                         <td>${event.sport}</td>
                         <td>${event.competition}</td>
-                        <td class="market-name">${event.desc}</td>
+                        <td class="market-name">${event.desc}${event.masterActive === false ? ' <span class="status-badge status-unmapped">Inactive</span>' : ''}</td>
                         <td style="text-align: right;">
                             <span class="row-actions">
                                 <button type="button" class="btn-action view-event-btn" data-id="${event.id}" style="background-color: #007bff;">View</button>
@@ -1149,11 +1483,13 @@
                             <td>${event.sport}</td>
                             <td>${event.competition}</td>
                             <td class="market-name">${event.desc}</td>
-                            <td><span class="status-badge ${linkClass}">${linkStatus}</span></td>
+                            <td><span class="status-badge ${linkClass}">${linkStatus}</span>${event.automaticCorrelationExcluded ? '<div class="reactivation-source-description">Automatic linking excluded</div>' : ''}</td>
                             <td style="text-align: right;">
                                 <span class="row-actions">
                                     <button type="button" class="btn-action view-provider-event-btn" data-provider-event-id="${event.id}" style="background-color: #007bff;">View</button>
-                                    ${linkStatus === 'Not linked' ? `<button type="button" class="btn-action link-provider-event-btn" data-provider-event-id="${event.id}">Link</button>` : ''}
+                                    ${linkStatus === 'Not linked' ? `<button type="button" class="btn-action link-provider-event-btn" data-provider-event-id="${event.id}">Link</button><button type="button" class="btn-action create-master-btn" data-provider-event-id="${event.id}">Create event</button>` : ''}
+                                    <button type="button" class="btn-action exclude-source-btn" data-provider-event-id="${event.id}" ${!event.internalId && event.automaticCorrelationExcluded ? 'disabled' : ''}>${event.internalId ? 'Unlink &amp; exclude' : 'Exclude automatic linking'}</button>
+                                    ${!event.internalId && event.automaticCorrelationExcluded ? `<button type="button" class="btn-action resume-source-btn" data-provider-event-id="${event.id}">Resume automatic linking</button>` : ''}
                                 </span>
                             </td>
                         </tr>
@@ -1179,6 +1515,8 @@
                 document.getElementById('eventDetailGrid').innerHTML = `
                     <div>
                         <div class="detail-row"><strong>Event ID:</strong><span>${currentEvent.internalId}</span></div>
+                        <div class="detail-row"><strong>Created from feed:</strong><span>${currentEvent.creationSourceProvider} · ${currentEvent.creationSourceFeed}</span></div>
+                        <div class="detail-row"><strong>Source event ID:</strong><span>${currentEvent.creationSourceId}</span></div>
                         <div class="detail-row"><strong>Sport:</strong><span>${currentEvent.sport}</span></div>
                         <div class="detail-row"><strong>Category:</strong><span>${currentEvent.category}</span></div>
                     </div>
@@ -1195,6 +1533,38 @@
                         <div class="detail-row"><strong>Provider IDs:</strong><span>${currentEvent.providerId}</span></div>
                     </div>
                 `;
+                const reference = providerEvents.find(source => source.id === currentEvent.referenceSourceId);
+                const retained = retainedEvents.get(currentEvent.internalId);
+                const panel = document.createElement('section'); panel.className = 'event-lifecycle-panel';
+                const header = document.createElement('div'); header.className = 'event-lifecycle-header';
+                const heading = document.createElement('h3'); heading.textContent = 'Event lifecycle'; header.appendChild(heading);
+                const stateBadge = document.createElement('span'); stateBadge.className = 'status-badge ' + (currentEvent.masterActive === false ? 'status-unmapped' : 'status-mapped'); stateBadge.textContent = currentEvent.masterActive === false ? 'Inactive' : 'Active'; header.appendChild(stateBadge); panel.appendChild(header);
+                const facts = document.createElement('div'); facts.className = 'event-lifecycle-facts';
+                [['Reference feed:', reference ? reference.provider + ' · ' + reference.providerId : 'None'], ['Leading feed:', 'ExeFeed']].forEach(([label, value]) => {
+                    const row = document.createElement('div'); row.className = 'detail-row'; const title = document.createElement('strong'); title.textContent = label; const text = document.createElement('span'); text.textContent = value; row.append(title, text); facts.appendChild(row);
+                }); panel.appendChild(facts);
+                function lifecycleTable(title, columns, rows) {
+                    const heading = document.createElement('h4'); heading.textContent = title; panel.appendChild(heading);
+                    const wrapper = document.createElement('div'); wrapper.className = 'event-lifecycle-table';
+                    const table = document.createElement('table'); const head = document.createElement('thead'); const headRow = document.createElement('tr');
+                    columns.forEach(label => { const cell = document.createElement('th'); cell.scope = 'col'; cell.textContent = label; headRow.appendChild(cell); }); head.appendChild(headRow); table.appendChild(head);
+                    const body = document.createElement('tbody'); rows.forEach(values => { const row = document.createElement('tr'); values.forEach(value => { const cell = document.createElement('td'); cell.textContent = value; row.appendChild(cell); }); body.appendChild(row); }); table.appendChild(body); wrapper.appendChild(table); panel.appendChild(wrapper);
+                }
+                if (retained) {
+                    if (!retained.masterActive) {
+                        const reason = document.createElement('p'); reason.className = 'event-lifecycle-reason'; reason.textContent = retained.inactiveReason; panel.appendChild(reason);
+                        const button = document.createElement('button'); button.className = 'btn-primary'; button.textContent = 'Reactivate event'; button.addEventListener('click', openReactivation); header.insertBefore(button, stateBadge);
+                        lifecycleTable('Previous links', ['Feed provider', 'Source event ID', 'Start time', 'Link status'], retained.formerLinks.map(old => { const source = providerEvents.find(item => item.id === old.id); return [source.provider, source.providerId, source.startTime || 'No start time', 'Not linked']; }));
+                    } else if (!originalBarcelonaSource.startTime) {
+                        const button = document.createElement('button'); button.className = 'btn-primary'; button.textContent = 'Simulate ExeFeed start time restored'; button.addEventListener('click', restoreLeadingSourceTime); header.insertBefore(button, stateBadge);
+                    }
+                    if (retained.restorationOutcomes.length) lifecycleTable('Link restoration results', ['Feed provider', 'Result'], retained.restorationOutcomes.map(outcome => [providerEvents.find(source => source.id === outcome.id).provider, outcome.text]));
+                    if (retained.history.length) {
+                        const heading = document.createElement('h4'); heading.textContent = 'Event history'; panel.appendChild(heading);
+                        const history = document.createElement('ul'); history.className = 'event-lifecycle-history'; retained.history.forEach(entry => { const row = document.createElement('li'); row.textContent = entry; history.appendChild(row); }); panel.appendChild(history);
+                    }
+                }
+                document.getElementById('eventDetailGrid').appendChild(panel);
                 renderLinkedEvents();
                 renderEventMarkets();
                 eventsListView.style.display = 'none';
@@ -1203,6 +1573,7 @@
                 eventDetailView.style.display = 'block';
             }
 
+            document.getElementById('excludeSourceFromDetailBtn').addEventListener('click', () => unlinkProviderEvent(currentProviderEvent.id));
             function showProviderEventDetail(providerEventId) {
                 currentProviderEvent = providerEvents.find(event => event.id === providerEventId) || null;
                 if (!currentProviderEvent) return;
@@ -1215,6 +1586,7 @@
                         <div class="detail-row"><strong>Source ID:</strong><span>${currentProviderEvent.providerId}</span></div>
                         <div class="detail-row"><strong>Event ID:</strong><span>${isLinked ? currentProviderEvent.internalId : '-'}</span></div>
                         <div class="detail-row"><strong>Link status:</strong><span class="status-badge ${isLinked ? 'status-mapped' : 'status-unmapped'}">${isLinked ? 'Linked' : 'Not linked'}</span></div>
+                        <div class="detail-row"><strong>Automatic linking:</strong><span>${currentProviderEvent.automaticCorrelationExcluded ? 'Excluded' : 'Enabled'}</span></div>
                     </div>
                     <div>
                         <div class="detail-row"><strong>Sport:</strong><span>${currentProviderEvent.sport}</span></div>
@@ -1232,7 +1604,14 @@
                 const linkButton = document.getElementById('linkProviderEventFromDetailBtn');
                 const masterButton = document.getElementById('viewMasterEventBtn');
                 linkButton.style.display = isLinked ? 'none' : 'inline-flex';
+                document.getElementById('createMasterFromDetailBtn').style.display = isLinked ? 'none' : 'inline-flex';
+                document.getElementById('resumeSourceFromDetailBtn').style.display = !isLinked && currentProviderEvent.automaticCorrelationExcluded ? 'inline-flex' : 'none';
+                const excludeButton = document.getElementById('excludeSourceFromDetailBtn'); excludeButton.textContent = isLinked ? 'Unlink & exclude' : 'Exclude automatic linking'; excludeButton.disabled = !isLinked && !!currentProviderEvent.automaticCorrelationExcluded;
                 masterButton.style.display = isLinked ? 'inline-flex' : 'none';
+                if (currentProviderEvent.correlationResult) {
+                    const result = document.createElement('p'); result.className = 'correlation-result'; result.textContent = currentProviderEvent.correlationResult;
+                    document.getElementById('providerEventDetailGrid').appendChild(result);
+                }
                 renderProviderEventMarkets();
                 eventsListView.style.display = 'none';
                 eventDetailView.style.display = 'none';
@@ -1261,16 +1640,14 @@
                 const linkedProviderEvents = currentEvent.providerEvents;
                 section.style.display = linkedProviderEvents.length ? 'block' : 'none';
                 list.innerHTML = linkedProviderEvents.map(event => `
-                    <div class="linked-event-row ${event.id === selectedProviderEventId ? 'selected' : ''}">
+                    <div class="linked-event-row ${event.id === selectedProviderEventId ? 'selected' : ''}" data-provider-event-id="${event.id}" style="cursor: pointer;">
                         <div>
                             <strong>${event.desc}</strong>
                             <div class="linked-event-meta">${event.provider} · ${event.providerId} · ${event.startTime} · <span class="status-badge ${statusClass(event.status)}">${event.status}</span></div>
                         </div>
                         <div class="linked-event-actions">
                             <button type="button" class="btn-action select-provider-event-btn" data-provider-event-id="${event.id}" style="background-color: #007bff;">Markets</button>
-                            ${linkedProviderEvents.length > 1
-                                ? `<button type="button" class="btn-action unlink-event-btn" data-provider-event-id="${event.id}">Remove link</button>`
-                                : ''}
+                            <button type="button" class="btn-action unlink-event-btn" data-provider-event-id="${event.id}">Unlink &amp; exclude</button>
                         </div>
                     </div>
                 `).join('');
@@ -1278,11 +1655,11 @@
 
             function renderEventMarkets() {
                 const providerEvent = currentEvent.providerEvents.find(event => event.id === selectedProviderEventId) || currentEvent.providerEvents[0];
-                if (!providerEvent) return;
+                if (!providerEvent) { document.getElementById('eventMarketsTitle').textContent = 'Provider markets'; document.getElementById('eventMarketsSummary').textContent = 'No linked source selected'; document.getElementById('eventMarketsBody').innerHTML = '<tr><td colspan="5">Reactivate the event to view linked source markets.</td></tr>'; return; }
                 const rows = eventMarkets.filter(market => market.eventId === providerEvent.id);
                 document.getElementById('eventMarketsTitle').textContent = `Provider markets: ${providerEvent.provider}`;
                 document.getElementById('eventMarketsSummary').textContent = rows.length
-                    ? `${rows.length} markets · Event status: ${providerEvent.status}`
+                    ? `${rows.length} markets · Source ID: ${providerEvent.providerId} · Event status: ${providerEvent.status}`
                     : `No markets received · Event status: ${providerEvent.status}`;
                 document.getElementById('eventMarketsBody').innerHTML = rows.length ? rows.map(market => `
                     <tr>
@@ -1408,8 +1785,12 @@
                     return;
                 }
                 const unlinkButton = event.target.closest('.unlink-event-btn');
-                if (!unlinkButton) return;
-                unlinkProviderEvent(unlinkButton.dataset.providerEventId);
+                if (unlinkButton) { unlinkProviderEvent(unlinkButton.dataset.providerEventId); return; }
+                const row = event.target.closest('.linked-event-row');
+                if (!row) return;
+                selectedProviderEventId = row.dataset.providerEventId;
+                renderLinkedEvents();
+                renderEventMarkets();
             });
             confirmLinkEventsBtn.addEventListener('click', () => {
                 if (!selectedLinkGroupId) return;
@@ -1425,6 +1806,8 @@
             window.addEventListener('click', event => {
                 if (event.target === messageDetailsModal) messageDetailsModal.style.display = 'none';
                 if (event.target === linkEventsModal) linkEventsModal.style.display = 'none';
+                if (event.target === promoteEventModal) promoteEventModal.style.display = 'none';
+                if (event.target === unlinkEventModal) unlinkEventModal.style.display = 'none';
             });
 
             eventTabs.forEach(tab => {
