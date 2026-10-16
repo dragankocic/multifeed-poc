@@ -190,28 +190,19 @@
     </div>
 
     <script src="../pagination.js"></script>
+    <script src="sport_mapping_model.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const internalSports = [
-                { id: "S-001", name: "Soccer", abbr: "SOC", leadingFeed: "ExeFeed", active: true },
-                { id: "S-002", name: "Basketball", abbr: "BKB", leadingFeed: "SportRadar", active: false },
-                { id: "S-003", name: "Tennis", abbr: "TEN", leadingFeed: "Bet Genius", active: false },
-                { id: "S-004", name: "Ice Hockey", abbr: "IHO", leadingFeed: "Inherited from Multifeed", active: false },
-                { id: "S-005", name: "Baseball", abbr: "BBS", leadingFeed: "Inherited from Multifeed", active: false },
-                { id: "S-006", name: "Moto GP", abbr: "MGP", leadingFeed: "ExeFeed", active: false }
+                { id: "1", name: "Soccer", abbr: "SOC", active: true },
+                { id: "2", name: "Basketball", abbr: "BKB", active: false },
+                { id: "3", name: "Tennis", abbr: "TEN", active: false },
+                { id: "4", name: "Ice Hockey", abbr: "IHO", active: false },
+                { id: "5", name: "Baseball", abbr: "BBS", active: false },
+                { id: "6", name: "Moto GP", abbr: "MGP", active: false }
             ];
 
-            const providerSports = [
-                { provider: "ExeFeed", provId: "F", provName: "Fudbal", internalId: "S-001", internalName: "Soccer", internalAbbr: "SOC", status: "Mapped" },
-                { provider: "SportRadar", provId: "sr:sport:1", provName: "Football", internalId: "S-001", internalName: "Soccer", internalAbbr: "SOC", status: "Mapped" },
-                { provider: "ExeFeed", provId: "B", provName: "Košarka", internalId: "S-002", internalName: "Basketball", internalAbbr: "BKB", status: "Mapped" },
-                { provider: "ExeFeed", provId: "T", provName: "Tenis", internalId: "S-003", internalName: "Tennis", internalAbbr: "TEN", status: "Mapped" },
-                { provider: "ExeFeed", provId: "MGP", provName: "Moto GP", internalId: "S-006", internalName: "Moto GP", internalAbbr: "MGP", status: "Mapped" },
-                { provider: "SportGenius", provId: "sg-10", provName: "Ice Hockey", internalId: "-", internalName: "-", internalAbbr: "-", status: "Unmapped" },
-                { provider: "ExeFeed", provId: "IH", provName: "Hokej na ledu", internalId: "-", internalName: "-", internalAbbr: "-", status: "Unmapped" },
-                { provider: "ExeFeed", provId: "V", provName: "Odbojka", internalId: "-", internalName: "-", internalAbbr: "-", status: "Unmapped" },
-                { provider: "ExeFeed", provId: "H", provName: "Rukomet", internalId: "-", internalName: "-", internalAbbr: "-", status: "Unmapped" }
-            ];
+            const providerSports = SportMappingDemo.providerRows();
 
             const tabs = document.querySelectorAll('.workspace-tab');
             const providerFilterGroup = document.getElementById('providerFilterGroup');
@@ -224,9 +215,10 @@
             const activateSportModal = document.getElementById('activateSportModal');
             const activateSportModalText = document.getElementById('activateSportModalText');
             let sportToActivate = null;
-            let activeView = 'internal';
+            let activeView = new URLSearchParams(location.search).get('view') === 'provider' ? 'provider' : 'internal';
 
-            const activeSportIds = new Set(JSON.parse(localStorage.getItem('multifeedActiveSports') || '[]'));
+            const activeSportIds = new Set(JSON.parse(localStorage.getItem('multifeedActiveSports') || '[]').map(id => String(id).replace(/^S-0*(\d+)$/, '$1')));
+            localStorage.setItem('multifeedActiveSports', JSON.stringify([...activeSportIds]));
             internalSports.forEach(sport => {
                 sport.active = sport.active || activeSportIds.has(sport.id);
             });
@@ -283,8 +275,8 @@
                         <td><span class="status-badge ${sport.active ? 'status-mapped' : 'status-unmapped'}">${sport.active ? 'Active' : 'Inactive'}</span></td>
                         <td style="text-align: right;">
                             <span class="row-actions">
-                                <a href="view_hermes_sport.html?id=${encodeURIComponent(sport.id)}&name=${encodeURIComponent(sport.name)}&abbr=${encodeURIComponent(sport.abbr)}&leadingFeed=${encodeURIComponent(sport.leadingFeed)}" class="btn-action" style="background-color: #007bff; text-decoration: none; display: inline-block;">View</a>
-                                <a href="create_sport.html?edit=true&id=${encodeURIComponent(sport.id)}&name=${encodeURIComponent(sport.name)}&abbr=${encodeURIComponent(sport.abbr)}&leadingFeed=${encodeURIComponent(sport.leadingFeed)}" class="btn-action" style="background-color: #17a2b8; text-decoration: none; display: inline-block;">Edit</a>
+                                <a href="view_hermes_sport.html?id=${encodeURIComponent(sport.id)}&name=${encodeURIComponent(sport.name)}&abbr=${encodeURIComponent(sport.abbr)}" class="btn-action" style="background-color: #007bff; text-decoration: none; display: inline-block;">View</a>
+                                <a href="create_sport.html?edit=true&id=${encodeURIComponent(sport.id)}&name=${encodeURIComponent(sport.name)}&abbr=${encodeURIComponent(sport.abbr)}" class="btn-action" style="background-color: #17a2b8; text-decoration: none; display: inline-block;">Edit</a>
                                 ${sport.active ? '' : `<button type="button" class="btn-action activate-sport-btn" data-id="${sport.id}" style="background-color: #28a745; border: none;">Activate</button>`}
                             </span>
                             </td>
@@ -301,6 +293,7 @@
             }
 
             function renderProviderView() {
+                const providerSports = SportMappingDemo.providerRows();
                 workspaceHead.innerHTML = `
                     <tr>
                         <th>Provider</th>
@@ -334,10 +327,8 @@
 
                 workspaceBody.innerHTML = rows.map(sport => {
                     const badgeClass = sport.status === 'Mapped' ? 'status-mapped' : 'status-unmapped';
-                    const actionHref = sport.status === 'Mapped'
-                        ? `map_sport.html?provider=${encodeURIComponent(sport.provider)}&provName=${encodeURIComponent(sport.provName)}&internalId=${encodeURIComponent(sport.internalId)}`
-                        : `map_sport.html?provider=${encodeURIComponent(sport.provider)}&provName=${encodeURIComponent(sport.provName)}`;
-                    const actionLabel = sport.status === 'Mapped' ? 'Edit mapping' : 'Map';
+                    const actionHref = 'map_sport.html?' + new URLSearchParams({provider:sport.provider,provId:sport.provId});
+                    const actionLabel = 'Manage mapping';
                     return `
                         <tr>
                             <td style="font-weight: 500;">${sport.provider}</td>
@@ -358,6 +349,7 @@
             }
 
             function render() {
+                tabs.forEach(tab => tab.classList.toggle('active', tab.dataset.view === activeView));
                 providerFilterGroup.style.display = activeView === 'provider' ? 'block' : 'none';
                 statusFilterGroup.style.display = activeView === 'provider' ? 'block' : 'none';
                 if (activeView === 'internal') {

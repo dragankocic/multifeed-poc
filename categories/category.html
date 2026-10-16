@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Categories</title>
     <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="category_mapping_demo.css">
     <script src="../auth.js"></script>
     <style>
         .workspace-tabs {
@@ -179,33 +180,12 @@
     </div>
 
     <script src="../pagination.js"></script>
+    <script src="category_mapping_model.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            let internalCategories = [
-                { id: "C-001", name: "England" },
-                { id: "C-002", name: "Spain" },
-                { id: "C-003", name: "Germany" },
-                { id: "C-004", name: "Italy" },
-                { id: "C-005", name: "France" },
-                { id: "C-006", name: "Serbia" },
-                { id: "C-007", name: "United States" }
-            ];
-
-            const providerCategories = [
-                { provider: "ExeFeed", provId: "1126", provName: "England", internalId: "C-001", internalName: "England", status: "Mapped" },
-                { provider: "ExeFeed", provId: "1127", provName: "Spain", internalId: "C-002", internalName: "Spain", status: "Mapped" },
-                { provider: "ExeFeed", provId: "1128", provName: "Germany", internalId: "C-003", internalName: "Germany", status: "Mapped" },
-                { provider: "ExeFeed", provId: "1129", provName: "United States", internalId: "C-007", internalName: "United States", status: "Mapped" },
-                { provider: "ExeFeed", provId: "1130", provName: "France", internalId: "C-005", internalName: "France", status: "Mapped" },
-                { provider: "SportRadar", provId: "sr:category:1", provName: "England", internalId: "C-001", internalName: "England", status: "Mapped" },
-                { provider: "SportRadar", provId: "sr:category:32", provName: "Spain", internalId: "C-002", internalName: "Spain", status: "Mapped" },
-                { provider: "SportRadar", provId: "sr:category:39", provName: "International", internalId: "-", internalName: "-", status: "Unmapped" },
-                { provider: "SportRadar", provId: "sr:category:15", provName: "Europe", internalId: "-", internalName: "-", status: "Unmapped" },
-                { provider: "SportGenius", provId: "sg-cat-uk", provName: "UK", internalId: "-", internalName: "-", status: "Unmapped" },
-                { provider: "SportGenius", provId: "sg-cat-it", provName: "Italy", internalId: "C-004", internalName: "Italy", status: "Mapped" },
-                { provider: "SportGenius", provId: "sg-cat-rs", provName: "Serbia", internalId: "C-006", internalName: "Serbia", status: "Mapped" }
-            ];
-
+            const api = CategoryMappingDemo;
+            const escape = value => String(value).replace(/[&<>\"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[char]));
+            let internalCategories = [];
             const tabs = document.querySelectorAll('.workspace-tab');
             const providerFilterGroup = document.getElementById('providerFilterGroup');
             const statusFilterGroup = document.getElementById('statusFilterGroup');
@@ -216,12 +196,16 @@
             const workspaceBody = document.getElementById('workspaceBody');
             const deleteModal = document.getElementById('deleteModal');
             const deleteModalText = document.getElementById('deleteModalText');
-            let activeView = 'internal';
+            let activeView = new URLSearchParams(location.search).get('view') === 'provider' ? 'provider' : 'internal';
             let categoryToDelete = null;
 
             function openDeleteModal(category) {
                 categoryToDelete = category;
                 deleteModalText.textContent = `Are you sure you want to delete category "${category.name}" (${category.id})?`;
+                const inUse = api.providerRows().some(source => source.internalId === category.id);
+                document.getElementById('confirmDeleteBtn').hidden = inUse;
+                document.getElementById('confirmDeleteBtn').style.display = inUse ? 'none' : '';
+                if (inUse) deleteModalText.textContent = 'This category has active mappings. Deactivate or replace them before deleting the category. Draft and deprecated mappings do not block deletion.';
                 deleteModal.style.display = 'flex';
             }
 
@@ -253,7 +237,7 @@
                 workspaceBody.innerHTML = rows.map(category => `
                     <tr>
                         <td style="font-weight: 500; color: #6c757d;">${category.id}</td>
-                        <td class="market-name">${category.name}</td>
+                        <td class="market-name">${escape(category.name)}</td>
                         <td style="text-align: right;">
                             <span class="row-actions">
                                 <a href="view_category.html?id=${encodeURIComponent(category.id)}&name=${encodeURIComponent(category.name)}" class="btn-action" style="background-color: #007bff; text-decoration: none; display: inline-block;">View</a>
@@ -285,6 +269,7 @@
                     </tr>
                 `;
 
+                const providerCategories = api.providerRows();
                 const providerVal = providerSelect.value;
                 const statusVal = statusSelect.value;
                 const searchVal = searchInput.value.toLowerCase();
@@ -309,7 +294,7 @@
                     const mapUrl = category.status === 'Mapped'
                         ? `map_category.html?provider=${encodeURIComponent(category.provider)}&provId=${encodeURIComponent(category.provId)}&provName=${encodeURIComponent(category.provName)}&internalId=${encodeURIComponent(category.internalId)}`
                         : `map_category.html?provider=${encodeURIComponent(category.provider)}&provId=${encodeURIComponent(category.provId)}&provName=${encodeURIComponent(category.provName)}`;
-                    const mapLabel = category.status === 'Mapped' ? 'Edit mapping' : 'Map';
+                    const mapLabel = 'Manage mapping';
                     const viewButton = category.status === 'Mapped'
                         ? `<a href="view_category.html?id=${encodeURIComponent(category.internalId)}&name=${encodeURIComponent(category.internalName)}" class="btn-action" style="background-color: #007bff; text-decoration: none; display: inline-block;">View</a>`
                         : '';
@@ -318,10 +303,10 @@
                         <tr>
                             <td style="font-weight: 500;">${category.provider}</td>
                             <td style="color: #6c757d;">${category.provId}</td>
-                            <td class="market-name" style="color: #007bff;">${category.provName}</td>
+                            <td class="market-name" style="color: #007bff;">${escape(category.provName)}</td>
                             <td style="color: #6c757d;">${category.internalId}</td>
-                            <td style="font-weight: 500;">${category.internalName}</td>
-                            <td><span class="status-badge ${badgeClass}">${category.status}</span></td>
+                            <td style="font-weight: 500;">${escape(category.internalName)}</td>
+                            <td><span class="status-badge ${badgeClass}">${category.status}</span>${category.hasDraft ? ' <span class="status-badge status-unmapped">Draft available</span>' : ''}</td>
                             <td style="text-align: right;">
                                 <span class="row-actions">
                                     ${viewButton}
@@ -334,6 +319,8 @@
             }
 
             function render() {
+                internalCategories = api.categories.filter(c => !c.deleted);
+                tabs.forEach(tab => tab.classList.toggle('active', tab.dataset.view === activeView));
                 const showProviderFilters = activeView === 'provider';
                 providerFilterGroup.style.display = showProviderFilters ? 'block' : 'none';
                 statusFilterGroup.style.display = showProviderFilters ? 'block' : 'none';
@@ -360,7 +347,8 @@
             document.getElementById('cancelDeleteBtn').addEventListener('click', closeDeleteModal);
             document.getElementById('confirmDeleteBtn').addEventListener('click', () => {
                 if (!categoryToDelete) return;
-                internalCategories = internalCategories.filter(category => category.id !== categoryToDelete.id);
+                try { const model = api.load(); model.deleteCategory(categoryToDelete.id); api.save(model); }
+                catch (error) { deleteModalText.textContent = error.message; return; }
                 closeDeleteModal();
                 render();
             });
@@ -368,6 +356,7 @@
                 if (event.target === deleteModal) closeDeleteModal();
             });
 
+            window.addEventListener('storage', event => { if (event.key === api.KEY) render(); });
             render();
         });
     </script>

@@ -46,11 +46,12 @@
         </main>
     </div>
 
+    <script src="category_mapping_model.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const urlParams = new URLSearchParams(window.location.search);
             const isEdit = urlParams.get('edit') === 'true';
-            const editId = urlParams.get('id') || 'auto-generated';
+            const editId = (urlParams.get('id') || '').replace(/^C-0*(\d+)$/, '$1');
             const editName = urlParams.get('name');
 
             if (isEdit) {
@@ -59,7 +60,8 @@
                 document.getElementById('saveCategoryBtn').textContent = 'Update category';
                 document.title = 'Edit Category';
 
-                if (editName) document.getElementById('categoryName').value = editName;
+                const category = CategoryMappingDemo.categories.find(c => c.id === editId);
+                if (category) document.getElementById('categoryName').value = category.name;
             }
 
             document.getElementById('saveCategoryBtn').addEventListener('click', () => {
@@ -70,9 +72,12 @@
                     return;
                 }
 
-                const actionText = isEdit ? "updated" : "created";
-                const idText = isEdit ? ` (${editId})` : '';
-                alert(`Category "${name}"${idText} successfully ${actionText}!`);
+                try {
+                    if (isEdit && !editId) throw Error('Category not found. Return to Categories and select a category.');
+                    const model = CategoryMappingDemo.load();
+                    model.saveCategory(name, isEdit ? editId : null);
+                    CategoryMappingDemo.save(model);
+                } catch (error) { alert(error.message); return; }
                 window.location.href = 'category.html';
             });
         });

@@ -353,11 +353,10 @@
                     </div>
                     <div class="top-bar event-toolbar">
                         <div class="filters">
-                            <div class="filter-group">
+                            <div class="filter-group" id="eventProviderFilterGroup" style="display: none;">
                                 <label for="providerSelect">Feed Provider</label>
                                 <select id="providerSelect">
-                                    <option value="all" selected>All</option>
-                                    <option value="ExeFeed">ExeFeed</option>
+                                    <option value="ExeFeed" selected>ExeFeed</option>
                                     <option value="SportRadar">SportRadar</option>
                                     <option value="Bet Genius">Bet Genius</option>
                                     <option value="IMG Arena">IMG Arena</option>
@@ -1348,7 +1347,6 @@
             }
 
             function filteredRows() {
-                const providerVal = providerSelect.value;
                 const sportVal = sportSelect.value;
                 const statusVal = statusSelect.value;
                 const tournamentVal = tournamentInput.value.trim().toLowerCase();
@@ -1358,7 +1356,6 @@
 
                 const rows = events.filter(event => {
                     const eventStartTime = parseEventStartTime(event.startTime);
-                    const providerMatch = providerVal === 'all' || event.providerEvents.some(source => source.provider === providerVal);
                     const sportMatch = sportVal === 'all' || event.sport === sportVal;
                     const statusMatch = statusVal === 'all' || event.status === statusVal;
                     const tournamentMatch = !tournamentVal || event.competition.toLowerCase().includes(tournamentVal);
@@ -1368,7 +1365,7 @@
                         event.providerId.toLowerCase().includes(searchVal) ||
                         event.desc.toLowerCase().includes(searchVal) ||
                         event.competition.toLowerCase().includes(searchVal);
-                    return providerMatch && sportMatch && statusMatch && tournamentMatch && startFromMatch && startToMatch && searchMatch;
+                    return sportMatch && statusMatch && tournamentMatch && startFromMatch && startToMatch && searchMatch;
                 });
                 return rows.sort((a, b) => a.startTime.localeCompare(b.startTime));
             }
@@ -1384,7 +1381,7 @@
 
                 return providerEvents.filter(event => {
                     const eventStartTime = parseEventStartTime(event.startTime);
-                    const providerMatch = providerVal === 'all' || event.provider === providerVal;
+                    const providerMatch = event.provider === providerVal;
                     const sportMatch = sportVal === 'all' || event.sport === sportVal;
                     const linkStatusMatch = linkStatusVal === 'all' ||
                         (linkStatusVal === 'linked' && providerEventLinkStatus(event) === 'Linked') ||
@@ -1409,6 +1406,7 @@
             }
 
             function renderTable() {
+                document.getElementById('eventProviderFilterGroup').style.display = activeEventsView === 'provider' ? 'block' : 'none';
                 if (activeEventsView === 'provider') {
                     renderProviderEventsTable();
                     return;
@@ -1646,7 +1644,6 @@
                             <div class="linked-event-meta">${event.provider} · ${event.providerId} · ${event.startTime} · <span class="status-badge ${statusClass(event.status)}">${event.status}</span></div>
                         </div>
                         <div class="linked-event-actions">
-                            <button type="button" class="btn-action select-provider-event-btn" data-provider-event-id="${event.id}" style="background-color: #007bff;">Markets</button>
                             <button type="button" class="btn-action unlink-event-btn" data-provider-event-id="${event.id}">Unlink &amp; exclude</button>
                         </div>
                     </div>
@@ -1777,13 +1774,6 @@
                 renderLinkEventRows();
             });
             document.getElementById('linkedEventsList').addEventListener('click', event => {
-                const selectButton = event.target.closest('.select-provider-event-btn');
-                if (selectButton) {
-                    selectedProviderEventId = selectButton.dataset.providerEventId;
-                    renderLinkedEvents();
-                    renderEventMarkets();
-                    return;
-                }
                 const unlinkButton = event.target.closest('.unlink-event-btn');
                 if (unlinkButton) { unlinkProviderEvent(unlinkButton.dataset.providerEventId); return; }
                 const row = event.target.closest('.linked-event-row');

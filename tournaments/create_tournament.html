@@ -64,7 +64,6 @@
                             <label for="primaryFeedSelect">Leading Feed Provider</label>
                             <select id="primaryFeedSelect">
                                 <option value="" disabled selected>Select leading feed provider</option>
-                                <option value="Inherited from Sport">Inherited from Sport</option>
                                 <option value="EXE">EXE</option>
                                 <option value="SR">SR</option>
                                 <option value="BG">BG</option>
@@ -80,11 +79,12 @@
         </main>
     </div>
 
+    <script src="tournament_mapping_model.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const urlParams = new URLSearchParams(window.location.search);
             const isEdit = urlParams.get('edit') === 'true';
-            const editId = urlParams.get('id') || 'auto-generated';
+            const editId = urlParams.get('id') || '';
             const editName = urlParams.get('name');
             const editSport = urlParams.get('sport');
             const editCategory = urlParams.get('category');
@@ -96,10 +96,13 @@
                 document.getElementById('saveTournamentBtn').textContent = 'Update tournament';
                 document.title = 'Edit Tournament';
 
-                if (editName) document.getElementById('tournamentName').value = editName;
-                if (editSport) document.getElementById('sportSelect').value = editSport;
-                if (editCategory) document.getElementById('categorySelect').value = editCategory;
-                if (editPrimaryFeed) document.getElementById('primaryFeedSelect').value = editPrimaryFeed;
+                const tournament=TournamentMappingDemo.tournaments.find(t=>t.id===editId);
+                if(tournament){
+                    document.getElementById('tournamentName').value=tournament.name;
+                    document.getElementById('sportSelect').value=tournament.sport;
+                    document.getElementById('categorySelect').value=tournament.category;
+                    document.getElementById('primaryFeedSelect').value=tournament.primaryFeed;
+                }
             }
 
             document.getElementById('saveTournamentBtn').addEventListener('click', () => {
@@ -113,9 +116,12 @@
                     return;
                 }
 
-                const actionText = isEdit ? "updated" : "created";
-                const idText = isEdit ? ` (${editId})` : '';
-                alert(`Tournament "${name}"${idText} successfully ${actionText}!`);
+                try{
+                    if(isEdit&&!editId)throw Error('Tournament not found.');
+                    const model=TournamentMappingDemo.load();
+                    model.saveTournament(name,isEdit?editId:null,{sport,category,primaryFeed});
+                    TournamentMappingDemo.save(model);
+                }catch(error){alert(error.message);return;}
                 window.location.href = 'tournament.html';
             });
         });

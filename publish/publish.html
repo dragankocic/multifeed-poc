@@ -47,18 +47,18 @@
                         </thead>
                         <tbody id="publishTableBody">
                             
-                            <tr class="sport-row" data-sport="S-001">
-                                <td style="text-align: center;"><input type="checkbox" class="cb-sport" data-id="S-001" data-name="Soccer"></td>
+                            <tr class="sport-row" data-sport="1">
+                                <td style="text-align: center;"><input type="checkbox" class="cb-sport" data-id="1" data-name="Soccer"></td>
                                 <td><span style="background: #e9ecef; padding: 3px 8px; border-radius: 4px; font-size: 12px;">SPORT</span></td>
                                 <td style="color: #007bff;">Soccer (ExeFeed)</td>
                                 <td>Soccer</td>
                                 <td style="text-align: right;">
                                     <button class="btn-action view-btn" style="background-color: #17a2b8;" data-type="sport" data-prov="Soccer" data-herm="Soccer">View mapping</button>
-                                    <a href="../sports/map_sport.html?provider=ExeFeed&provName=Soccer&hermesId=S-001" class="btn-action" style="background-color: #007bff; text-decoration: none; display: inline-block; margin-left: 8px;">Edit mapping</a>
+                                    <a href="../sports/map_sport.html?provider=ExeFeed&provName=Soccer&hermesId=1" class="btn-action" style="background-color: #007bff; text-decoration: none; display: inline-block; margin-left: 8px;">Edit mapping</a>
                                 </td>
                             </tr>
-                            <tr class="market-row" data-parent="S-001">
-                                <td class="market-indent"><input type="checkbox" class="cb-market" data-id="M-001" data-parent="S-001" data-name="1X2"></td>
+                            <tr class="market-row" data-parent="1">
+                                <td class="market-indent"><input type="checkbox" class="cb-market" data-id="M-001" data-parent="1" data-name="1X2"></td>
                                 <td><span style="background: #f8d7da; color: #721c24; padding: 3px 8px; border-radius: 4px; font-size: 12px;">MARKET</span></td>
                                 <td>1X2</td>
                                 <td>1X2</td>
@@ -67,8 +67,8 @@
                                     <a href="../mapping/mapping.html?market=1X2&sport=Soccer&edit=1X2" class="btn-action" style="background-color: #007bff; text-decoration: none; display: inline-block; margin-left: 8px;">Edit mapping</a>
                                 </td>
                             </tr>
-                            <tr class="market-row" data-parent="S-001">
-                                <td class="market-indent"><input type="checkbox" class="cb-market" data-id="M-002" data-parent="S-001" data-name="Total Goals"></td>
+                            <tr class="market-row" data-parent="1">
+                                <td class="market-indent"><input type="checkbox" class="cb-market" data-id="M-002" data-parent="1" data-name="Total Goals"></td>
                                 <td><span style="background: #f8d7da; color: #721c24; padding: 3px 8px; border-radius: 4px; font-size: 12px;">MARKET</span></td>
                                 <td>TOTAL_GOALS</td>
                                 <td>Total Goals</td>
@@ -78,18 +78,18 @@
                                 </td>
                             </tr>
 
-                            <tr class="sport-row" data-sport="S-002">
-                                <td style="text-align: center;"><input type="checkbox" class="cb-sport" data-id="S-002" data-name="Basketball"></td>
+                            <tr class="sport-row" data-sport="2">
+                                <td style="text-align: center;"><input type="checkbox" class="cb-sport" data-id="2" data-name="Basketball"></td>
                                 <td><span style="background: #e9ecef; padding: 3px 8px; border-radius: 4px; font-size: 12px;">SPORT</span></td>
                                 <td style="color: #007bff;">Basketball (SportRadar)</td>
                                 <td>Basketball</td>
                                 <td style="text-align: right;">
                                     <button class="btn-action view-btn" style="background-color: #17a2b8;" data-type="sport" data-prov="Basketball" data-herm="Basketball">View mapping</button>
-                                    <a href="../sports/map_sport.html?provider=SportRadar&provName=Basketball&hermesId=S-002" class="btn-action" style="background-color: #007bff; text-decoration: none; display: inline-block; margin-left: 8px;">Edit mapping</a>
+                                    <a href="../sports/map_sport.html?provider=SportRadar&provName=Basketball&hermesId=2" class="btn-action" style="background-color: #007bff; text-decoration: none; display: inline-block; margin-left: 8px;">Edit mapping</a>
                                 </td>
                             </tr>
-                            <tr class="market-row" data-parent="S-002">
-                                <td class="market-indent"><input type="checkbox" class="cb-market" data-id="M-003" data-parent="S-002" data-name="Match Winner"></td>
+                            <tr class="market-row" data-parent="2">
+                                <td class="market-indent"><input type="checkbox" class="cb-market" data-id="M-003" data-parent="2" data-name="Match Winner"></td>
                                 <td><span style="background: #f8d7da; color: #721c24; padding: 3px 8px; border-radius: 4px; font-size: 12px;">MARKET</span></td>
                                 <td>MONEYLINE</td>
                                 <td>Match Winner</td>
@@ -220,7 +220,7 @@
                             "routing_key": "hermes.mapping.sport",
                             "status": "published",
                             "mapped_data": {
-                                "hermes_sport_id": "S-XXX",
+                                "hermes_sport_id": 1,
                                 "hermes_sport_name": hermName,
                                 "provider_reference": "sr:sport:1"
                             }
