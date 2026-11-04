@@ -348,12 +348,12 @@
             <div class="form-side">
                 <div id="eventsListView">
                     <div class="event-tabs" aria-label="Event perspective">
-                        <button type="button" class="event-tab active" data-view="master">Events</button>
-                        <button type="button" class="event-tab" data-view="provider">Provider events</button>
+                        <button type="button" class="event-tab active" data-view="provider">Provider events</button>
+                        <button type="button" class="event-tab" data-view="master">Events</button>
                     </div>
                     <div class="top-bar event-toolbar">
                         <div class="filters">
-                            <div class="filter-group" id="eventProviderFilterGroup" style="display: none;">
+                            <div class="filter-group" id="eventProviderFilterGroup">
                                 <label for="providerSelect">Feed Provider</label>
                                 <select id="providerSelect">
                                     <option value="ExeFeed" selected>ExeFeed</option>
@@ -382,7 +382,7 @@
                                 </select>
                             </div>
 
-                            <div class="filter-group" id="eventStatusFilterGroup">
+                            <div class="filter-group" id="eventStatusFilterGroup" style="display: none;">
                                 <label for="statusSelect">Status</label>
                                 <select id="statusSelect">
                                     <option value="all" selected>All</option>
@@ -396,7 +396,7 @@
                                 </select>
                             </div>
 
-                            <div class="filter-group" id="linkStatusFilterGroup" style="display: none;">
+                            <div class="filter-group" id="linkStatusFilterGroup">
                                 <label for="linkStatusSelect">Link status</label>
                                 <select id="linkStatusSelect">
                                     <option value="all" selected>All</option>
@@ -833,7 +833,7 @@
             let events = buildMasterEvents(providerEvents);
             let currentEvent = events[0];
             let currentProviderEvent = null;
-            let activeEventsView = 'master';
+            let activeEventsView = 'provider';
             let selectedLinkGroupId = '';
             let selectedProviderEventId = '';
             let linkSourceProviderEventId = '';
