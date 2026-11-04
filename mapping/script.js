@@ -490,7 +490,7 @@ addMappingBtn.addEventListener('click', function() {
  
     saveSingleMappingBtn.addEventListener('click', () => {
         const selectedMarket = selectMarket.value;
-        alert(`Mapping #${currentMappingId} for Market "${selectedMarket}" has been saved!`);
+        alert('This market mapping form is a visual demo. Changes have not been saved.');
     });
 
     dynamicSections.appendChild(newSection);

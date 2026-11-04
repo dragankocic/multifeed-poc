@@ -341,7 +341,7 @@
     <div class="main-content">
         <header class="main-header">
             <h1>View Events</h1>
-            <p class="page-subtitle">Browse master and provider events, then inspect their details, markets, and messages.</p>
+            <p class="page-subtitle">Browse events and provider events, then inspect their details, markets, and messages.</p>
         </header>
 
         <main class="split-layout">
@@ -488,11 +488,11 @@
                             </div>
                         </div>
                         <div class="actions detail-actions" style="display: flex; gap: 10px; justify-content: flex-end;">
-                            <button type="button" id="linkProviderEventFromDetailBtn" class="btn-secondary">Link to master event</button>
+                            <button type="button" id="linkProviderEventFromDetailBtn" class="btn-secondary">Link to event</button>
                             <button type="button" id="createMasterFromDetailBtn" class="btn-primary">Create event</button>
                             <button type="button" id="excludeSourceFromDetailBtn" class="btn-secondary">Unlink &amp; exclude</button>
                             <button type="button" id="resumeSourceFromDetailBtn" class="btn-primary">Resume automatic linking</button>
-                            <button type="button" id="viewMasterEventBtn" class="btn-secondary" style="display: none;">View master event</button>
+                            <button type="button" id="viewMasterEventBtn" class="btn-secondary" style="display: none;">View event</button>
                         </div>
                     </div>
 
@@ -663,51 +663,54 @@
         </div>
     </div>
     <script src="../../pagination.js"></script>
+    <script src="../../sports/sport_mapping_model.js"></script>
+    <script src="../../categories/category_mapping_model.js"></script>
+    <script src="event_mapping_projection.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const providerEvents = [
-                { id: "EV-001", internalId: "event:56418719", providerId: "sr:match:61300621", provider: "SportRadar", sport: "Soccer", category: "England", competition: "Premier League", season: "2025/26", stage: "-", startTime: "17.03.2026. 16:00", venue: "Old Trafford", status: "Not started", desc: "Manchester United vs Liverpool", updatedAt: "04:46:32 PM", group: "G-001", mappingStatus: "Mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Mapped" },
-                { id: "EV-011", internalId: "event:56418719", providerId: "6569588", provider: "ExeFeed", sport: "Soccer", category: "England", competition: "Premier League", season: "2025/26", stage: "-", startTime: "17.03.2026. 16:00", venue: "Old Trafford", status: "Not started", desc: "Manchester United - Liverpool", updatedAt: "04:45:10 PM", group: "G-001", mappingStatus: "Mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Mapped" },
-                { id: "EV-002", internalId: "event:56418720", providerId: "61310022", provider: "Bet Genius", sport: "Basketball", category: "United States", competition: "NBA", season: "2025/26", stage: "Regular season", startTime: "09.06.2026. 12:28", venue: "Madison Square Garden", status: "Live", desc: "New York Knicks - San Antonio Spurs", updatedAt: "12:28:10 PM", group: "G-002", mappingStatus: "Partially mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Unmapped" },
-                { id: "EV-003", internalId: "event:56418721", providerId: "bg:match:33000033", provider: "Bet Genius", sport: "Tennis", category: "France", competition: "Roland Garros", season: "2026", stage: "Final", startTime: "09.06.2026. 11:00", venue: "Court Philippe-Chatrier", status: "Ended", desc: "Novak Djokovic - Carlos Alcaraz", updatedAt: "11:00:00 AM", group: "G-003", mappingStatus: "Mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Mapped" },
-                { id: "EV-004", internalId: "event:56418722", providerId: "sr:match:61300622", provider: "SportRadar", sport: "Soccer", category: "England", competition: "Premier League", season: "2025/26", stage: "-", startTime: "10.06.2026. 20:45", venue: "Etihad Stadium", status: "Not started", desc: "Manchester City FC - Arsenal FC", updatedAt: "03:00:00 PM", group: "G-004", mappingStatus: "Partially mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Unmapped" },
-                { id: "EV-012", internalId: "event:56418722", providerId: "61310622", provider: "ExeFeed", sport: "Soccer", category: "England", competition: "Premier League", season: "2025/26", stage: "-", startTime: "10.06.2026. 20:45", venue: "Etihad Stadium", status: "Not started", desc: "Man Cit - Ars", updatedAt: "03:02:14 PM", group: "G-004", mappingStatus: "Partially mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Unmapped" },
-                { id: "EV-005", internalId: "event:56418723", providerId: "61310055", provider: "ExeFeed", sport: "Soccer", category: "Germany", competition: "Bundesliga", season: "2025/26", stage: "-", startTime: "09.06.2026. 10:15", venue: "Allianz Arena", status: "Cancelled", desc: "Bayern Munich - BVB", updatedAt: "10:15:00 AM", group: "G-005", mappingStatus: "Unmapped", sportMapping: "Mapped", categoryMapping: "Unmapped", tournamentMapping: "Unmapped" },
-                { id: "EV-013", internalId: "event:56418723", providerId: "sr:match:61310055", provider: "SportRadar", sport: "Soccer", category: "Germany", competition: "Bundesliga", season: "2025/26", stage: "-", startTime: "09.06.2026. 10:15", venue: "Allianz Arena", status: "Cancelled", desc: "FC Bayern Munich vs Borussia Dortmund", updatedAt: "10:16:22 AM", group: "G-005", mappingStatus: "Unmapped", sportMapping: "Mapped", categoryMapping: "Unmapped", tournamentMapping: "Unmapped" },
-                { id: "EV-008", internalId: "event:56418724", providerId: "sr:race:1", provider: "IMG Arena", sport: "Motorsport", category: "International", competition: "Formula 1", season: "2026", stage: "Race", startTime: "14.06.2026. 15:00", venue: "Monaco", status: "Delayed", desc: "Monaco GP", updatedAt: "02:00:00 PM", group: "G-008", mappingStatus: "Unmapped", sportMapping: "Unmapped", categoryMapping: "Unmapped", tournamentMapping: "Unmapped" },
-                { id: "EV-006", internalId: "event:56418726", providerId: "61310831", provider: "ExeFeed", sport: "Volleyball", category: "Italy", competition: "SuperLega", season: "2025/26", stage: "Quarter-final", startTime: "11.06.2026. 18:30", venue: "Pala Barton", status: "Not started", desc: "Sir Susa Vim Perugia - Lube Civitanova", updatedAt: "01:20:00 PM", group: "G-006", mappingStatus: "Mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Mapped" },
-                { id: "EV-007", internalId: "event:56418727", providerId: "sr:match:61310832", provider: "SportRadar", sport: "Handball", category: "Germany", competition: "Bundesliga", season: "2025/26", stage: "Regular season", startTime: "11.06.2026. 19:00", venue: "Sparkassen-Arena", status: "Not started", desc: "THW Kiel - SC Magdeburg", updatedAt: "01:22:00 PM", group: "G-007", mappingStatus: "Mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Mapped" },
-                { id: "EV-009", internalId: "event:56418728", providerId: "mgp:race:2026:07", provider: "ExeFeed", sport: "Moto GP", category: "Italy", competition: "MotoGP World Championship", season: "2026", stage: "Race", startTime: "12.06.2026. 14:00", venue: "Mugello Circuit", status: "Not started", desc: "Italian Grand Prix", updatedAt: "01:25:00 PM", group: "G-009", mappingStatus: "Partially mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Unmapped" },
-                { id: "EV-010", internalId: "event:56418729", providerId: "ls:match:882091", provider: "LSports", sport: "Baseball", category: "United States", competition: "MLB", season: "2026", stage: "Regular season", startTime: "12.06.2026. 01:10", venue: "Yankee Stadium", status: "Not started", desc: "New York Yankees - Boston Red Sox", updatedAt: "01:28:00 PM", group: "G-010", mappingStatus: "Mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Mapped" },
-                { id: "EV-014", internalId: "event:56418730", providerId: "sr:match:61310833", provider: "SportRadar", sport: "Cricket", category: "England", competition: "County Championship", season: "2026", stage: "Round 8", startTime: "12.06.2026. 11:00", venue: "The Oval", status: "Live", desc: "Surrey - Lancashire", updatedAt: "01:30:00 PM", group: "G-014", mappingStatus: "Unmapped", sportMapping: "Unmapped", categoryMapping: "Unmapped", tournamentMapping: "Unmapped" },
-                { id: "EV-015", internalId: "event:56418731", providerId: "bc:match:441208", provider: "Bet Construct", sport: "Ice Hockey", category: "Sweden", competition: "SHL", season: "2025/26", stage: "Final", startTime: "13.06.2026. 20:00", venue: "Avicii Arena", status: "Not started", desc: "Frolunda HC - Lulea HF", updatedAt: "01:34:00 PM", group: "G-015", mappingStatus: "Partially mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Unmapped" },
-                { id: "EV-016", internalId: "event:56418720", providerId: "sr:match:61310022", provider: "SportRadar", sport: "Basketball", category: "United States", competition: "NBA", season: "2025/26", stage: "Regular season", startTime: "09.06.2026. 12:28", venue: "Madison Square Garden", status: "Live", desc: "New York Knicks vs San Antonio Spurs", updatedAt: "12:28:14 PM", group: "G-002", mappingStatus: "Partially mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Unmapped" },
-                { id: "EV-017", internalId: "event:56418721", providerId: "61310033", provider: "ExeFeed", sport: "Tennis", category: "France", competition: "Roland Garros", season: "2026", stage: "Final", startTime: "09.06.2026. 11:00", venue: "Court Philippe-Chatrier", status: "Ended", desc: "N. Djokovic - C. Alcaraz", updatedAt: "11:00:04 AM", group: "G-003", mappingStatus: "Mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Mapped" },
-                { id: "EV-018", internalId: "event:56418724", providerId: "f1:race:2026:monaco", provider: "ExeFeed", sport: "Motorsport", category: "International", competition: "Formula 1", season: "2026", stage: "Race", startTime: "14.06.2026. 15:00", venue: "Monaco", status: "Delayed", desc: "Monaco Grand Prix", updatedAt: "02:01:00 PM", group: "G-008", mappingStatus: "Unmapped", sportMapping: "Unmapped", categoryMapping: "Unmapped", tournamentMapping: "Unmapped" },
-                { id: "EV-019", internalId: "event:56418726", providerId: "sr:match:61310831", provider: "SportRadar", sport: "Volleyball", category: "Italy", competition: "SuperLega", season: "2025/26", stage: "Quarter-final", startTime: "11.06.2026. 18:30", venue: "Pala Barton", status: "Not started", desc: "Perugia vs Lube Civitanova", updatedAt: "01:21:00 PM", group: "G-006", mappingStatus: "Mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Mapped" },
-                { id: "EV-020", internalId: "event:56418727", providerId: "61310832", provider: "ExeFeed", sport: "Handball", category: "Germany", competition: "Bundesliga", season: "2025/26", stage: "Regular season", startTime: "11.06.2026. 19:00", venue: "Sparkassen-Arena", status: "Not started", desc: "Kiel - Magdeburg", updatedAt: "01:23:00 PM", group: "G-007", mappingStatus: "Mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Mapped" },
-                { id: "EV-021", internalId: "event:56418728", providerId: "img:race:motogp:07", provider: "IMG Arena", sport: "Moto GP", category: "Italy", competition: "MotoGP World Championship", season: "2026", stage: "Race", startTime: "12.06.2026. 14:00", venue: "Mugello Circuit", status: "Not started", desc: "Italian GP", updatedAt: "01:26:00 PM", group: "G-009", mappingStatus: "Partially mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Unmapped" },
-                { id: "EV-022", internalId: "event:56418729", providerId: "bb:match:882091", provider: "ExeFeed", sport: "Baseball", category: "United States", competition: "MLB", season: "2026", stage: "Regular season", startTime: "12.06.2026. 01:10", venue: "Yankee Stadium", status: "Not started", desc: "NY Yankees - Boston Red Sox", updatedAt: "01:29:00 PM", group: "G-010", mappingStatus: "Mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Mapped" },
-                { id: "EV-023", internalId: "event:56418730", providerId: "61310833", provider: "ExeFeed", sport: "Cricket", category: "England", competition: "County Championship", season: "2026", stage: "Round 8", startTime: "12.06.2026. 11:00", venue: "The Oval", status: "Live", desc: "Surrey vs Lancashire", updatedAt: "01:31:00 PM", group: "G-014", mappingStatus: "Unmapped", sportMapping: "Unmapped", categoryMapping: "Unmapped", tournamentMapping: "Unmapped" },
-                { id: "EV-024", internalId: "event:56418731", providerId: "sr:match:441208", provider: "SportRadar", sport: "Ice Hockey", category: "Sweden", competition: "SHL", season: "2025/26", stage: "Final", startTime: "13.06.2026. 20:00", venue: "Avicii Arena", status: "Not started", desc: "Frolunda - Lulea", updatedAt: "01:35:00 PM", group: "G-015", mappingStatus: "Partially mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Unmapped" },
-                { id: "EV-025", internalId: "", providerId: "bg:match:33000052", provider: "Bet Genius", sport: "Soccer", category: "Spain", competition: "La Liga", season: "2025/26", stage: "Regular season", startTime: "14.06.2026. 21:00", venue: "Santiago Bernabeu", status: "Not started", desc: "Real Madrid - Atletico Madrid", updatedAt: "01:40:00 PM", group: "G-025", mappingStatus: "Mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Mapped" },
-                { id: "EV-026", internalId: "", providerId: "sr:match:61310911", provider: "SportRadar", sport: "Basketball", category: "United States", competition: "NBA", season: "2025/26", stage: "Playoffs", startTime: "14.06.2026. 02:30", venue: "Chase Center", status: "Not started", desc: "Golden State Warriors - Los Angeles Lakers", updatedAt: "01:42:00 PM", group: "G-026", mappingStatus: "Mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Unmapped" },
-                { id: "EV-027", internalId: "", providerId: "tn:match:752901", provider: "ExeFeed", sport: "Tennis", category: "England", competition: "Wimbledon", season: "2026", stage: "First round", startTime: "15.06.2026. 13:30", venue: "Centre Court", status: "Not started", desc: "Jannik Sinner - Daniil Medvedev", updatedAt: "01:44:00 PM", group: "G-027", mappingStatus: "Mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Mapped" },
-                { id: "EV-028", internalId: "", providerId: "sr:race:2", provider: "SportRadar", sport: "Motorsport", category: "Canada", competition: "Formula 1", season: "2026", stage: "Race", startTime: "15.06.2026. 20:00", venue: "Circuit Gilles-Villeneuve", status: "Not started", desc: "Canadian Grand Prix", updatedAt: "01:46:00 PM", group: "G-028", mappingStatus: "Unmapped", sportMapping: "Unmapped", categoryMapping: "Unmapped", tournamentMapping: "Unmapped" },
-                { id: "EV-029", internalId: "", providerId: "61310912", provider: "ExeFeed", sport: "Volleyball", category: "Poland", competition: "PlusLiga", season: "2025/26", stage: "Semi-final", startTime: "15.06.2026. 18:00", venue: "Spodek", status: "Not started", desc: "ZAKSA Kedzierzyn-Kozle - Jastrzebski Wegiel", updatedAt: "01:48:00 PM", group: "G-029", mappingStatus: "Mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Mapped" },
-                { id: "EV-030", internalId: "", providerId: "sr:match:61310913", provider: "SportRadar", sport: "Handball", category: "France", competition: "LNH Division 1", season: "2025/26", stage: "Regular season", startTime: "15.06.2026. 20:45", venue: "Stade Pierre de Coubertin", status: "Not started", desc: "Paris Saint-Germain - Nantes", updatedAt: "01:50:00 PM", group: "G-030", mappingStatus: "Mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Mapped" },
-                { id: "EV-031", internalId: "", providerId: "mgp:race:2026:08", provider: "ExeFeed", sport: "Moto GP", category: "Netherlands", competition: "MotoGP World Championship", season: "2026", stage: "Race", startTime: "16.06.2026. 14:00", venue: "TT Circuit Assen", status: "Not started", desc: "Dutch Grand Prix", updatedAt: "01:52:00 PM", group: "G-031", mappingStatus: "Partially mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Unmapped" },
-                { id: "EV-032", internalId: "", providerId: "ls:match:882117", provider: "LSports", sport: "Baseball", category: "United States", competition: "MLB", season: "2026", stage: "Regular season", startTime: "16.06.2026. 03:10", venue: "Dodger Stadium", status: "Not started", desc: "Los Angeles Dodgers - Chicago Cubs", updatedAt: "01:54:00 PM", group: "G-032", mappingStatus: "Mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Mapped" },
-                { id: "EV-033", internalId: "", providerId: "cr:match:99171", provider: "Bet Genius", sport: "Cricket", category: "India", competition: "Indian Premier League", season: "2026", stage: "League stage", startTime: "16.06.2026. 16:00", venue: "Wankhede Stadium", status: "Not started", desc: "Mumbai Indians - Chennai Super Kings", updatedAt: "01:56:00 PM", group: "G-033", mappingStatus: "Unmapped", sportMapping: "Unmapped", categoryMapping: "Unmapped", tournamentMapping: "Unmapped" },
-                { id: "EV-034", internalId: "", providerId: "bc:match:441244", provider: "Bet Construct", sport: "Ice Hockey", category: "Finland", competition: "Liiga", season: "2025/26", stage: "Semi-final", startTime: "16.06.2026. 19:30", venue: "Nokia Arena", status: "Not started", desc: "Tappara - Ilves", updatedAt: "01:58:00 PM", group: "G-034", mappingStatus: "Partially mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Unmapped" },
-                { id: "EV-035", feedId: "exefeed-live", mappedTournamentId: "T-SERIE-A", mappedHomeId: "C-INT", mappedAwayId: "C-NAP", internalId: "event:56418742", providerId: "61310940", provider: "ExeFeed", sport: "Soccer", category: "Italy", competition: "Serie A", season: "2025/26", stage: "Regular season", startTime: "17.06.2026. 20:45", venue: "San Siro", status: "Not started", desc: "Inter Milan - Napoli", updatedAt: "02:00:00 PM", group: "G-035", mappingStatus: "Mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Mapped" },
-                { id: "EV-036", feedId: "sportradar-live", mappedTournamentId: "T-SERIE-A", mappedHomeId: "C-INT", mappedAwayId: "C-NAP", internalId: "", providerId: "sr:match:61310940", provider: "SportRadar", sport: "Soccer", category: "Italy", competition: "Serie A", season: "2025/26", stage: "Regular season", startTime: "17.06.2026. 18:45", venue: "Stadio Giuseppe Meazza", status: "Not started", desc: "Internazionale Milano vs SSC Napoli", updatedAt: "02:02:00 PM", group: "G-036", mappingStatus: "Mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Mapped" },
-                { id: "EV-037", internalId: "event:56418743", providerId: "61310941", provider: "ExeFeed", feedId: "exefeed-live", sport: "Soccer", category: "Italy", competition: "Serie A", mappedTournamentId: "T-SERIE-A", mappedHomeId: "C-JUV", mappedAwayId: "C-MIL", season: "2025/26", stage: "Regular season", startTime: "18.06.2026. 20:45", venue: "Allianz Stadium", status: "Not started", desc: "Juventus - Milan", updatedAt: "02:03:00 PM", group: "G-037", mappingStatus: "Mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Mapped", automaticCorrelationExcluded: false },
-                { id: "EV-038", internalId: "", providerId: "sr:match:61310941", provider: "SportRadar", feedId: "sportradar-live", sport: "Soccer", category: "Italy", competition: "Serie A", mappedTournamentId: "T-SERIE-A", mappedHomeId: "C-JUV", mappedAwayId: "C-MIL", season: "2025/26", stage: "Regular season", startTime: "18.06.2026. 20:45", venue: "Allianz Stadium", status: "Not started", desc: "Juventus vs AC Milan", updatedAt: "02:03:00 PM", group: "G-038", mappingStatus: "Mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Mapped", automaticCorrelationExcluded: false },
-                { id: "EV-039", internalId: "", providerId: "sr:match:61310942", provider: "SportRadar", feedId: "sportradar-live", sport: "Soccer", category: "Italy", competition: "Serie A", mappedTournamentId: "T-SERIE-A", mappedHomeId: "C-ROM", mappedAwayId: "C-LAZ", season: "2025/26", stage: "Regular season", startTime: "19.06.2026. 20:45", venue: "Stadio Olimpico", status: "Not started", desc: "Roma - Lazio", updatedAt: "02:03:00 PM", group: "G-039", mappingStatus: "Mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Mapped", automaticCorrelationExcluded: false },
-                { id: "EV-040", internalId: "", providerId: "61310943", provider: "ExeFeed", feedId: "exefeed-live", mappedTournamentId: "T-LA-LIGA", mappedHomeId: "C-BAR", mappedAwayId: "C-RMA", sport: "Soccer", category: "Spain", competition: "La Liga", season: "2025/26", stage: "Regular season", startTime: "", venue: "Camp Nou", status: "Not started", desc: "Barcelona - Real Madrid", updatedAt: "02:05:00 PM", group: "G-040", mappingStatus: "Mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Mapped", decisionRevision: 0 },
-                { id: "EV-041", internalId: "", providerId: "sr:match:61310943", provider: "SportRadar", feedId: "sportradar-live", mappedTournamentId: "T-LA-LIGA", mappedHomeId: "C-BAR", mappedAwayId: "C-RMA", sport: "Soccer", category: "Spain", competition: "La Liga", season: "2025/26", stage: "Regular season", startTime: "20.06.2026. 20:50", venue: "Camp Nou", status: "Not started", desc: "Barcelona - Real Madrid", updatedAt: "02:05:00 PM", group: "G-041", mappingStatus: "Mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Mapped", decisionRevision: 0 },
-                { id: "EV-042", internalId: "", providerId: "bg:match:61310943", provider: "Bet Genius", feedId: "bet-genius-live", mappedTournamentId: "T-LA-LIGA", mappedHomeId: "C-BAR", mappedAwayId: "C-RMA", sport: "Soccer", category: "Spain", competition: "La Liga", season: "2025/26", stage: "Regular season", startTime: "20.06.2026. 20:55", venue: "Camp Nou", status: "Not started", desc: "Barcelona - Real Madrid", updatedAt: "02:05:00 PM", group: "G-042", mappingStatus: "Mapped", sportMapping: "Mapped", categoryMapping: "Mapped", tournamentMapping: "Mapped", decisionRevision: 0 }
+                { id: "EV-001", internalId: "event:56418719", providerId: "sr:match:61300621", provider: "SportRadar", sourceSportId: "sr:sport:1", sourceCategoryId: "sr:category:1", sport: "Soccer", category: "England", competition: "Premier League", season: "2025/26", stage: "-", startTime: "17.03.2026. 16:00", venue: "Old Trafford", status: "Not started", desc: "Manchester United vs Liverpool", updatedAt: "04:46:32 PM", group: "G-001", tournamentMapping: "Mapped" },
+                { id: "EV-011", internalId: "event:56418719", providerId: "6569588", provider: "ExeFeed", sourceSportId: "F", sourceCategoryId: "1126", sport: "Soccer", category: "England", competition: "Premier League", season: "2025/26", stage: "-", startTime: "17.03.2026. 16:00", venue: "Old Trafford", status: "Not started", desc: "Manchester United - Liverpool", updatedAt: "04:45:10 PM", group: "G-001", tournamentMapping: "Mapped" },
+                { id: "EV-002", internalId: "event:56418720", providerId: "61310022", provider: "Bet Genius", sourceSportId: "demo:bet-genius:sport:basketball", sourceCategoryId: "demo:bet-genius:category:united-states", sport: "Basketball", category: "United States", competition: "NBA", season: "2025/26", stage: "Regular season", startTime: "09.06.2026. 12:28", venue: "Madison Square Garden", status: "Live", desc: "New York Knicks - San Antonio Spurs", updatedAt: "12:28:10 PM", group: "G-002", tournamentMapping: "Unmapped" },
+                { id: "EV-003", internalId: "event:56418721", providerId: "bg:match:33000033", provider: "Bet Genius", sourceSportId: "demo:bet-genius:sport:tennis", sourceCategoryId: "demo:bet-genius:category:france", sport: "Tennis", category: "France", competition: "Roland Garros", season: "2026", stage: "Final", startTime: "09.06.2026. 11:00", venue: "Court Philippe-Chatrier", status: "Ended", desc: "Novak Djokovic - Carlos Alcaraz", updatedAt: "11:00:00 AM", group: "G-003", tournamentMapping: "Mapped" },
+                { id: "EV-004", internalId: "event:56418722", providerId: "sr:match:61300622", provider: "SportRadar", sourceSportId: "sr:sport:1", sourceCategoryId: "sr:category:1", sport: "Soccer", category: "England", competition: "Premier League", season: "2025/26", stage: "-", startTime: "10.06.2026. 20:45", venue: "Etihad Stadium", status: "Not started", desc: "Manchester City FC - Arsenal FC", updatedAt: "03:00:00 PM", group: "G-004", tournamentMapping: "Unmapped" },
+                { id: "EV-012", internalId: "event:56418722", providerId: "61310622", provider: "ExeFeed", sourceSportId: "F", sourceCategoryId: "1126", sport: "Soccer", category: "England", competition: "Premier League", season: "2025/26", stage: "-", startTime: "10.06.2026. 20:45", venue: "Etihad Stadium", status: "Not started", desc: "Man Cit - Ars", updatedAt: "03:02:14 PM", group: "G-004", tournamentMapping: "Unmapped" },
+                { id: "EV-005", internalId: "event:56418723", providerId: "61310055", provider: "ExeFeed", sourceSportId: "F", sourceCategoryId: "1128", sport: "Soccer", category: "Germany", competition: "Bundesliga", season: "2025/26", stage: "-", startTime: "09.06.2026. 10:15", venue: "Allianz Arena", status: "Cancelled", desc: "Bayern Munich - BVB", updatedAt: "10:15:00 AM", group: "G-005", tournamentMapping: "Unmapped" },
+                { id: "EV-013", internalId: "event:56418723", providerId: "sr:match:61310055", provider: "SportRadar", sourceSportId: "sr:sport:1", sourceCategoryId: "sr:category:30", sport: "Soccer", category: "Germany", competition: "Bundesliga", season: "2025/26", stage: "-", startTime: "09.06.2026. 10:15", venue: "Allianz Arena", status: "Cancelled", desc: "FC Bayern Munich vs Borussia Dortmund", updatedAt: "10:16:22 AM", group: "G-005", tournamentMapping: "Unmapped" },
+                { id: "EV-008", internalId: "event:56418724", providerId: "sr:race:1", provider: "IMG Arena", sourceSportId: "demo:img-arena:sport:motorsport", sourceCategoryId: "demo:img-arena:category:international", sport: "Motorsport", category: "International", competition: "Formula 1", season: "2026", stage: "Race", startTime: "14.06.2026. 15:00", venue: "Monaco", status: "Delayed", desc: "Monaco GP", updatedAt: "02:00:00 PM", group: "G-008", tournamentMapping: "Unmapped" },
+                { id: "EV-006", internalId: "event:56418726", providerId: "61310831", provider: "ExeFeed", sourceSportId: "V", sourceCategoryId: "1131", sport: "Volleyball", category: "Italy", competition: "SuperLega", season: "2025/26", stage: "Quarter-final", startTime: "11.06.2026. 18:30", venue: "Pala Barton", status: "Not started", desc: "Sir Susa Vim Perugia - Lube Civitanova", updatedAt: "01:20:00 PM", group: "G-006", tournamentMapping: "Mapped" },
+                { id: "EV-007", internalId: "event:56418727", providerId: "sr:match:61310832", provider: "SportRadar", sourceSportId: "demo:sportradar:sport:handball", sourceCategoryId: "sr:category:30", sport: "Handball", category: "Germany", competition: "Bundesliga", season: "2025/26", stage: "Regular season", startTime: "11.06.2026. 19:00", venue: "Sparkassen-Arena", status: "Not started", desc: "THW Kiel - SC Magdeburg", updatedAt: "01:22:00 PM", group: "G-007", tournamentMapping: "Mapped" },
+                { id: "EV-009", internalId: "event:56418728", providerId: "mgp:race:2026:07", provider: "ExeFeed", sourceSportId: "demo:exefeed:sport:moto-gp", sourceCategoryId: "1131", sport: "Moto GP", category: "Italy", competition: "MotoGP World Championship", season: "2026", stage: "Race", startTime: "12.06.2026. 14:00", venue: "Mugello Circuit", status: "Not started", desc: "Italian Grand Prix", updatedAt: "01:25:00 PM", group: "G-009", tournamentMapping: "Unmapped" },
+                { id: "EV-010", internalId: "event:56418729", providerId: "ls:match:882091", provider: "LSports", sourceSportId: "demo:lsports:sport:baseball", sourceCategoryId: "demo:lsports:category:united-states", sport: "Baseball", category: "United States", competition: "MLB", season: "2026", stage: "Regular season", startTime: "12.06.2026. 01:10", venue: "Yankee Stadium", status: "Not started", desc: "New York Yankees - Boston Red Sox", updatedAt: "01:28:00 PM", group: "G-010", tournamentMapping: "Mapped" },
+                { id: "EV-014", internalId: "event:56418730", providerId: "sr:match:61310833", provider: "SportRadar", sourceSportId: "demo:sportradar:sport:cricket", sourceCategoryId: "sr:category:1", sport: "Cricket", category: "England", competition: "County Championship", season: "2026", stage: "Round 8", startTime: "12.06.2026. 11:00", venue: "The Oval", status: "Live", desc: "Surrey - Lancashire", updatedAt: "01:30:00 PM", group: "G-014", tournamentMapping: "Unmapped" },
+                { id: "EV-015", internalId: "event:56418731", providerId: "bc:match:441208", provider: "Bet Construct", sourceSportId: "demo:bet-construct:sport:ice-hockey", sourceCategoryId: "demo:bet-construct:category:sweden", sport: "Ice Hockey", category: "Sweden", competition: "SHL", season: "2025/26", stage: "Final", startTime: "13.06.2026. 20:00", venue: "Avicii Arena", status: "Not started", desc: "Frolunda HC - Lulea HF", updatedAt: "01:34:00 PM", group: "G-015", tournamentMapping: "Unmapped" },
+                { id: "EV-016", internalId: "event:56418720", providerId: "sr:match:61310022", provider: "SportRadar", sourceSportId: "sr:sport:2", sourceCategoryId: "demo:sportradar:category:united-states", sport: "Basketball", category: "United States", competition: "NBA", season: "2025/26", stage: "Regular season", startTime: "09.06.2026. 12:28", venue: "Madison Square Garden", status: "Live", desc: "New York Knicks vs San Antonio Spurs", updatedAt: "12:28:14 PM", group: "G-002", tournamentMapping: "Unmapped" },
+                { id: "EV-017", internalId: "event:56418721", providerId: "61310033", provider: "ExeFeed", sourceSportId: "T", sourceCategoryId: "1130", sport: "Tennis", category: "France", competition: "Roland Garros", season: "2026", stage: "Final", startTime: "09.06.2026. 11:00", venue: "Court Philippe-Chatrier", status: "Ended", desc: "N. Djokovic - C. Alcaraz", updatedAt: "11:00:04 AM", group: "G-003", tournamentMapping: "Mapped" },
+                { id: "EV-018", internalId: "event:56418724", providerId: "f1:race:2026:monaco", provider: "ExeFeed", sourceSportId: "demo:exefeed:sport:motorsport", sourceCategoryId: "demo:exefeed:category:international", sport: "Motorsport", category: "International", competition: "Formula 1", season: "2026", stage: "Race", startTime: "14.06.2026. 15:00", venue: "Monaco", status: "Delayed", desc: "Monaco Grand Prix", updatedAt: "02:01:00 PM", group: "G-008", tournamentMapping: "Unmapped" },
+                { id: "EV-019", internalId: "event:56418726", providerId: "sr:match:61310831", provider: "SportRadar", sourceSportId: "demo:sportradar:sport:volleyball", sourceCategoryId: "sr:category:31", sport: "Volleyball", category: "Italy", competition: "SuperLega", season: "2025/26", stage: "Quarter-final", startTime: "11.06.2026. 18:30", venue: "Pala Barton", status: "Not started", desc: "Perugia vs Lube Civitanova", updatedAt: "01:21:00 PM", group: "G-006", tournamentMapping: "Mapped" },
+                { id: "EV-020", internalId: "event:56418727", providerId: "61310832", provider: "ExeFeed", sourceSportId: "H", sourceCategoryId: "1128", sport: "Handball", category: "Germany", competition: "Bundesliga", season: "2025/26", stage: "Regular season", startTime: "11.06.2026. 19:00", venue: "Sparkassen-Arena", status: "Not started", desc: "Kiel - Magdeburg", updatedAt: "01:23:00 PM", group: "G-007", tournamentMapping: "Mapped" },
+                { id: "EV-021", internalId: "event:56418728", providerId: "img:race:motogp:07", provider: "IMG Arena", sourceSportId: "demo:img-arena:sport:moto-gp", sourceCategoryId: "demo:img-arena:category:italy", sport: "Moto GP", category: "Italy", competition: "MotoGP World Championship", season: "2026", stage: "Race", startTime: "12.06.2026. 14:00", venue: "Mugello Circuit", status: "Not started", desc: "Italian GP", updatedAt: "01:26:00 PM", group: "G-009", tournamentMapping: "Unmapped" },
+                { id: "EV-022", internalId: "event:56418729", providerId: "bb:match:882091", provider: "ExeFeed", sourceSportId: "demo:exefeed:sport:baseball", sourceCategoryId: "1129", sport: "Baseball", category: "United States", competition: "MLB", season: "2026", stage: "Regular season", startTime: "12.06.2026. 01:10", venue: "Yankee Stadium", status: "Not started", desc: "NY Yankees - Boston Red Sox", updatedAt: "01:29:00 PM", group: "G-010", tournamentMapping: "Mapped" },
+                { id: "EV-023", internalId: "event:56418730", providerId: "61310833", provider: "ExeFeed", sourceSportId: "demo:exefeed:sport:cricket", sourceCategoryId: "1126", sport: "Cricket", category: "England", competition: "County Championship", season: "2026", stage: "Round 8", startTime: "12.06.2026. 11:00", venue: "The Oval", status: "Live", desc: "Surrey vs Lancashire", updatedAt: "01:31:00 PM", group: "G-014", tournamentMapping: "Unmapped" },
+                { id: "EV-024", internalId: "event:56418731", providerId: "sr:match:441208", provider: "SportRadar", sourceSportId: "demo:sportradar:sport:ice-hockey", sourceCategoryId: "demo:sportradar:category:sweden", sport: "Ice Hockey", category: "Sweden", competition: "SHL", season: "2025/26", stage: "Final", startTime: "13.06.2026. 20:00", venue: "Avicii Arena", status: "Not started", desc: "Frolunda - Lulea", updatedAt: "01:35:00 PM", group: "G-015", tournamentMapping: "Unmapped" },
+                { id: "EV-025", internalId: "", providerId: "bg:match:33000052", provider: "Bet Genius", sourceSportId: "demo:bet-genius:sport:soccer", sourceCategoryId: "demo:bet-genius:category:spain", sport: "Soccer", category: "Spain", competition: "La Liga", season: "2025/26", stage: "Regular season", startTime: "14.06.2026. 21:00", venue: "Santiago Bernabeu", status: "Not started", desc: "Real Madrid - Atletico Madrid", updatedAt: "01:40:00 PM", group: "G-025", tournamentMapping: "Mapped" },
+                { id: "EV-026", internalId: "", providerId: "sr:match:61310911", provider: "SportRadar", sourceSportId: "sr:sport:2", sourceCategoryId: "demo:sportradar:category:united-states", sport: "Basketball", category: "United States", competition: "NBA", season: "2025/26", stage: "Playoffs", startTime: "14.06.2026. 02:30", venue: "Chase Center", status: "Not started", desc: "Golden State Warriors - Los Angeles Lakers", updatedAt: "01:42:00 PM", group: "G-026", tournamentMapping: "Unmapped" },
+                { id: "EV-027", internalId: "", providerId: "tn:match:752901", provider: "ExeFeed", sourceSportId: "T", sourceCategoryId: "1126", sport: "Tennis", category: "England", competition: "Wimbledon", season: "2026", stage: "First round", startTime: "15.06.2026. 13:30", venue: "Centre Court", status: "Not started", desc: "Jannik Sinner - Daniil Medvedev", updatedAt: "01:44:00 PM", group: "G-027", tournamentMapping: "Mapped" },
+                { id: "EV-028", internalId: "", providerId: "sr:race:2", provider: "SportRadar", sourceSportId: "demo:sportradar:sport:motorsport", sourceCategoryId: "demo:sportradar:category:canada", sport: "Motorsport", category: "Canada", competition: "Formula 1", season: "2026", stage: "Race", startTime: "15.06.2026. 20:00", venue: "Circuit Gilles-Villeneuve", status: "Not started", desc: "Canadian Grand Prix", updatedAt: "01:46:00 PM", group: "G-028", tournamentMapping: "Unmapped" },
+                { id: "EV-029", internalId: "", providerId: "61310912", provider: "ExeFeed", sourceSportId: "V", sourceCategoryId: "demo:exefeed:category:poland", sport: "Volleyball", category: "Poland", competition: "PlusLiga", season: "2025/26", stage: "Semi-final", startTime: "15.06.2026. 18:00", venue: "Spodek", status: "Not started", desc: "ZAKSA Kedzierzyn-Kozle - Jastrzebski Wegiel", updatedAt: "01:48:00 PM", group: "G-029", tournamentMapping: "Mapped" },
+                { id: "EV-030", internalId: "", providerId: "sr:match:61310913", provider: "SportRadar", sourceSportId: "demo:sportradar:sport:handball", sourceCategoryId: "sr:category:7", sport: "Handball", category: "France", competition: "LNH Division 1", season: "2025/26", stage: "Regular season", startTime: "15.06.2026. 20:45", venue: "Stade Pierre de Coubertin", status: "Not started", desc: "Paris Saint-Germain - Nantes", updatedAt: "01:50:00 PM", group: "G-030", tournamentMapping: "Mapped" },
+                { id: "EV-031", internalId: "", providerId: "mgp:race:2026:08", provider: "ExeFeed", sourceSportId: "demo:exefeed:sport:moto-gp", sourceCategoryId: "demo:exefeed:category:netherlands", sport: "Moto GP", category: "Netherlands", competition: "MotoGP World Championship", season: "2026", stage: "Race", startTime: "16.06.2026. 14:00", venue: "TT Circuit Assen", status: "Not started", desc: "Dutch Grand Prix", updatedAt: "01:52:00 PM", group: "G-031", tournamentMapping: "Unmapped" },
+                { id: "EV-032", internalId: "", providerId: "ls:match:882117", provider: "LSports", sourceSportId: "demo:lsports:sport:baseball", sourceCategoryId: "demo:lsports:category:united-states", sport: "Baseball", category: "United States", competition: "MLB", season: "2026", stage: "Regular season", startTime: "16.06.2026. 03:10", venue: "Dodger Stadium", status: "Not started", desc: "Los Angeles Dodgers - Chicago Cubs", updatedAt: "01:54:00 PM", group: "G-032", tournamentMapping: "Mapped" },
+                { id: "EV-033", internalId: "", providerId: "cr:match:99171", provider: "Bet Genius", sourceSportId: "demo:bet-genius:sport:cricket", sourceCategoryId: "demo:bet-genius:category:india", sport: "Cricket", category: "India", competition: "Indian Premier League", season: "2026", stage: "League stage", startTime: "16.06.2026. 16:00", venue: "Wankhede Stadium", status: "Not started", desc: "Mumbai Indians - Chennai Super Kings", updatedAt: "01:56:00 PM", group: "G-033", tournamentMapping: "Unmapped" },
+                { id: "EV-034", internalId: "", providerId: "bc:match:441244", provider: "Bet Construct", sourceSportId: "demo:bet-construct:sport:ice-hockey", sourceCategoryId: "demo:bet-construct:category:finland", sport: "Ice Hockey", category: "Finland", competition: "Liiga", season: "2025/26", stage: "Semi-final", startTime: "16.06.2026. 19:30", venue: "Nokia Arena", status: "Not started", desc: "Tappara - Ilves", updatedAt: "01:58:00 PM", group: "G-034", tournamentMapping: "Unmapped" },
+                { id: "EV-035", feedId: "exefeed-live", mappedTournamentId: "T-SERIE-A", mappedHomeId: "C-INT", mappedAwayId: "C-NAP", internalId: "event:56418742", providerId: "61310940", provider: "ExeFeed", sourceSportId: "F", sourceCategoryId: "1131", sport: "Soccer", category: "Italy", competition: "Serie A", season: "2025/26", stage: "Regular season", startTime: "17.06.2026. 20:45", venue: "San Siro", status: "Not started", desc: "Inter Milan - Napoli", updatedAt: "02:00:00 PM", group: "G-035", tournamentMapping: "Mapped" },
+                { id: "EV-036", feedId: "sportradar-live", mappedTournamentId: "T-SERIE-A", mappedHomeId: "C-INT", mappedAwayId: "C-NAP", internalId: "", providerId: "sr:match:61310940", provider: "SportRadar", sourceSportId: "sr:sport:1", sourceCategoryId: "sr:category:31", sport: "Soccer", category: "Italy", competition: "Serie A", season: "2025/26", stage: "Regular season", startTime: "17.06.2026. 18:45", venue: "Stadio Giuseppe Meazza", status: "Not started", desc: "Internazionale Milano vs SSC Napoli", updatedAt: "02:02:00 PM", group: "G-036", tournamentMapping: "Mapped" },
+                { id: "EV-037", internalId: "event:56418743", providerId: "61310941", provider: "ExeFeed", sourceSportId: "F", sourceCategoryId: "1131", feedId: "exefeed-live", sport: "Soccer", category: "Italy", competition: "Serie A", mappedTournamentId: "T-SERIE-A", mappedHomeId: "C-JUV", mappedAwayId: "C-MIL", season: "2025/26", stage: "Regular season", startTime: "18.06.2026. 20:45", venue: "Allianz Stadium", status: "Not started", desc: "Juventus - Milan", updatedAt: "02:03:00 PM", group: "G-037", tournamentMapping: "Mapped", automaticCorrelationExcluded: false },
+                { id: "EV-038", internalId: "", providerId: "sr:match:61310941", provider: "SportRadar", sourceSportId: "sr:sport:1", sourceCategoryId: "sr:category:31", feedId: "sportradar-live", sport: "Soccer", category: "Italy", competition: "Serie A", mappedTournamentId: "T-SERIE-A", mappedHomeId: "C-JUV", mappedAwayId: "C-MIL", season: "2025/26", stage: "Regular season", startTime: "18.06.2026. 20:45", venue: "Allianz Stadium", status: "Not started", desc: "Juventus vs AC Milan", updatedAt: "02:03:00 PM", group: "G-038", tournamentMapping: "Mapped", automaticCorrelationExcluded: false },
+                { id: "EV-039", internalId: "", providerId: "sr:match:61310942", provider: "SportRadar", sourceSportId: "sr:sport:1", sourceCategoryId: "sr:category:31", feedId: "sportradar-live", sport: "Soccer", category: "Italy", competition: "Serie A", mappedTournamentId: "T-SERIE-A", mappedHomeId: "C-ROM", mappedAwayId: "C-LAZ", season: "2025/26", stage: "Regular season", startTime: "19.06.2026. 20:45", venue: "Stadio Olimpico", status: "Not started", desc: "Roma - Lazio", updatedAt: "02:03:00 PM", group: "G-039", tournamentMapping: "Mapped", automaticCorrelationExcluded: false },
+                { id: "EV-040", internalId: "", providerId: "61310943", provider: "ExeFeed", sourceSportId: "F", sourceCategoryId: "1127", feedId: "exefeed-live", mappedTournamentId: "T-LA-LIGA", mappedHomeId: "C-BAR", mappedAwayId: "C-RMA", sport: "Soccer", category: "Spain", competition: "La Liga", season: "2025/26", stage: "Regular season", startTime: "", venue: "Camp Nou", status: "Not started", desc: "Barcelona - Real Madrid", updatedAt: "02:05:00 PM", group: "G-040", tournamentMapping: "Mapped", decisionRevision: 0 },
+                { id: "EV-041", internalId: "", providerId: "sr:match:61310943", provider: "SportRadar", sourceSportId: "sr:sport:1", sourceCategoryId: "sr:category:32", feedId: "sportradar-live", mappedTournamentId: "T-LA-LIGA", mappedHomeId: "C-BAR", mappedAwayId: "C-RMA", sport: "Soccer", category: "Spain", competition: "La Liga", season: "2025/26", stage: "Regular season", startTime: "20.06.2026. 20:50", venue: "Camp Nou", status: "Not started", desc: "Barcelona - Real Madrid", updatedAt: "02:05:00 PM", group: "G-041", tournamentMapping: "Mapped", decisionRevision: 0 },
+                { id: "EV-042", internalId: "", providerId: "bg:match:61310943", provider: "Bet Genius", sourceSportId: "demo:bet-genius:sport:soccer", sourceCategoryId: "demo:bet-genius:category:spain", feedId: "bet-genius-live", mappedTournamentId: "T-LA-LIGA", mappedHomeId: "C-BAR", mappedAwayId: "C-RMA", sport: "Soccer", category: "Spain", competition: "La Liga", season: "2025/26", stage: "Regular season", startTime: "20.06.2026. 20:55", venue: "Camp Nou", status: "Not started", desc: "Barcelona - Real Madrid", updatedAt: "02:05:00 PM", group: "G-042", tournamentMapping: "Mapped", decisionRevision: 0 }
             ];
 
             const messages = [
@@ -830,6 +833,30 @@
                 history: ['ExeFeed reference start time removed. Event made inactive; all three source links closed.'],
                 restorationOutcomes: []
             });
+            function refreshResolvedMappings() {
+                const snapshot = EventMappingProjectionDemo.snapshot();
+                providerEvents.forEach(source => {
+                    const result = EventMappingProjectionDemo.resolve(snapshot, source);
+                    source.mappingReadError = !result.ok;
+                    source.sportMapping = result.ok ? (result.sport ? 'Mapped' : 'Unmapped') : 'Unavailable';
+                    source.categoryMapping = result.ok ? (result.category ? 'Mapped' : 'Unmapped') : 'Unavailable';
+                    if (result.ok) {
+                        source.mappedSportId = result.sport?.id || null;
+                        source.mappedSportName = result.sport?.name || null;
+                        source.mappedCategoryId = result.category?.id || null;
+                        source.mappedCategoryName = result.category?.name || null;
+                    }
+                    const statuses = [source.sportMapping, source.categoryMapping, source.tournamentMapping];
+                    source.mappingStatus = !result.ok ? 'Unavailable' : statuses.every(status => status === 'Mapped') ? 'Mapped' : statuses.some(status => status === 'Mapped') ? 'Partially mapped' : 'Unmapped';
+                });
+            }
+            function mappedValue(source, entity) {
+                if (source.mappingReadError) return 'Unavailable';
+                const name = entity === 'sport' ? source.mappedSportName : source.mappedCategoryName;
+                const id = entity === 'sport' ? source.mappedSportId : source.mappedCategoryId;
+                return name ? String(id + ' · ' + name).replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char])) : 'Unmapped';
+            }
+            refreshResolvedMappings();
             let events = buildMasterEvents(providerEvents);
             let currentEvent = events[0];
             let currentProviderEvent = null;
@@ -857,6 +884,7 @@
                     return {
                         ...leadEvent,
                         ...retained,
+                        category: leadEvent.mappingReadError ? 'Unavailable' : leadEvent.mappedCategoryName || '-',
                         startTime: leadEvent.startTime,
                         masterActive: retained ? retained.masterActive : true,
                         referenceSourceId: retained?.referenceSourceId || leadEvent.id,
@@ -905,11 +933,13 @@
             const promoteEventModal = document.getElementById('promoteEventModal');
             function eventFeed(event) { return event.feedId || event.provider; }
             function eventStartMillis(event) {
-                const match = event.startTime.match(/^(\d{2})\.(\d{2})\.(\d{4})\. (\d{2}):(\d{2})$/);
-                return match ? Date.UTC(+match[3], +match[2] - 1, +match[1], +match[4], +match[5]) : NaN;
+                const match = String(event?.startTime || '').match(/^(\d{2})\.(\d{2})\.(\d{4})\. (\d{2}):(\d{2})$/);
+                if (!match) return NaN;
+                const date = new Date(Date.UTC(+match[3], +match[2] - 1, +match[1], +match[4], +match[5]));
+                return date.getUTCFullYear() === +match[3] && date.getUTCMonth() === +match[2] - 1 && date.getUTCDate() === +match[1] && date.getUTCHours() === +match[4] && date.getUTCMinutes() === +match[5] ? date.getTime() : NaN;
             }
             function manualLinkEligible(source, master) {
-                return !source.internalId && master.masterActive !== false &&
+                return !!source && !!master && !source.withdrawn && !source.internalId && master.masterActive !== false &&
                     source.mappedTournamentId && source.mappedHomeId && source.mappedAwayId &&
                     source.mappedTournamentId === master.mappedTournamentId &&
                     source.mappedHomeId === master.mappedHomeId && source.mappedAwayId === master.mappedAwayId && Number.isFinite(eventStartMillis(source)) &&
@@ -920,7 +950,7 @@
                     Math.abs(eventStartMillis(source) - eventStartMillis(master)) <= promotionToleranceMinutes * 60000);
             }
             function promotionReady(source) {
-                return source && !source.internalId && source.mappedTournamentId && source.mappedHomeId &&
+                return source && !source.withdrawn && !source.internalId && source.mappedTournamentId && source.mappedHomeId &&
                     source.mappedAwayId && Number.isFinite(eventStartMillis(source));
             }
             function openPromotion(sourceId) {
@@ -936,7 +966,7 @@
                 const text = document.createElement('p');
                 text.textContent = candidates.length ?
                     (candidates.length === 1 ? 'A matching event already exists. No new event will be created. You can link this source to the existing event.' : 'Several matching events already exist. No new event will be created. Review and select the correct event.') :
-                    `No matching master exists. Create a master from ${source.provider}: ${source.desc}, ${source.startTime}? Manual creation is allowed from a non-leading feed. Other eligible waiting sources may also be linked.`;
+                    `No matching event exists. Create an event from ${source.provider}: ${source.desc}, ${source.startTime}? Manual creation is allowed from a non-leading feed. Other eligible waiting sources may also be linked.`;
                 body.appendChild(text);
                 candidates.forEach(master => {
                     const row = document.createElement('div'); row.style.marginBottom = '12px';
@@ -1055,7 +1085,7 @@
                     const targetMasterEvent = events.find(event => event.id === targetGroupId);
                     if (!sourceEvent || !targetMasterEvent) return;
 
-                    if (sourceEvent.mappedTournamentId && !manualLinkEligible(sourceEvent, targetMasterEvent)) { alert('The source cannot be linked: check mapped teams, tournament, active master and feed availability.'); return; }
+                    if (!manualLinkEligible(sourceEvent, targetMasterEvent)) { alert('The source cannot be linked: check mapped teams, tournament, active event and feed availability.'); return; }
                     sourceEvent.automaticCorrelationExcluded = false;
                     sourceEvent.linkOrigin = { group: sourceEvent.group, internalId: sourceEvent.internalId };
                     sourceEvent.group = targetMasterEvent.id;
@@ -1073,22 +1103,10 @@
                     return;
                 }
 
-                providerEvents
-                    .filter(event => event.group === targetGroupId)
-                    .forEach(event => {
-                        if (!event.linkOrigin) {
-                            event.linkOrigin = {
-                                group: event.group,
-                                internalId: event.internalId
-                            };
-                        }
-                        event.group = currentEvent.id;
-                        event.internalId = currentEvent.internalId;
-                    });
-                events = buildMasterEvents(providerEvents);
-                currentEvent = events.find(event => event.id === currentEvent.id) || events[0];
-                renderTable();
-                showEventDetail(currentEvent.id);
+                const sourceEvent = providerEvents.find(event => event.id === targetGroupId);
+                if (!manualLinkEligible(sourceEvent, currentEvent)) { alert('Select an eligible unlinked provider event.'); return; }
+                linkSourceProviderEventId = sourceEvent.id;
+                linkEvents(currentEvent.id);
             }
 
             let unlinkSourceId = '';
@@ -1189,20 +1207,14 @@
                             event.providerId.toLowerCase().includes(searchVal) ||
                             event.desc.toLowerCase().includes(searchVal) ||
                             event.competition.toLowerCase().includes(searchVal);
-                        return event.id !== sourceEvent.group && providerMatch && sportMatch && tournamentMatch && searchMatch && (!sourceEvent.mappedTournamentId || manualLinkEligible(sourceEvent, event));
+                        return event.id !== sourceEvent.group && providerMatch && sportMatch && tournamentMatch && searchMatch && manualLinkEligible(sourceEvent, event);
                     });
                 }
-                return events.filter(event => {
-                    const providerMatch = providerVal === 'all' || event.providerEvents.some(source => source.provider === providerVal);
-                    const sportMatch = event.sport === currentEvent.sport;
+                return providerEvents.filter(event => {
+                    const providerMatch = providerVal === 'all' || event.provider === providerVal;
                     const tournamentMatch = !tournamentVal || event.competition.toLowerCase().includes(tournamentVal);
-                    const searchMatch = !searchVal ||
-                        event.internalId.toLowerCase().includes(searchVal) ||
-                        event.providerId.toLowerCase().includes(searchVal) ||
-                        event.desc.toLowerCase().includes(searchVal) ||
-                        event.sport.toLowerCase().includes(searchVal) ||
-                        event.competition.toLowerCase().includes(searchVal);
-                    return event.id !== currentEvent.id && providerMatch && sportMatch && tournamentMatch && searchMatch;
+                    const searchMatch = !searchVal || [event.providerId, event.desc, event.competition].some(value => value.toLowerCase().includes(searchVal));
+                    return providerMatch && tournamentMatch && searchMatch && manualLinkEligible(event, currentEvent);
                 });
             }
 
@@ -1228,7 +1240,7 @@
                     <tr class="link-event-row ${event.id === selectedLinkGroupId ? 'selected' : ''}" data-group-id="${event.id}">
                         <td><input type="radio" name="linkEventTarget" ${event.id === selectedLinkGroupId ? 'checked' : ''} aria-label="Select event to link"></td>
                         <td class="market-name">${event.desc}</td>
-                        <td>${event.internalId}</td>
+                        <td>${event.internalId || event.providerId}</td>
                         <td>${event.startTime}</td>
                         <td>${event.competition}</td>
                     </tr>
@@ -1237,14 +1249,14 @@
 
             function openLinkEventsModal() {
                 selectedLinkGroupId = '';
-                document.getElementById('linkEventsSubtitle').textContent = `Select an event to link with ${currentEvent.desc}.`;
+                document.getElementById('linkEventsSubtitle').textContent = linkSourceProviderEventId ? `Select an event to link with ${currentEvent.desc}.` : `Select an unlinked provider event to add to ${currentEvent.desc}.`;
                 linkTournamentInput.value = '';
                 linkEventSearch.value = '';
                 document.getElementById('linkEventsHead').innerHTML = `
                     <tr>
                         <th style="width: 44px;">Select</th>
                         <th>Event</th>
-                        <th>Event ID</th>
+                        <th>${linkSourceProviderEventId ? 'Event ID' : 'Provider event ID'}</th>
                         <th>Start Time</th>
                         <th>Tournament</th>
                     </tr>
@@ -1413,7 +1425,7 @@
                 }
                 tableHead.innerHTML = `
                     <tr>
-                        <th>Event ID</th>
+                        <th>${linkSourceProviderEventId ? 'Event ID' : 'Provider event ID'}</th>
                         <th>Start Time</th>
                         <th>Sport</th>
                         <th>Tournament</th>
@@ -1430,7 +1442,7 @@
 
                 tableBody.innerHTML = rows.map(event => `
                     <tr>
-                        <td style="font-weight: 600; color: #007bff;">${event.internalId}</td>
+                        <td style="font-weight: 600; color: #007bff;">${event.internalId || event.providerId}</td>
                         <td>${event.startTime}</td>
                         <td>${event.sport}</td>
                         <td>${event.competition}</td>
@@ -1453,7 +1465,7 @@
                     <tr>
                         <th>Feed Provider</th>
                         <th>Source ID</th>
-                        <th>Event ID</th>
+                        <th>${linkSourceProviderEventId ? 'Event ID' : 'Provider event ID'}</th>
                         <th>Start Time</th>
                         <th>Sport</th>
                         <th>Tournament</th>
@@ -1516,7 +1528,7 @@
                         <div class="detail-row"><strong>Created from feed:</strong><span>${currentEvent.creationSourceProvider} · ${currentEvent.creationSourceFeed}</span></div>
                         <div class="detail-row"><strong>Source event ID:</strong><span>${currentEvent.creationSourceId}</span></div>
                         <div class="detail-row"><strong>Sport:</strong><span>${currentEvent.sport}</span></div>
-                        <div class="detail-row"><strong>Category:</strong><span>${currentEvent.category}</span></div>
+                        <div class="detail-row"><strong>Category:</strong><span>${String(currentEvent.category).replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]))}</span></div>
                     </div>
                     <div>
                         <div class="detail-row"><strong>Tournament:</strong><span>${currentEvent.competition}</span></div>
@@ -1587,8 +1599,10 @@
                         <div class="detail-row"><strong>Automatic linking:</strong><span>${currentProviderEvent.automaticCorrelationExcluded ? 'Excluded' : 'Enabled'}</span></div>
                     </div>
                     <div>
-                        <div class="detail-row"><strong>Sport:</strong><span>${currentProviderEvent.sport}</span></div>
-                        <div class="detail-row"><strong>Category:</strong><span>${currentProviderEvent.category}</span></div>
+                        <div class="detail-row"><strong>Provider sport:</strong><span>${currentProviderEvent.sport}</span></div>
+                        <div class="detail-row"><strong>Mapped sport:</strong><span>${mappedValue(currentProviderEvent, 'sport')}</span></div>
+                        <div class="detail-row"><strong>Provider category:</strong><span>${currentProviderEvent.category}</span></div>
+                        <div class="detail-row"><strong>Mapped category:</strong><span>${mappedValue(currentProviderEvent, 'category')}</span></div>
                         <div class="detail-row"><strong>Tournament:</strong><span>${currentProviderEvent.competition}</span></div>
                         <div class="detail-row"><strong>Season:</strong><span>${currentProviderEvent.season}</span></div>
                     </div>
@@ -1810,6 +1824,24 @@
                 });
             });
 
+            function refreshMappingProjectionViews() {
+                const masterId = currentEvent?.internalId;
+                const providerId = currentProviderEvent?.id;
+                const masterVisible = eventDetailView.style.display === 'block';
+                const providerVisible = providerEventDetailView.style.display === 'block';
+                refreshResolvedMappings();
+                events = buildMasterEvents(providerEvents);
+                renderTable();
+                if (providerVisible && providerId) showProviderEventDetail(providerId);
+                else if (masterVisible && masterId) {
+                    const master = events.find(event => event.internalId === masterId);
+                    if (master) showEventDetail(master.id);
+                }
+            }
+            window.addEventListener('storage', event => {
+                if ([SportMappingDemo.KEY, CategoryMappingDemo.KEY, null].includes(event.key)) refreshMappingProjectionViews();
+            });
+            window.addEventListener('focus', refreshMappingProjectionViews);
             populateTournamentOptions();
             renderTable();
         });

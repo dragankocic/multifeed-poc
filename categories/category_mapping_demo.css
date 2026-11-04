@@ -1,2 +1,41 @@
 @import url("../sports/sport_mapping_demo.css");
 .mapping-workspace { max-width: none; width: 100%; box-sizing: border-box; }
+/* Compact provider-to-master summary, scoped to category Manage mapping only. */
+.category-manage-page { width: 100%; max-width: none; box-sizing: border-box; }
+#mappingDetails.category-manage-card { border-radius: 10px; }
+.category-map-summary { display: grid; grid-template-columns: minmax(180px, 1fr) 32px minmax(320px, 2fr); gap: 26px; align-items: center; padding: 30px; }
+.category-map-caption { display: block; color: #7a8996; font-size: 12px; font-weight: 600; margin-bottom: 10px; }
+.category-map-source h2, .category-map-master > strong { display: block; margin: 0 0 10px; color: #263d50; font-size: 24px; line-height: 1.25; font-weight: 600; overflow-wrap: anywhere; }
+.category-map-meta { font-size: 13px; line-height: 1.6; color: #71808e; overflow-wrap: anywhere; }
+.category-map-meta .mapping-badge { margin-left: 10px; }
+.category-map-arrow { color: #94a5b2; font-size: 27px; text-align: center; }
+.category-map-current { display: flex; align-items: center; justify-content: space-between; gap: 24px; min-width: 0; padding: 22px 24px; border: 1px solid #e2e9ef; border-radius: 8px; background: #f8fafc; flex-wrap: wrap; }
+.category-map-updated { margin-top: 8px; color: #87939d; font-size: 12px; }
+.category-map-current .mapping-actions { gap: 10px; }
+.category-map-current .btn-action { padding: 10px 15px; border-radius: 5px; font-size: 13px; border: 1px solid #007bff; background: #007bff; color: #fff; cursor: pointer; }
+.category-map-current [data-action="delete"] { color: #a44242; border-color: #dfc7c7; background: #fff; }
+.category-map-master > .category-map-unmapped { color: #7a8996; font-weight: 500; }
+.category-manage-card .category-map-history { margin: 0; padding: 24px 30px 30px; border-top: 1px solid #e7ecf1; }
+@media(max-width:1000px){ .category-map-summary { grid-template-columns: minmax(0, 1fr); gap: 18px; }.category-map-arrow { display: none; } }
+@media(max-width:700px){ .category-map-summary { padding: 20px; }.category-manage-card .category-map-history { padding: 20px; }.category-map-current { padding: 20px; } }
+
+/* Explicit category mapping review and delete confirmation. */
+.category-confirm-dialog [hidden] { display: none !important; }
+.category-confirm-dialog .modal-actions { border-top: 1px solid #e6ecf1; padding-top: 20px; }
+.category-confirm-dialog .mapping-review-back { margin-right: auto; }
+.category-confirm-change { display: grid; grid-template-columns: minmax(0,1fr) 24px minmax(0,1fr); gap: 16px; align-items: center; margin: 22px 0 18px; }
+.category-confirm-change > div { min-width: 0; padding: 18px; border: 1px solid #dfe6ec; border-radius: 8px; background: #f7f9fb; }
+.category-confirm-change > div > span { display: block; color: #778795; font-size: 12px; margin-bottom: 9px; }
+.category-confirm-change strong { font-size: 18px; line-height: 1.4; font-weight: 600; color: #2c4356; overflow-wrap: anywhere; }
+.category-confirm-arrow { color: #8ca0b1; font-size: 23px; text-align: center; }
+.category-confirm-change > .category-confirm-destination { background: #eff7ff; border-color: #bfd9f0; }
+.category-confirm-change > .category-confirm-removed { background: #fff6f5; border-color: #edccca; }
+.category-confirm-dialog .category-confirm-effect { margin-bottom: 0; font-size: 14px; color: #607384; line-height: 1.6; }
+.category-confirm-dialog .mapping-confirm-danger { background: #c83d3d; border-color: #c83d3d; }
+@media(max-width:600px){ .category-confirm-change { grid-template-columns: minmax(0,1fr); gap: 10px; }.category-confirm-arrow { transform: rotate(90deg); }.category-confirm-dialog .modal-actions { flex-wrap: wrap; } }
+
+.category-confirm-dialog .mapping-picker-toolbar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 10px; }
+.category-confirm-dialog .mapping-picker-toolbar .master-target-search-label { margin: 0; }
+.category-confirm-dialog .mapping-create-shortcut { display: inline-flex; align-items: center; padding: 8px 12px; border-color: #c8d9e6; background: #f6faff; color: #1767a6; font-size: 13px; font-weight: 600; text-decoration: none; white-space: nowrap; }
+.category-confirm-dialog .mapping-create-shortcut:hover { background: #eaf4ff; border-color: #8dbbe2; }
+.category-confirm-dialog .mapping-create-shortcut:focus-visible { outline: 2px solid #007bff; outline-offset: 2px; }

@@ -1,2 +1,45 @@
 @import url("../sports/sport_mapping_demo.css");
 .mapping-workspace { max-width: none; width: 100%; box-sizing: border-box; }
+/* Compact provider-to-master summary, scoped to tournament Manage mapping only. */
+.tournament-manage-page { width: 100%; max-width: none; box-sizing: border-box; }
+#mappingDetails.tournament-manage-card { border-radius: 10px; }
+.tournament-map-summary { display: grid; grid-template-columns: minmax(180px, 1fr) 32px minmax(320px, 2fr); gap: 26px; align-items: center; padding: 30px; }
+.tournament-map-caption { display: block; color: #7a8996; font-size: 12px; font-weight: 600; margin-bottom: 10px; }
+.tournament-map-source h2, .tournament-map-master > strong { display: block; margin: 0 0 10px; color: #263d50; font-size: 24px; line-height: 1.25; font-weight: 600; overflow-wrap: anywhere; }
+.tournament-map-meta { font-size: 13px; line-height: 1.6; color: #71808e; overflow-wrap: anywhere; }
+.tournament-map-meta .mapping-badge { margin-left: 10px; }
+.tournament-map-arrow { color: #94a5b2; font-size: 27px; text-align: center; }
+.tournament-map-current { display: flex; align-items: center; justify-content: space-between; gap: 24px; min-width: 0; padding: 22px 24px; border: 1px solid #e2e9ef; border-radius: 8px; background: #f8fafc; flex-wrap: wrap; }
+.tournament-map-updated { margin-top: 8px; color: #87939d; font-size: 12px; }
+.tournament-map-current .mapping-actions { gap: 10px; }
+.tournament-map-current .btn-action { padding: 10px 15px; border-radius: 5px; font-size: 13px; border: 1px solid #007bff; background: #007bff; color: #fff; cursor: pointer; }
+.tournament-map-current [data-action="delete"] { color: #a44242; border-color: #dfc7c7; background: #fff; }
+.tournament-map-master > .tournament-map-unmapped { color: #7a8996; font-weight: 500; }
+.tournament-manage-card .tournament-map-history { margin: 0; padding: 24px 30px 30px; border-top: 1px solid #e7ecf1; }
+@media(max-width:1000px){ .tournament-map-summary { grid-template-columns: minmax(0, 1fr); gap: 18px; }.tournament-map-arrow { display: none; } }
+@media(max-width:700px){ .tournament-map-summary { padding: 20px; }.tournament-manage-card .tournament-map-history { padding: 20px; }.tournament-map-current { padding: 20px; } }
+
+/* Explicit tournament mapping review and delete confirmation. */
+.tournament-confirm-dialog [hidden] { display: none !important; }
+.tournament-confirm-dialog .modal-actions { border-top: 1px solid #e6ecf1; padding-top: 20px; }
+.tournament-confirm-dialog .mapping-review-back { margin-right: auto; }
+.tournament-confirm-change { display: grid; grid-template-columns: minmax(0,1fr) 24px minmax(0,1fr); gap: 16px; align-items: center; margin: 22px 0 18px; }
+.tournament-confirm-change > div { min-width: 0; padding: 18px; border: 1px solid #dfe6ec; border-radius: 8px; background: #f7f9fb; }
+.tournament-confirm-change > div > span { display: block; color: #778795; font-size: 12px; margin-bottom: 9px; }
+.tournament-confirm-change strong { font-size: 18px; line-height: 1.4; font-weight: 600; color: #2c4356; overflow-wrap: anywhere; }
+.tournament-confirm-arrow { color: #8ca0b1; font-size: 23px; text-align: center; }
+.tournament-confirm-change > .tournament-confirm-destination { background: #eff7ff; border-color: #bfd9f0; }
+.tournament-confirm-change > .tournament-confirm-removed { background: #fff6f5; border-color: #edccca; }
+.tournament-confirm-dialog .tournament-confirm-effect { margin-bottom: 0; font-size: 14px; color: #607384; line-height: 1.6; }
+.tournament-confirm-dialog .mapping-confirm-danger { background: #c83d3d; border-color: #c83d3d; }
+@media(max-width:600px){ .tournament-confirm-change { grid-template-columns: minmax(0,1fr); gap: 10px; }.tournament-confirm-arrow { transform: rotate(90deg); }.tournament-confirm-dialog .modal-actions { flex-wrap: wrap; } }
+
+.tournament-confirm-dialog .mapping-picker-toolbar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 10px; }
+.tournament-confirm-dialog .mapping-picker-toolbar .master-target-search-label { margin: 0; }
+.tournament-confirm-dialog .mapping-create-shortcut { display: inline-flex; align-items: center; padding: 8px 12px; border-color: #c8d9e6; background: #f6faff; color: #1767a6; font-size: 13px; font-weight: 600; text-decoration: none; white-space: nowrap; }
+.tournament-confirm-dialog .mapping-create-shortcut:hover { background: #eaf4ff; border-color: #8dbbe2; }
+.tournament-confirm-dialog .mapping-create-shortcut:focus-visible { outline: 2px solid #007bff; outline-offset: 2px; }
+
+/* Category prerequisites block writes, while existing mapping removal remains available. */
+.tournament-manage-page .mapping-actions button:disabled,
+#availableProviderTournamentsList button:disabled { opacity:.45;cursor:not-allowed; }

@@ -1,11 +1,11 @@
-/* Browser-only sport mapping lifecycle demo. No backend calls. */
+/* Browser-only sport mapping demo: immediate writes, soft deletion and observed sources. */
 (function(root){
 'use strict';
 const KEY='multifeed:sport-mapping-lifecycle:v1';
-// Prototype catalog; IDs beyond Soccer and Basketball are demo values.
+const BACKUP_KEY=KEY+':before-soft-delete';
 const sports=[
- {id:'1',name:'Soccer',abbr:'S'},
- {id:'2',name:'Basketball',abbr:'B'},
+ {id:'1',name:'Soccer',abbr:'SOC'},
+ {id:'2',name:'Basketball',abbr:'BKB'},
  {id:'3',name:'Tennis',abbr:'TEN'},
  {id:'4',name:'Ice Hockey',abbr:'IHO'},
  {id:'5',name:'Baseball',abbr:'BBS'},
@@ -15,51 +15,89 @@ const sports=[
  {id:'9',name:'Cricket',abbr:'CRI'},
  {id:'10',name:'Motorsport',abbr:'MOT'}
 ];
-const copy=x=>JSON.parse(JSON.stringify(x));
+
+const copy=value=>JSON.parse(JSON.stringify(value));
+const uid=()=>typeof crypto!=='undefined'&&crypto.randomUUID?crypto.randomUUID():'demo-'+Date.now()+'-'+Math.random().toString(16).slice(2);
+const providers=['ExeFeed','SportRadar','SportGenius'];
 function seed(){
- const sources=[['ExeFeed','F','Fudbal'],['ExeFeed','B','Košarka'],['SportRadar','sr:sport:1','Football'],['SportRadar','sr:sport:2','Basketball'],['ExeFeed','T','Tenis'],['ExeFeed','IH','Hokej na ledu'],['ExeFeed','V','Odbojka'],['ExeFeed','H','Rukomet'],['SportGenius','sg-10','Ice Hockey']].map(([provider,provId,provName])=>({provider,provId,provName,mappings:[]}));
- const revision=(id,target,phase,version=null,validFrom=null,validTo=null)=>({id,target,phase,version,validFrom,validTo,operator:'Demo operator'});
- sources[0].mappings=[revision('map-exe-f-0','1','Active',0,'2026-10-01T09:00:00.000Z')];
- sources[2].mappings=[revision('map-sr-f-0','1','Deprecated',0,'2026-10-01T09:00:00.000Z','2026-10-08T09:00:00.000Z'),revision('map-sr-f-1','2','Active',1,'2026-10-08T09:00:00.000Z'),revision('map-sr-f-draft','1','Draft')];
- return {schema:1,sources};
+ const sources=[['ExeFeed','F','Fudbal','1'],['ExeFeed','B','Košarka','2'],['SportRadar','sr:sport:1','Football','1'],['SportRadar','sr:sport:2','Basketball','2'],['ExeFeed','T','Tenis','3'],['ExeFeed','IH','Hokej na ledu','4'],['ExeFeed','V','Odbojka',null],['ExeFeed','H','Rukomet',null],['SportGenius','sg-10','Ice Hockey','4']].map(([provider,provId,provName,target],index)=>({provider,provId,provName,firstSeenAt:'2026-10-01T09:00:00.000Z',lastSeenAt:'2026-10-01T09:00:00.000Z',revision:target?1:0,mapping:target?{id:'sport-map-'+index,target,deleted:false,createdAt:'2026-10-01T09:00:00.000Z',updatedAt:'2026-10-01T09:00:00.000Z',deletedAt:null,operator:'Demo operator'}:null,audit:target?[{action:'Created',mappingId:'sport-map-'+index,oldTarget:null,target,at:'2026-10-01T09:00:00.000Z',operator:'Demo operator'}]:[]}));
+ return {schema:2,sources};
 }
-class Model {
- constructor(state){this.state=copy(state||seed());}
+function migrate(old){
+ if(old.schema===2)return copy(old);
+ return {schema:2,sources:old.sources.map(source=>{
+  const rows=source.mappings||[],active=rows.find(row=>row.phase==='Active');
+  const previous=rows.filter(row=>row.phase==='Deprecated').sort((a,b)=>b.version-a.version)[0];
+  const chosen=active||previous;
+  return {provider:source.provider,provId:source.provId,provName:source.provName,firstSeenAt:null,lastSeenAt:null,revision:chosen?1:0,
+   mapping:chosen?{id:chosen.id,target:chosen.target,deleted:!active,createdAt:chosen.validFrom,updatedAt:chosen.validTo||chosen.validFrom,deletedAt:active?null:chosen.validTo,operator:chosen.operator||'Demo operator'}:null,
+   audit:rows.filter(row=>row.phase!=='Draft').flatMap(row=>[{action:'Created',mappingId:row.id,oldTarget:null,target:row.target,at:row.validFrom,operator:row.operator||'Demo operator'},...(row.phase==='Deprecated'?[{action:'Deleted',mappingId:row.id,oldTarget:row.target,target:null,at:row.validTo,operator:row.operator||'Demo operator'}]:[])])};
+ })};
+}
+class Model{
+ constructor(state){this.state=state?migrate(state):seed();}
  source(provider,id){const source=this.state.sources.find(s=>s.provider===provider&&s.provId===id);if(!source)throw Error('Provider sport not found.');return source;}
- current(source){return source.mappings.find(m=>m.phase==='Active')||null;}
- draft(source){return source.mappings.find(m=>m.phase==='Draft')||null;}
- target(id){const sport=sports.find(s=>s.id===String(id));if(!sport)throw Error('Select an enabled sport.');return sport;}
- mapping(source,id){const m=source.mappings.find(m=>m.id===id);if(!m)throw Error('Mapping no longer exists. Refresh the page.');return m;}
- apply(provider,id,action,{mappingId,target,at=new Date().toISOString()}={}){
-  // Validate on a copy so rejected operations never partially change stored state.
-  const next=new Model(this.state),source=next.source(provider,id),active=next.current(source),draft=next.draft(source);
-  if(action==='create'||action==='replace'){
-   next.target(target);
-   if(draft)throw Error('A draft already exists. Edit or delete it first.');
-   if(action==='create'&&active)throw Error('An active mapping exists. Use Create new version.');
-   if(action==='replace') {const base=next.mapping(source,mappingId);if(base.phase!=='Active')throw Error('A new version requires the current active mapping.');if(base.target===String(target))throw Error('The selected sport is already active. Choose a different target.');}
-   const uid=typeof crypto!=='undefined'&&crypto.randomUUID?crypto.randomUUID():'demo-'+Date.now()+'-'+Math.random().toString(16).slice(2);
-   source.mappings.push({id:uid,target:String(target),phase:'Draft',version:null,validFrom:null,validTo:null,operator:'Demo operator'});
-  }else{
-   const m=next.mapping(source,mappingId);
-   if(action==='edit'){if(m.phase!=='Draft')throw Error('Only drafts can be edited.');next.target(target);if(active&&active.target===String(target))throw Error('The selected sport is already active.');m.target=String(target);}
-   else if(action==='delete'){if(m.phase!=='Draft')throw Error('Only drafts can be deleted.');source.mappings=source.mappings.filter(x=>x.id!==m.id);}
-   else if(action==='activate'){
-    if(m.phase!=='Draft')throw Error('Only drafts can be activated.');next.target(m.target);if(!Number.isFinite(Date.parse(at)))throw Error('Invalid activation time.');
-    if(active&&Date.parse(at)<Date.parse(active.validFrom))throw Error('Activation cannot precede the active mapping start time.');
-    const versions=source.mappings.filter(x=>x.version!==null).map(x=>x.version);
-    if(active){active.phase='Deprecated';active.validTo=at;}
-    m.phase='Active';m.version=versions.length?Math.max(...versions)+1:0;m.validFrom=at;
-   }else if(action==='deprecate'){
-    if(m.phase!=='Active')throw Error('Only active mappings can be deactivated.');
-    if(!Number.isFinite(Date.parse(at))||Date.parse(at)<Date.parse(m.validFrom))throw Error('Deactivation cannot precede activation.');m.phase='Deprecated';m.validTo=at;
-   }else throw Error('Unknown action.');
+ current(source){return source.mapping&&!source.mapping.deleted?source.mapping:null;}
+ target(id){const sport=sports.find(s=>s.id===String(id));if(!sport)throw Error('Select a valid sport.');return sport;}
+ apply(provider,id,action,{mappingId,target,expectedRevision,at=new Date().toISOString(),operator='Demo operator'}={}){
+  const next=new Model(this.state),source=next.source(provider,id),mapping=next.current(source);
+  if(expectedRevision!==undefined&&source.revision!==expectedRevision)throw Error('This mapping changed while the form was open. Close it and try again.');
+  if(!Number.isFinite(Date.parse(at)))throw Error('Invalid change time.');
+  if(action==='create'){
+   next.target(target);if(mapping)throw Error('A mapping already exists. Use Edit mapping.');
+   const previous=source.mapping;
+   source.mapping={id:previous?.id||uid(),target:String(target),deleted:false,createdAt:previous?.createdAt||at,updatedAt:at,deletedAt:null,operator};
+   source.audit.push({action:'Created',mappingId:source.mapping.id,oldTarget:null,target:String(target),at,operator});
+  }else if(action==='edit'||action==='delete'){
+   if(!mapping||mapping.id!==mappingId)throw Error('Mapping no longer exists. Close the form and try again.');
+   const oldTarget=mapping.target;
+   if(action==='edit'){
+    next.target(target);if(oldTarget===String(target))throw Error('Select a different sport.');
+    mapping.target=String(target);
+   }else{mapping.deleted=true;mapping.deletedAt=at;}
+   mapping.updatedAt=at;mapping.operator=operator;
+   source.audit.push({action:action==='edit'?'Updated':'Deleted',mappingId:mapping.id,oldTarget,target:action==='delete'?null:String(target),at,operator});
+  }else throw Error('Unknown mapping action.');
+  source.revision+=1;this.state=next.state;return this.source(provider,id);
+ }
+ observeUnmapped({provider,provId,provName='',at=new Date().toISOString()}){
+  if(!providers.includes(provider)||!String(provId||'').trim()||!Number.isFinite(Date.parse(at)))throw Error('Invalid provider sport notification.');
+  let source=this.state.sources.find(s=>s.provider===provider&&s.provId===String(provId));
+  if(!source){source={provider,provId:String(provId),provName:provName||String(provId),firstSeenAt:at,lastSeenAt:at,revision:0,mapping:null,audit:[]};this.state.sources.push(source);}
+  else{
+   if(!source.firstSeenAt||Date.parse(at)<Date.parse(source.firstSeenAt))source.firstSeenAt=at;
+   if(!source.lastSeenAt||Date.parse(at)>=Date.parse(source.lastSeenAt)){source.lastSeenAt=at;if(provName)source.provName=provName;}
   }
-  this.state=next.state;return this.source(provider,id);
+  // A late failure notification registers the observed source; it never removes a current mapping.
+  return source;
  }
 }
-function load(){try{const saved=JSON.parse(localStorage.getItem(KEY));if(saved?.schema===1&&Array.isArray(saved.sources))return new Model(saved);}catch{}return new Model();}
+function load(){
+ let saved;try{saved=JSON.parse(localStorage.getItem(KEY));}catch{throw Error('Saved mappings could not be read. No changes were saved.');}
+ if(!saved)return new Model();
+ if(![1,2].includes(saved.schema)||!Array.isArray(saved.sources))throw Error('Saved mappings are invalid. No changes were saved.');
+ const model=new Model(saved);
+ // Correct only the untouched old demo seed; preserve operator changes and deletions.
+ const source=model.state.sources.find(row=>row.provider==='SportRadar'&&row.provId==='sr:sport:1');
+ const initial=source?.audit?.[0],mapping=source&&model.current(source);
+ if(source?.revision===1&&mapping?.id==='sport-map-2'&&mapping.target==='2'&&source.audit.length===1&&initial.action==='Created'&&initial.target==='2'&&initial.at==='2026-10-01T09:00:00.000Z'){
+  model.apply(source.provider,source.provId,'edit',{mappingId:mapping.id,target:'1',expectedRevision:1,operator:'Demo data correction'});
+  localStorage.setItem(KEY,JSON.stringify(model.state));
+ }
+ // Fill only untouched demo sources; never replace a user's mapping or deletion.
+ let addedDemoMappings=false;
+ for(const [provider,id,target] of [['ExeFeed','B','2'],['SportRadar','sr:sport:2','2'],['ExeFeed','T','3'],['ExeFeed','IH','4'],['SportGenius','sg-10','4']]){
+  const row=model.state.sources.find(s=>s.provider===provider&&s.provId===id);
+  if(row?.revision===0&&row.mapping===null&&row.audit?.length===0&&row.firstSeenAt==='2026-10-01T09:00:00.000Z'){
+   model.apply(provider,id,'create',{target,expectedRevision:0,operator:'Demo data setup'});addedDemoMappings=true;
+  }
+ }
+ if(addedDemoMappings)localStorage.setItem(KEY,JSON.stringify(model.state));
+ if(saved.schema===1){try{if(!localStorage.getItem(BACKUP_KEY))localStorage.setItem(BACKUP_KEY,JSON.stringify(saved));localStorage.setItem(KEY,JSON.stringify(model.state));}catch{}}
+ return model;
+}
 function save(model){localStorage.setItem(KEY,JSON.stringify(model.state));}
-function providerRows(){const model=load();return model.state.sources.map(s=>{const active=model.current(s),sport=active?sports.find(x=>x.id===active.target):null;return {...s,internalId:active?.target||'-',internalName:sport?.name||'-',internalAbbr:sport?.abbr||'-',status:active?'Mapped':'Unmapped'};});}
-const api={Model,seed,sports,load,save,providerRows,KEY};if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.SportMappingDemo=api;
+function providerRows(){const model=load();return model.state.sources.map(source=>{const mapping=model.current(source),sport=mapping?sports.find(s=>s.id===mapping.target):null;return {...source,internalId:mapping?.target||'-',internalName:sport?.name||'-',internalAbbr:sport?.abbr||'-',status:mapping?'Mapped':'Unmapped'};});}
+function unmappedRows(){return providerRows().filter(source=>source.status==='Unmapped');}
+const api={Model,seed,migrate,sports,load,save,providerRows,unmappedRows,KEY,BACKUP_KEY};if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.SportMappingDemo=api;
 })(typeof window==='undefined'?globalThis:window);

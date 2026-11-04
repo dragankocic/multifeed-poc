@@ -12,29 +12,33 @@ function render(){
  $('editCategoryLink').href='create_category.html?'+new URLSearchParams({edit:'true',id:category.id,name:category.name});
  $('editCategoryLink').style.display=category.deleted?'none':'';
  $('deleteCategoryBtn').style.display=category.deleted?'none':'';$('addMappingBtn').style.display=category.deleted?'none':'';
- const rows=model.state.sources.filter(source=>model.current(source)?.target===categoryId||model.draft(source)?.target===categoryId);
+ const rows=model.state.sources.filter(source=>model.current(source)?.target===categoryId);
  const activeCount=rows.filter(source=>model.current(source)?.target===categoryId).length;
- $('mappingCount').textContent=activeCount+' active mapping'+(activeCount===1?'':'s')+' · '+rows.filter(source=>model.draft(source)?.target===categoryId).length+' drafts';
+ $('mappingCount').textContent=activeCount+' mapping'+(activeCount===1?'':'s');
  $('providerCategoriesList').innerHTML=rows.length?rows.map(source=>{
-  const active=model.current(source)?.target===categoryId,draft=model.draft(source)?.target===categoryId;
-  return `<tr><td>${escape(source.provider)}</td><td>${escape(source.provId)}</td><td>${escape(source.provName)}</td><td>${active?'<span class="mapping-badge active">Active</span>':''} ${draft?'<span class="mapping-badge draft">Draft</span>':''}</td><td style="text-align:right;"><a class="btn-action category-action" href="${escape(sourceLink(source))}">Manage mapping</a></td></tr>`;
- }).join(''):'<tr><td colspan="5" class="mapping-empty">No provider categories mapped yet. Add a mapping to prepare your first draft.</td></tr>';
+  const active=model.current(source)?.target===categoryId;
+  return `<tr><td><div class="overview-provider"><span class="overview-provider-icon" aria-hidden="true">${escape(source.provider.slice(0,1))}</span>${escape(source.provider)}</div></td><td><span class="overview-source-name">${escape(source.provName)}</span><span class="overview-source-id">${escape(source.provId)}</span></td><td style="text-align:right;"><a class="btn-action category-action" href="${escape(sourceLink(source))}">Manage mapping</a></td></tr>`;
+ }).join(''):'<tr><td colspan="3" class="mapping-empty">No provider categories mapped yet. Add a provider category mapping.</td></tr>';
 }
 function renderAvailable(){
  const model=api.load(),provider=$('providerFilter').value,search=$('providerCategorySearch').value.toLowerCase();
- const rows=model.state.sources.filter(source=>source.provider===provider&&model.current(source)?.target!==categoryId&&[source.provider,source.provId,source.provName].some(value=>value.toLowerCase().includes(search)));
+ const rows=model.state.sources.filter(source=>source.provider===provider&&!model.current(source)&&[source.provider,source.provId,source.provName].some(value=>value.toLowerCase().includes(search)));
  $('availableProviderCategoriesList').innerHTML=rows.length?rows.map(source=>{
- const active=model.current(source),draft=model.draft(source);
- return `<tr><td>${escape(source.provider)}</td><td>${escape(source.provId)}</td><td>${escape(source.provName)}</td><td>${active?'Mapped':draft?'Draft available':'Unmapped'}</td><td style="text-align:right;"><a class="btn-action category-action" href="${escape(sourceLink(source))}">${active?'Manage mapping':draft?'Continue draft':'Add mapping'}</a></td></tr>`;
+ const active=model.current(source);
+ return `<tr><td>${escape(source.provider)}</td><td>${escape(source.provId)}</td><td>${escape(source.provName)}</td><td>${active?'Mapped':'Unmapped'}</td><td style="text-align:right;"><button type="button" class="btn-action category-action" data-provider="${escape(source.provider)}" data-source-id="${escape(source.provId)}">Map</button></td></tr>`;
  }).join(''):'<tr><td colspan="5" class="mapping-empty">No provider categories match these filters.</td></tr>';
 }
+$('availableProviderCategoriesList').addEventListener('click',event=>{
+ const button=event.target.closest('[data-source-id]');if(!button)return;
+ window.MasterMappingAction({api,provider:button.dataset.provider,sourceId:button.dataset.sourceId,targetId:categoryId,entityName:'category',onSaved:()=>{$('addMappingModal').style.display='none';render();renderAvailable();}});
+});
 $('addMappingBtn').addEventListener('click',()=>{$('providerFilter').value='ExeFeed';$('providerCategorySearch').value='';$('mappingCategoryName').textContent=category.name;renderAvailable();$('addMappingModal').style.display='flex';});
 $('providerFilter').addEventListener('change',renderAvailable);$('providerCategorySearch').addEventListener('input',renderAvailable);
 $('closeAddMappingModalBtn').addEventListener('click',()=>{$('addMappingModal').style.display='none';});
 function closeDelete(){$('deleteCategoryModal').style.display='none';}
 $('deleteCategoryBtn').addEventListener('click',()=>{
  const inUse=api.providerRows().some(source=>source.internalId===categoryId);
- $('deleteCategoryModalText').textContent=inUse?'This category has active mappings. Deactivate or replace them before deleting it. Draft and deprecated mappings do not block deletion.':`Delete category "${category.name}"? Its identity and mapping history will be retained. Drafts targeting it will need another category before activation.`;
+ $('deleteCategoryModalText').textContent=inUse?'This category has mappings. Delete or update them before deleting the category.':`Delete category "${category.name}"? Its identity and mapping history will be retained.`;
  $('confirmDeleteCategoryBtn').hidden=inUse;$('confirmDeleteCategoryBtn').style.display=inUse?'none':'';$('cancelDeleteCategoryBtn').textContent=inUse?'Close':'Cancel';$('deleteCategoryModal').style.display='flex';
 });
 $('confirmDeleteCategoryBtn').addEventListener('click',()=>{try{const model=api.load();model.deleteCategory(categoryId);api.save(model);location.href='category.html';}catch(error){$('deleteCategoryModalText').textContent=error.message;}});

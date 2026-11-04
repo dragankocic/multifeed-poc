@@ -39,3 +39,106 @@
 .mapping-history-section .mapping-table td { padding: 14px; color: #52616e; font-size: 13px; }
 @media(max-width:1050px){ .mapping-state-grid { grid-template-columns: minmax(0,1fr); } }
 @media(max-width:700px){ #mappingDetails .mapping-card-header,#mappingDetails .mapping-card-body { padding: 18px; }.mapping-state-card { padding: 18px; }.mapping-facts > div { grid-template-columns: 85px minmax(0,1fr); } }
+
+/* Searchable master entity picker used by all versioned mapping dialogs. */
+.mapping-action-source { margin: -4px 0 20px; padding: 12px 15px; border-radius: 6px; background: #f3f6f9; color: #526772; font-size: 13px; overflow-wrap: anywhere; }
+.master-target-search-label { display: block; margin-bottom: 8px; font-size: 13px; font-weight: 600; color: #526772; }
+.mapping-dialog #mappingTargetSearch { width: 100%; min-width: 0; box-sizing: border-box; border: 1px solid #cbd6de; border-radius: 6px; padding: 12px 14px; background: #fff; font: inherit; font-size: 14px; }
+.mapping-dialog #mappingTargetSearch:focus { outline: 2px solid #80bdff; outline-offset: 1px; border-color: #007bff; }
+.master-target-list-heading { display: flex; justify-content: space-between; gap: 16px; margin: 20px 0 10px; color: #526772; font-size: 13px; }
+.master-target-list-heading span { color: #7b8995; }
+.master-target-list { margin: 0; padding: 0; min-width: 0; max-height: 300px; overflow-y: auto; border: 1px solid #dde5eb; border-radius: 8px; }
+.master-target-row { display: flex; align-items: center; gap: 14px; padding: 14px 16px; cursor: pointer; border-bottom: 1px solid #e8edf1; background: #fff; }
+.master-target-row:last-child { border-bottom: 0; }
+.master-target-row:hover { background: #f6faff; }
+.master-target-row.is-selected { background: #edf6ff; box-shadow: inset 3px 0 #007bff; }
+.master-target-row:focus-within { outline: 2px solid #007bff; outline-offset: -2px; }
+.master-target-row.is-unavailable { cursor: default; background: #f7f8fa; }
+.master-target-row input[type="radio"] { flex: 0 0 18px; width: 18px; height: 18px; margin: 0; accent-color: #007bff; }
+.master-target-identity { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 5px; }
+.master-target-identity strong { color: #293f52; font-size: 15px; font-weight: 600; overflow-wrap: anywhere; }
+.master-target-identity > span { color: #788795; font-size: 12px; overflow-wrap: anywhere; }
+.master-target-state { font-size: 11px; background: #e9edf1; color: #647582; padding: 4px 7px; border-radius: 4px; }
+.master-target-selection { font-size: 13px; margin-top: 14px; color: #788795; min-height: 20px; overflow-wrap: anywhere; }
+.master-target-selection.has-selection { color: #1261a4; font-weight: 600; }
+.master-target-empty { padding: 32px 18px; text-align: center; color: #788795; font-size: 14px; }
+.mapping-dialog .btn-primary:disabled { opacity: .45; cursor: not-allowed; }
+@media(max-width:600px){ .master-target-row { gap: 10px; padding: 12px; }.master-target-state { max-width: 70px; text-align: center; }.master-target-list { max-height: 260px; } }
+
+/* Sport mappings apply immediately; category and tournament lifecycle layouts are unchanged. */
+.sport-mapping-state { grid-template-columns: minmax(0, 1fr); }
+.sport-mapping-state [data-action="edit"] { background: #007bff; border-color: #007bff; color: #fff; }
+.mapping-badge.unmapped { background: #fff3cd; color: #856404; }
+
+/* Compact provider-to-master summary, scoped to sport Manage mapping only. */
+.sport-manage-page { width: 100%; max-width: none; box-sizing: border-box; }
+#mappingDetails.sport-manage-card { border-radius: 10px; }
+.sport-map-summary { display: grid; grid-template-columns: minmax(180px, 1fr) 32px minmax(320px, 2fr); gap: 26px; align-items: center; padding: 30px; }
+.sport-map-caption { display: block; color: #7a8996; font-size: 12px; font-weight: 600; margin-bottom: 10px; }
+.sport-map-source h2, .sport-map-master > strong { display: block; margin: 0 0 10px; color: #263d50; font-size: 24px; line-height: 1.25; font-weight: 600; overflow-wrap: anywhere; }
+.sport-map-meta { font-size: 13px; line-height: 1.6; color: #71808e; overflow-wrap: anywhere; }
+.sport-map-meta .mapping-badge { margin-left: 10px; }
+.sport-map-arrow { color: #94a5b2; font-size: 27px; text-align: center; }
+.sport-map-current { display: flex; align-items: center; justify-content: space-between; gap: 24px; min-width: 0; padding: 22px 24px; border: 1px solid #e2e9ef; border-radius: 8px; background: #f8fafc; flex-wrap: wrap; }
+.sport-map-updated { margin-top: 8px; color: #87939d; font-size: 12px; }
+.sport-map-current .mapping-actions { gap: 10px; }
+.sport-map-current .btn-action { padding: 10px 15px; border-radius: 5px; font-size: 13px; border: 1px solid #007bff; background: #007bff; color: #fff; cursor: pointer; }
+.sport-map-current [data-action="delete"] { color: #a44242; border-color: #dfc7c7; background: #fff; }
+.sport-map-master > .sport-map-unmapped { color: #7a8996; font-weight: 500; }
+.sport-manage-card .sport-map-history { margin: 0; padding: 24px 30px 30px; border-top: 1px solid #e7ecf1; }
+@media(max-width:1000px){ .sport-map-summary { grid-template-columns: minmax(0, 1fr); gap: 18px; }.sport-map-arrow { display: none; } }
+@media(max-width:700px){ .sport-map-summary { padding: 20px; }.sport-manage-card .sport-map-history { padding: 20px; }.sport-map-current { padding: 20px; } }
+
+/* Explicit sport mapping review and delete confirmation. */
+.sport-confirm-dialog [hidden] { display: none !important; }
+.sport-confirm-dialog .modal-actions { border-top: 1px solid #e6ecf1; padding-top: 20px; }
+.sport-confirm-dialog .mapping-review-back { margin-right: auto; }
+.sport-confirm-change { display: grid; grid-template-columns: minmax(0,1fr) 24px minmax(0,1fr); gap: 16px; align-items: center; margin: 22px 0 18px; }
+.sport-confirm-change > div { min-width: 0; padding: 18px; border: 1px solid #dfe6ec; border-radius: 8px; background: #f7f9fb; }
+.sport-confirm-change > div > span { display: block; color: #778795; font-size: 12px; margin-bottom: 9px; }
+.sport-confirm-change strong { font-size: 18px; line-height: 1.4; font-weight: 600; color: #2c4356; overflow-wrap: anywhere; }
+.sport-confirm-arrow { color: #8ca0b1; font-size: 23px; text-align: center; }
+.sport-confirm-change > .sport-confirm-destination { background: #eff7ff; border-color: #bfd9f0; }
+.sport-confirm-change > .sport-confirm-removed { background: #fff6f5; border-color: #edccca; }
+.sport-confirm-dialog .sport-confirm-effect { margin-bottom: 0; font-size: 14px; color: #607384; line-height: 1.6; }
+.sport-confirm-dialog .mapping-confirm-danger { background: #c83d3d; border-color: #c83d3d; }
+@media(max-width:600px){ .sport-confirm-change { grid-template-columns: minmax(0,1fr); gap: 10px; }.sport-confirm-arrow { transform: rotate(90deg); }.sport-confirm-dialog .modal-actions { flex-wrap: wrap; } }
+
+/* Sport mapping workspace: scoped to avoid changing category/tournament dialogs. */
+.sport-mapping-page .mapping-workspace { width:100%;max-width:none;box-sizing:border-box;padding:24px 28px; }
+.sport-mapping-page #mappingBackLink { display:inline-flex;align-items:center;gap:8px;margin-bottom:20px;font-weight:600;text-decoration:none; }
+.sport-mapping-page #mappingBackLink:hover { color:#087e92;text-decoration:underline; }
+.sport-mapping-page #mappingDetails { margin-top:0;border:1px solid #e1e8ee;border-radius:12px; }
+.sport-mapping-page .sport-map-section-heading { padding:22px 28px;border-bottom:1px solid #edf1f4; }
+.sport-mapping-page .sport-map-section-heading h2 { margin:0;font-size:18px;color:#263b50; }
+.sport-mapping-page .sport-map-summary { padding:28px;grid-template-columns:minmax(0,1fr) 42px minmax(0,1.4fr);align-items:stretch;gap:24px; }
+.sport-mapping-page .sport-map-source { padding:22px;background:#f7f9fb;border:1px solid #e3eaf0;border-radius:10px;display:flex;flex-direction:column;justify-content:center;min-width:0; }
+.sport-mapping-page .sport-map-caption { font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#758597; }
+.sport-mapping-page .sport-map-source h2 { font-size:26px;line-height:1.3;margin:12px 0 10px;color:#263b50;overflow-wrap:anywhere; }
+.sport-mapping-page .sport-map-meta { font-size:13px;line-height:1.6;color:#738396;overflow-wrap:anywhere; }
+.sport-mapping-page .sport-map-arrow { display:flex;align-items:center;justify-content:center;color:#8396a8;font-size:25px; }
+.sport-mapping-page #mappingCurrent { border:1px solid #cce4e9;background:#f4fbfc;border-radius:10px;padding:24px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap; }
+.sport-mapping-page .sport-map-master strong { display:block;margin:12px 0 8px;font-size:26px;color:#263b50; }
+.sport-mapping-page .sport-map-updated { margin-top:14px;color:#748597;font-size:12px;line-height:1.5; }
+.sport-mapping-page .mapping-actions { display:flex;flex-direction:column;align-items:stretch;gap:10px; }
+.sport-mapping-page .mapping-actions .btn-action { min-height:40px;padding:10px 16px;border:1px solid #cad9e5;border-radius:6px;background:white;color:#355570;font-size:13px;font-weight:600;cursor:pointer; }
+.sport-mapping-page .mapping-actions [data-action="edit"],.sport-mapping-page .mapping-actions [data-action="create"] { background:#007bff;border-color:#007bff;color:white; }
+.sport-mapping-page .mapping-actions [data-action="delete"] { color:#aa4545;border-color:#e7cfcf;background:#fff; }
+.sport-mapping-page .sport-map-history { padding:24px 28px 28px;background:#fff; }
+.sport-mapping-page .mapping-table-wrap { border:1px solid #e4ebf0;border-radius:8px; }
+.sport-mapping-page .mapping-history-section .mapping-table { border:0; }
+.sport-mapping-page .mapping-history-section .mapping-table th { padding:14px 18px;background:#f7f9fb;font-size:11px;color:#758597; }
+.sport-mapping-page .mapping-history-section .mapping-table td { padding:17px 18px; }
+.sport-mapping-page .mapping-history-section tbody tr:hover { background:#fafcfd; }
+.sport-mapping-page .mapping-dialog .modal-content { border-radius:12px;padding:28px;width:min(720px,calc(100vw - 32px)); }
+.sport-mapping-page .mapping-dialog h3 { font-size:23px;color:#263b50;padding-right:32px; }
+.sport-mapping-page .mapping-action-source { border:1px solid #e3eaf0;background:#f7f9fb;padding:14px 16px;border-radius:8px; }
+.sport-mapping-page .master-target-row { padding:14px 16px;border-radius:7px; }
+.sport-mapping-page .master-target-row:hover { background:#f3fafc; }
+.sport-mapping-page .master-target-row.is-selected { background:#eef8fb;border-color:#58adbf; }
+.sport-mapping-page .master-target-selection { padding:12px 14px;border-radius:7px;font-size:13px; }
+.sport-mapping-page .modal-actions button { min-height:42px;border-radius:6px;font-size:14px; }
+.sport-mapping-page #closeMappingAction { cursor:pointer;color:#748597; }
+.sport-mapping-page a:focus-visible,.sport-mapping-page button:focus-visible { outline:3px solid #4abbd0;outline-offset:3px; }
+@media(max-width:1100px) { .sport-mapping-page .sport-map-summary { grid-template-columns:minmax(0,1fr);gap:16px; }.sport-mapping-page .sport-map-arrow { display:none; } }
+@media(max-width:700px) { .sport-mapping-page .mapping-workspace { padding:20px 16px; }.sport-mapping-page .sport-map-summary,.sport-mapping-page .sport-map-history { padding:20px; }.sport-mapping-page .sport-map-section-heading { padding:20px; }.sport-mapping-page #mappingCurrent { padding:20px; }.sport-mapping-page .mapping-actions { flex-direction:row;flex-wrap:wrap;width:100%; }.sport-mapping-page .mapping-actions .btn-action { flex:1; }.sport-mapping-page .mapping-dialog .modal-content { padding:22px; } }

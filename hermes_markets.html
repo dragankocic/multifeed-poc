@@ -145,8 +145,8 @@
                         <div class="filter-group">
                             <label>View</label>
                             <div class="workspace-tabs" aria-label="Market mapping perspective">
-                                <button type="button" class="workspace-tab active" data-view="internal">Markets</button>
-                                <button type="button" class="workspace-tab" data-view="provider">Provider markets</button>
+                                <button type="button" class="workspace-tab active" data-view="provider">Provider markets</button>
+                                <button type="button" class="workspace-tab" data-view="internal">Markets</button>
                             </div>
                         </div>
 
@@ -247,7 +247,7 @@
             const searchInput = document.getElementById('searchInput');
             const workspaceHead = document.getElementById('workspaceHead');
             const workspaceBody = document.getElementById('workspaceBody');
-            let activeView = 'internal';
+            let activeView = new URLSearchParams(location.search).get('view') === 'internal' ? 'internal' : 'provider';
 
             function statusBadgeClass(status) {
                 if (status === 'Mapped') return 'status-mapped';
@@ -364,6 +364,7 @@
             }
 
             function render() {
+                tabs.forEach(tab => tab.classList.toggle('active', tab.dataset.view === activeView));
                 const showProvider = activeView === 'provider';
                 providerFilterGroup.style.display = showProvider ? 'block' : 'none';
                 statusFilterGroup.style.display = showProvider ? 'block' : 'none';

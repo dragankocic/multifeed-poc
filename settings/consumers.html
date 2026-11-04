@@ -155,6 +155,7 @@
                     </div>
                 </div>
             </div>
+            <p id="consumerSaveError" class="form-feedback" role="alert" hidden></p>
             <div class="modal-actions">
                 <button type="button" id="cancelConsumerBtn" class="btn-secondary">Cancel</button>
                 <button type="button" id="saveConsumerBtn" class="btn-primary">Create consumer</button>
@@ -169,22 +170,33 @@
             const consumerNameInput = document.getElementById('consumerNameInput');
             const saveConsumerBtn = document.getElementById('saveConsumerBtn');
             const consumersTableBody = document.getElementById('consumersTableBody');
-            const feedCheckboxes = [...document.querySelectorAll('#feedSelectionGrid input[type="checkbox"]')];
-            const consumers = [
+            let feedCheckboxes = [...document.querySelectorAll('#feedSelectionGrid input[type="checkbox"]')];
+            let consumers = [
                 { id: 'consumer-1', name: 'Consumer 1', type: 'Kafka', feeds: ['SportRadar - Feed 1', 'ExeFeed - Feed 1'] },
                 { id: 'consumer-2', name: 'Consumer 2', type: 'Kafka', feeds: ['SportRadar - Feed 2'] }
             ];
+            const escape = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+            const storageKey='multifeed:consumers:v1';
+            try { const saved=localStorage.getItem(storageKey);if(saved){const parsed=JSON.parse(saved);if(!Array.isArray(parsed)||parsed.some(item=>typeof item.name!=='string'||!Array.isArray(item.feeds)))throw Error();consumers=parsed;} }
+            catch { saveConsumerBtn.disabled=true; }
+            function refreshFeedChoices(){
+                const saved=localStorage.getItem('multifeed:provider-settings:v1');
+                if(!saved)return;
+                const providers=JSON.parse(saved);
+                document.getElementById('feedSelectionGrid').innerHTML=Object.entries(providers).flatMap(([provider,feeds])=>feeds.map(feed=>{const label=provider+' - '+feed.name;return `<label class="feed-option"><input type="checkbox" value="${escape(label)}"><span>${escape(label)}</span></label>`;})).join('');
+                feedCheckboxes=[...document.querySelectorAll('#feedSelectionGrid input[type="checkbox"]')];
+            }
             let currentMode = 'create';
             let editingConsumerId = null;
 
             function renderConsumers() {
                 consumersTableBody.innerHTML = consumers.map(consumer => `
                     <tr>
-                        <td class="market-name">${consumer.name}</td>
+                        <td class="market-name">${escape(consumer.name)}</td>
                         <td>${consumer.type}</td>
                         <td>
                             <div class="consumer-feeds">
-                                ${consumer.feeds.map(feed => `<span class="feed-chip">${feed}</span>`).join('')}
+                                ${consumer.feeds.map(feed => `<span class="feed-chip">${escape(feed)}</span>`).join('')}
                             </div>
                         </td>
                         <td>${consumer.feeds.length}</td>
@@ -212,6 +224,10 @@
             }
 
             function openConsumerModal(mode, consumer = null) {
+                let readError='';try { refreshFeedChoices(); } catch { readError='Feed choices could not be read. Reload and try again.'; }
+                const error=document.getElementById('consumerSaveError');error.hidden=!readError&&!saveConsumerBtn.disabled;
+                error.textContent=readError||'Saved consumer settings could not be read. Reload after restoring the saved data.';
+                if(readError)saveConsumerBtn.disabled=true;
                 currentMode = mode;
                 editingConsumerId = consumer?.id || null;
                 consumerModalTitle.textContent = mode === 'edit' ? 'Edit Consumer' : 'Create Consumer';
@@ -224,22 +240,24 @@
             document.getElementById('openCreateConsumerBtn').addEventListener('click', () => openConsumerModal('create'));
             saveConsumerBtn.addEventListener('click', () => {
                 const name = consumerNameInput.value.trim();
-                if (!name) return;
-                const feeds = selectedFeeds();
-                if (currentMode === 'edit') {
-                    const consumer = consumers.find(item => item.id === editingConsumerId);
-                    if (consumer) {
-                        consumer.name = name;
-                        consumer.feeds = feeds;
-                    }
-                } else {
-                    consumers.push({
-                        id: `consumer-${Date.now()}`,
-                        name,
-                        type: 'Kafka',
-                        feeds
-                    });
-                }
+                const error=document.getElementById('consumerSaveError');
+                try {
+                    if(!name)throw Error('Enter a consumer name.');
+                    const fresh=JSON.parse(localStorage.getItem(storageKey)||'null')||consumers;
+                    if(fresh.some(consumer=>consumer.id!==editingConsumerId&&consumer.name.toLowerCase()===name.toLowerCase()))throw Error('A consumer with this name already exists.');
+                    const feeds=selectedFeeds();
+                    if(!feeds.length)throw Error('Select at least one feed.');
+                    const providerData=JSON.parse(localStorage.getItem('multifeed:provider-settings:v1')||'null');
+                    if(providerData){const available=Object.entries(providerData).flatMap(([provider,rows])=>rows.map(row=>provider+' - '+row.name));if(feeds.some(feed=>!available.includes(feed)))throw Error('Selected feeds changed. Close and reopen this window.');}
+                    if(currentMode==='edit'&&JSON.stringify(fresh.find(item=>item.id===editingConsumerId))!==JSON.stringify(consumers.find(item=>item.id===editingConsumerId)))throw Error('This consumer changed. Reload and review it before saving.');
+                    const next=fresh.map(consumer=>({...consumer}));
+                    if(currentMode==='edit'){
+                        const consumer=next.find(item=>item.id===editingConsumerId);
+                        if(!consumer)throw Error('This consumer no longer exists.');
+                        consumer.name=name;consumer.feeds=feeds;
+                    }else next.push({id:'consumer-'+Date.now(),name,type:'Kafka',feeds});
+                    localStorage.setItem(storageKey,JSON.stringify(next));consumers=next;
+                }catch(problem){error.textContent=problem.message;error.hidden=false;return;}
                 consumerModal.style.display = 'none';
                 renderConsumers();
             });

@@ -15,8 +15,9 @@
         .lazy-section-body { display: none; margin-top: 15px; }
         .lazy-section.open .lazy-section-body { display: block; }
     </style>
+    <link rel="stylesheet" href="../entity_overview.css">
 </head>
-<body>
+<body class="entity-overview-page">
 
     <div id="sidebar-container" data-root=".." data-active="player-management" data-service="sportsbook"></div>
     <script src="../sidebar.js"></script>
@@ -30,20 +31,17 @@
         <main class="split-layout">
             <div class="form-side">
                 <div style="margin-bottom: 20px;">
-                    <a href="player.html" class="btn-secondary" style="text-decoration: none; display: inline-block;">&larr; Back to Players</a>
+                    <a href="player.html?view=internal" class="overview-back">&larr; All players</a>
                 </div>
 
-                <section class="top-bar" style="display: block; background-color: white; padding: 25px; border-radius: 8px; border: 1px solid #e0e0e0;">
-                    <h2 style="margin-bottom: 15px; color: #2c3e50; font-size: 24px;">
-                        Player: <span id="displayPlayerName" style="color: #17a2b8;"></span>
+                <section class="top-bar overview-summary" style="display: block; background-color: white; padding: 25px; border-radius: 8px; border: 1px solid #e0e0e0;">
+                    <p class="overview-eyebrow">Player</p><h2 style="margin-bottom: 15px; color: #2c3e50; font-size: 24px;">
+                        <span id="displayPlayerName" style="color: #17a2b8;"></span>
                     </h2>
-                    <div style="display: flex; gap: 30px; border-top: 1px dashed #ccc; padding-top: 15px; flex-wrap: wrap;">
-                        <p style="font-size: 16px; color: #555;">Player ID: <strong id="displayPlayerId" style="color: #333;"></strong></p>
-                        <p style="font-size: 16px; color: #555;">Sport: <strong id="displaySport" style="color: #333;"></strong></p>
-                    </div>
+                    <dl class="overview-facts"><div><dt>Player ID</dt><dd id="displayPlayerId"></dd></div><div><dt>Sport</dt><dd id="displaySport"></dd></div></dl>
                 </section>
 
-                <section class="markets-section lazy-section" id="mappedProviderSection" style="margin-top: 25px; padding: 25px; background: white; border-radius: 8px; border: 1px solid #e0e0e0;">
+                <section class="markets-section lazy-section open" id="mappedProviderSection" style="margin-top: 25px; padding: 25px; background: white; border-radius: 8px; border: 1px solid #e0e0e0;">
                     <div class="section-header" style="display: flex; align-items: center; justify-content: space-between; gap: 16px; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 15px;">
                         <button type="button" class="lazy-section-toggle" data-target="mappedProviderSection">
                             <h3>Mapped Provider Players</h3>

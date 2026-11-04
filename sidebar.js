@@ -13,7 +13,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const sportDataManagementPages = [
         'sports/hermes_sports.html',
-        'sports/view_hermes_sport.html'
+        'sports/view_hermes_sport.html',
+        'sports/map_sport.html'
     ];
     const categoryDataManagementPages = [
         'categories/category.html',
@@ -108,11 +109,18 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
 
     container.innerHTML = sidebarHTML;
+    container.querySelectorAll('a.active').forEach(anchor => anchor.setAttribute('aria-current', 'page'));
+    const main = document.querySelector('.main-content');
+    if (main) {
+        main.id = main.id || 'main-content'; main.tabIndex = -1;
+        const skip = document.createElement('a'); skip.className = 'skip-content'; skip.href = '#' + main.id; skip.textContent = 'Skip to content';
+        document.body.prepend(skip);
+    }
 
     container.querySelectorAll('.sidebar-nav-group').forEach(group => {
         const sectionKey = group.dataset.section;
         const toggle = group.querySelector('.sidebar-section-toggle');
-        const storedState = localStorage.getItem(`sidebar:${sectionKey}`);
+        let storedState; try { storedState = localStorage.getItem(`sidebar:${sectionKey}`); } catch {}
         const containsActivePage = !!group.querySelector('a.active');
         const shouldCollapse = storedState === 'collapsed' && !containsActivePage;
 
@@ -122,7 +130,21 @@ document.addEventListener("DOMContentLoaded", () => {
         toggle.addEventListener('click', () => {
             const isCollapsed = group.classList.toggle('collapsed');
             toggle.setAttribute('aria-expanded', String(!isCollapsed));
-            localStorage.setItem(`sidebar:${sectionKey}`, isCollapsed ? 'collapsed' : 'expanded');
+            try { localStorage.setItem(`sidebar:${sectionKey}`, isCollapsed ? 'collapsed' : 'expanded'); } catch {}
         });
+    });
+});
+
+// Keep data failures visible and make existing dialog close controls keyboard reachable.
+window.addEventListener('error', event => {
+    if (!/Saved mappings|Tournament data could not be read/.test(event.message || '')) return;
+    const main=document.querySelector('.main-content');
+    if(main&&!document.getElementById('mappingReadError')){const notice=document.createElement('p');notice.id='mappingReadError';notice.className='form-feedback';notice.setAttribute('role','alert');notice.textContent=event.message;main.prepend(notice);}
+});
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.modal').forEach((modal,index) => {
+        modal.setAttribute('role','dialog');modal.setAttribute('aria-modal','true');
+        const title=modal.querySelector('h3,h2');if(title){title.id=title.id||'dialog-title-'+index;modal.setAttribute('aria-labelledby',title.id);}
+        modal.querySelectorAll('span.close-modal').forEach(close => {close.tabIndex=0;close.setAttribute('role','button');close.setAttribute('aria-label','Close');close.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();close.click();}});});
     });
 });

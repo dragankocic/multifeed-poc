@@ -213,7 +213,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if(marketName) {
                 const actionText = isEdit ? 'updated' : 'added';
                 const idText = isEdit && editId ? ` (${editId})` : '';
-                alert(`Market "${marketName}"${idText} successfully ${actionText}!`);
+                alert('This market form is a visual demo. Changes have not been saved.');
             } else {
                 alert("Please enter a market name.");
             }

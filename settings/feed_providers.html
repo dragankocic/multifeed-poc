@@ -276,6 +276,7 @@
                     </div>
                 </div>
             </div>
+            <p id="providerSaveError" class="form-feedback" role="alert" hidden></p>
             <div class="modal-actions">
                 <button type="button" id="cancelEditProviderBtn" class="btn-secondary">Cancel</button>
                 <button type="button" id="saveProviderBtn" class="btn-primary">Save changes</button>
@@ -303,7 +304,7 @@
                 });
             });
 
-            const providerFeeds = {
+            let providerFeeds = {
                 SportRadar: [
                     { name: 'Feed 1' },
                     { name: 'Feed 2' }
@@ -313,6 +314,30 @@
                 ]
             };
 
+            const storageKey = 'multifeed:provider-settings:v1';
+            const escape = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+            try { const saved = localStorage.getItem(storageKey); if (saved) { const parsed=JSON.parse(saved); if (!Array.isArray(parsed.SportRadar)||!Array.isArray(parsed.ExeFeed)||Object.values(parsed).some(feeds=>!Array.isArray(feeds)||feeds.some(feed=>typeof feed.name!=='string'))) throw Error(); providerFeeds=parsed; } }
+            catch { document.getElementById('saveProviderBtn').disabled=true; }
+            const providerCards = [...document.querySelectorAll('.provider-card')];
+            const originalCards = new Map();
+            providerCards.forEach(card => { const provider=card.querySelector('.edit-provider-btn').dataset.provider; card.querySelectorAll('.feed-card').forEach(feed => originalCards.set(provider+' - '+feed.querySelector('strong').textContent,feed.cloneNode(true))); });
+            function renderFeeds() {
+                providerCards.forEach(card => {
+                    const provider=card.querySelector('.edit-provider-btn').dataset.provider;
+                    card.querySelectorAll('.feed-card').forEach(feed=>feed.remove());
+                    providerFeeds[provider].forEach(feed=>{
+                        const original=originalCards.get(provider+' - '+feed.name);
+                        const node=original?original.cloneNode(true):document.createElement('div');
+                        if(!original){node.className='feed-card';node.innerHTML='<strong>'+escape(feed.name)+'</strong><p style="margin-top:8px;color:#667085">No status received</p>';}
+                        else {node.tabIndex=0;node.setAttribute('role','button');node.setAttribute('aria-expanded',String(node.classList.contains('expanded')));const toggle=()=>{node.classList.toggle('expanded');node.setAttribute('aria-expanded',String(node.classList.contains('expanded')));};node.addEventListener('click',toggle);node.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();toggle();}});}
+                        card.appendChild(node);
+                    });
+                });
+                const totals=document.querySelectorAll('.summary-grid .feed-card strong:last-child');
+                if(totals[0])totals[0].textContent=Object.keys(providerFeeds).length;
+                if(totals[1])totals[1].textContent=Object.values(providerFeeds).flat().length;
+            }
+            renderFeeds();
             const editProviderModal = document.getElementById('editProviderModal');
             const deleteFeedModal = document.getElementById('deleteFeedModal');
             const editFeedRows = document.getElementById('editFeedRows');
@@ -324,7 +349,7 @@
                 row.innerHTML = `
                     <div class="form-group">
                         <label>Feed Name</label>
-                        <input type="text" placeholder="Feed name" value="${feed.name}">
+                        <input type="text" placeholder="Feed name" value="${escape(feed.name)}">
                     </div>
                     <button type="button" class="danger-button delete-feed-row-btn">Delete</button>
                 `;
@@ -342,6 +367,8 @@
 
             function openProviderModal(providerName) {
                 document.getElementById('providerNameInput').value = providerName;
+                document.getElementById('providerSaveError').hidden=!document.getElementById('saveProviderBtn').disabled;
+                if(document.getElementById('saveProviderBtn').disabled)document.getElementById('providerSaveError').textContent='Saved provider settings could not be read. Reload after restoring the saved data.';
                 editFeedRows.innerHTML = '';
                 providerFeeds[providerName].forEach(feed => {
                     editFeedRows.appendChild(createFeedRow(feed));
@@ -364,7 +391,20 @@
                 editProviderModal.style.display = 'none';
             });
             document.getElementById('saveProviderBtn').addEventListener('click', () => {
-                editProviderModal.style.display = 'none';
+                const error=document.getElementById('providerSaveError');
+                try {
+                    const provider=document.getElementById('providerNameInput').value;
+                    const names=[...editFeedRows.querySelectorAll('input')].map(input=>input.value.trim());
+                    if(!names.length||names.some(name=>!name))throw Error('Enter a name for every feed. Keep at least one feed.');
+                    if(new Set(names.map(name=>name.toLowerCase())).size!==names.length)throw Error('Feed names must be unique within this provider.');
+                    const consumers=JSON.parse(localStorage.getItem('multifeed:consumers:v1')||'null')||[{feeds:['SportRadar - Feed 1','SportRadar - Feed 2','ExeFeed - Feed 1']}];
+                    const removed=providerFeeds[provider].filter(feed=>!names.includes(feed.name));
+                    if(removed.some(feed=>consumers.some(consumer=>consumer.feeds.includes(provider+' - '+feed.name))))throw Error('A feed is used by a consumer. Remove it from the consumer before renaming or deleting it.');
+                    const fresh=JSON.parse(localStorage.getItem(storageKey)||'null')||providerFeeds;
+                    if(JSON.stringify(fresh[provider])!==JSON.stringify(providerFeeds[provider]))throw Error('Provider settings changed. Reload and review them before saving.');
+                    const next={...fresh,[provider]:names.map(name=>({name}))};
+                    localStorage.setItem(storageKey,JSON.stringify(next));providerFeeds=next;renderFeeds();editProviderModal.style.display='none';
+                }catch(problem){error.textContent=problem.message;error.hidden=false;}
             });
             document.getElementById('addFeedRowBtn').addEventListener('click', () => {
                 editFeedRows.appendChild(createFeedRow());

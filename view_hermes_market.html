@@ -30,8 +30,9 @@
             }
         }
     </style>
+    <link rel="stylesheet" href="entity_overview.css">
 </head>
-<body>
+<body class="entity-overview-page">
 
     <div id="sidebar-container" data-root="." data-active="markets-management" data-service="sportsbook"></div>
     <script src="sidebar.js"></script>
@@ -45,19 +46,14 @@
         <main class="split-layout">
             <div class="form-side">
                 <div style="margin-bottom: 20px;">
-                    <a href="hermes_markets.html" class="btn-secondary" style="text-decoration: none; display: inline-block;">&larr; Back to Markets</a>
+                    <a href="hermes_markets.html?view=internal" class="overview-back">&larr; All markets</a>
                 </div>
 
-                <section class="top-bar" style="display: block; background-color: white; padding: 25px; border-radius: 8px; border: 1px solid #e0e0e0;">
-                    <h2 style="margin-bottom: 15px; color: #2c3e50; font-size: 24px;">
-                        Market: <span id="displayMarketName" style="color: #17a2b8;"></span>
+                <section class="top-bar overview-summary" style="display: block; background-color: white; padding: 25px; border-radius: 8px; border: 1px solid #e0e0e0;">
+                    <p class="overview-eyebrow">Market</p><h2 style="margin-bottom: 15px; color: #2c3e50; font-size: 24px;">
+                        <span id="displayMarketName" style="color: #17a2b8;"></span>
                     </h2>
-                    <div style="display: flex; gap: 30px; border-top: 1px dashed #ccc; padding-top: 15px; flex-wrap: wrap;">
-                        <p style="font-size: 16px; color: #555;">Market ID: <strong id="displayMarketId" style="color: #333;"></strong></p>
-                        <p style="font-size: 16px; color: #555;">Sport: <strong id="displaySport" style="color: #333;"></strong></p>
-                        <p style="font-size: 16px; color: #555;">Sport abbreviation: <strong id="displaySportAbbreviation" style="color: #333;"></strong></p>
-                        <p style="font-size: 16px; color: #555;">Market Type: <strong id="displayMarketType" style="color: #333;"></strong></p>
-                    </div>
+                    <dl class="overview-facts"><div><dt>Market ID</dt><dd id="displayMarketId"></dd></div><div><dt>Sport</dt><dd id="displaySport"></dd></div><div><dt>Sport abbreviation</dt><dd id="displaySportAbbreviation"></dd></div><div><dt>Market Type</dt><dd id="displayMarketType"></dd></div></dl>
 
                     <div style="margin-top: 22px; border-top: 1px solid #eee; padding-top: 18px;">
                         <h3 style="margin: 0 0 16px; color: #333; font-size: 18px;">Market Definition</h3>

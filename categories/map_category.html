@@ -1,12 +1,25 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Category Mapping</title><link rel="stylesheet" href="../style.css"><link rel="stylesheet" href="category_mapping_demo.css"><script src="../auth.js"></script></head>
-<body><div id="sidebar-container" data-root=".." data-active="category-management" data-service="sportsbook"></div><script src="../sidebar.js"></script>
-<div class="main-content"><header class="main-header"><h1 id="mappingPageTitle">Category Mapping</h1><p id="mappingPageSubtitle" class="page-subtitle">Prepare, activate and maintain provider category mappings.</p></header>
-<main class="mapping-workspace">
-<a id="mappingBackLink" href="category.html?view=provider" class="btn-secondary" style="display:inline-block;margin-bottom:18px;text-decoration:none;">&larr; Back to Provider categories</a>
-
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Category Mapping</title><link rel="stylesheet" href="../style.css"><link rel="stylesheet" href="category_mapping_demo.css"><script src="../auth.js"></script><link rel="stylesheet" href="../mapping_workspace.css"></head>
+<body class="entity-mapping-page"><div id="sidebar-container" data-root=".." data-active="category-management" data-service="sportsbook"></div><script src="../sidebar.js"></script>
+<div class="main-content"><header class="main-header"><h1 id="mappingPageTitle">Category Mapping</h1><p id="mappingPageSubtitle" class="page-subtitle">Manage provider category mappings.</p></header>
+<main class="mapping-workspace category-manage-page">
+<a id="mappingBackLink" href="category.html?view=provider" class="entity-mapping-back">&larr; Back to Provider categories</a>
 <div id="mappingMessage" class="mapping-message" role="status" hidden></div>
-<section id="mappingDetails" class="mapping-card" hidden><div class="mapping-card-header"><div><h2 id="mappingDetailTitle"></h2><div id="mappingDetailSource" class="mapping-subtext"></div></div><div id="mappingDetailBadges" class="mapping-badges"></div></div><div class="mapping-card-body"><div class="mapping-state-grid"><section id="mappingCurrent" class="mapping-state-card"></section><section id="mappingDraft" class="mapping-state-card"></section></div><section id="mappingHistory" class="mapping-history-section"></section></div></section>
+<section id="mappingDetails" class="mapping-card category-manage-card" hidden>
+<div class="category-map-section-heading"><h2>Current mapping</h2></div>
+<div class="category-map-summary">
+<section class="category-map-source"><span class="category-map-caption">Provider category</span><h2 id="mappingDetailTitle"></h2><div id="mappingDetailSource" class="category-map-meta"></div></section>
+<span class="category-map-arrow" aria-hidden="true">&rarr;</span>
+<section id="mappingCurrent" class="category-map-current"></section>
+</div>
+<section id="mappingHistory" class="mapping-history-section category-map-history"></section>
+</section>
 </main></div>
-<div id="mappingActionModal" class="modal mapping-dialog"><div class="modal-content"><button type="button" id="closeMappingAction" class="close-modal" aria-label="Close" style="border:0;background:transparent;padding:0;">&times;</button><h3 id="mappingActionTitle"></h3><p id="mappingActionDescription"></p><div id="mappingTargetField"><label for="mappingTarget">Master category</label><select id="mappingTarget"></select></div><div id="mappingActionError" class="mapping-message error" role="alert" hidden></div><div class="modal-actions"><button type="button" id="cancelMappingAction" class="btn-secondary">Cancel</button><button type="button" id="confirmMappingAction" class="btn-primary">Confirm</button></div></div></div>
-<script src="category_mapping_model.js"></script><script src="category_mapping_demo.js"></script></body></html>
+<div id="mappingActionModal" class="modal mapping-dialog category-confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="mappingActionTitle"><div class="modal-content"><button type="button" id="closeMappingAction" class="close-modal" aria-label="Close" style="border:0;background:transparent;padding:0;">&times;</button><h3 id="mappingActionTitle"></h3><p id="mappingActionDescription"></p><div id="mappingActionSource" class="mapping-action-source"></div><div id="mappingTargetField" class="master-target-picker">
+<div class="mapping-picker-toolbar"><label for="mappingTargetSearch" class="master-target-search-label">Search categories</label><a href="create_category.html" class="btn-secondary mapping-create-shortcut">+ Create Category</a></div>
+<input type="search" id="mappingTargetSearch" placeholder="Search by name or ID..." autocomplete="off">
+<div class="master-target-list-heading"><strong>Categories</strong><span id="mappingTargetCount" aria-live="polite"></span></div>
+<fieldset id="mappingTargetList" class="master-target-list" aria-label="Choose a category"></fieldset>
+<input type="hidden" id="mappingTarget"><div id="mappingTargetSelection" class="master-target-selection" role="status"></div>
+</div><div id="mappingConfirmation" class="category-mapping-confirmation" hidden></div><div id="mappingActionError" class="mapping-message error" role="alert" hidden></div><div class="modal-actions"><button type="button" id="backMappingAction" class="btn-secondary mapping-review-back" hidden>&larr; Back</button><button type="button" id="cancelMappingAction" class="btn-secondary">Cancel</button><button type="button" id="confirmMappingAction" class="btn-primary">Confirm</button></div></div></div>
+<script src="category_mapping_model.js"></script><script src="../sports/mapping_target_picker.js"></script><script src="category_mapping_demo.js"></script></body></html>

@@ -21,8 +21,9 @@
         .mapping-table .tournament-action { display: inline-block; text-decoration: none; white-space: nowrap; }
         @media(max-width:700px){ .tournament-overview { padding: 18px; } .tournament-summary { padding: 20px; } }
     </style>
+    <link rel="stylesheet" href="../entity_overview.css">
 </head>
-<body>
+<body class="entity-overview-page">
 
     <div id="sidebar-container" data-root=".." data-active="tournament-management" data-service="sportsbook"></div>
     <script src="../sidebar.js"></script>
@@ -34,22 +35,23 @@
         </header>
 
         <main class="tournament-overview">
-            <a href="tournament.html" class="btn-secondary" style="text-decoration:none;">&larr; Back to Tournaments</a>
-            <section class="tournament-summary">
-                <div><h2 id="displayTournamentName"></h2><p>Tournament ID: <strong id="displayTournamentId"></strong></p><p style="margin-top:10px;"><span id="displaySport"></span> · <span id="displayCategory"></span> · Leading feed provider: <strong id="displayPrimaryFeed"></strong></p></div>
-                <div class="tournament-summary-actions"><a id="editTournamentLink" class="btn-primary">Edit tournament</a><button type="button" id="deleteTournamentBtn" class="btn-secondary">Delete tournament</button></div>
+            <a href="tournament.html?view=internal" class="overview-back">&larr; All tournaments</a>
+            <section class="tournament-summary overview-summary" aria-labelledby="displayTournamentName">
+                <div style="width:100%"><div class="overview-summary-layout"><div><p class="overview-eyebrow">Tournament</p><h2 id="displayTournamentName"></h2></div>
+                <div class="tournament-summary-actions overview-actions"><a id="editTournamentLink" class="btn-primary">Edit tournament</a><button type="button" id="deleteTournamentBtn" class="btn-secondary">Delete tournament</button></div></div>
+                <dl class="overview-facts"><div><dt>Tournament ID</dt><dd id="displayTournamentId"></dd></div><div><dt>Sport</dt><dd id="displaySport"></dd></div><div><dt>Category</dt><dd id="displayCategory"></dd></div><div><dt>Leading feed provider</dt><dd id="displayPrimaryFeed"></dd></div><div><dt>Provider mappings</dt><dd id="mappingCount"></dd></div><div id="tournamentCreationSource" hidden><dt>Created from provider</dt><dd id="tournamentCreationSourceValue"></dd></div></dl></div>
             </section>
 
             <section class="mapping-card" id="mappedProviderSection">
-                <div class="mapping-card-header provider-tournament-heading"><div><h3>Provider tournaments</h3><p class="mapping-subtext" id="mappingCount"></p></div><button type="button" id="addMappingBtn" class="btn-primary">Add mapping</button></div>
-                <div class="mapping-table-wrap"><table class="mapping-table"><thead><tr><th>Provider</th><th>Provider tournament ID</th><th>Provider tournament name</th><th>Mapping state</th><th style="text-align:right;">Action</th></tr></thead><tbody id="providerTournamentsList"></tbody></table></div>
+                <div class="mapping-card-header provider-tournament-heading"><div><h3>Provider tournaments</h3></div><button type="button" id="addMappingBtn" class="btn-primary">+ Add mapping</button></div>
+                <div class="mapping-table-wrap"><table class="mapping-table"><thead><tr><th>Provider</th><th>Provider tournament</th><th style="text-align:right;">Action</th></tr></thead><tbody id="providerTournamentsList"></tbody></table></div>
             </section>
         </main>
     </div>
 
     <div id="addMappingModal" class="modal">
         <div class="modal-content" style="width: min(900px, 92vw);">
-            <span class="close-modal" id="closeAddMappingModalBtn">&times;</span>
+            <button type="button" class="close-modal" id="closeAddMappingModalBtn" aria-label="Close add mapping" style="background:none;border:0;cursor:pointer">&times;</button>
             <h3>Add provider tournament mapping for <span id="mappingTournamentName" style="color: #17a2b8;"></span></h3>
             <div class="top-bar" style="box-shadow: none; margin-bottom: 15px;">
                 <div class="filters">
@@ -95,7 +97,9 @@
     </div>
 
     <script src="../pagination.js"></script>
+    <script src="../categories/category_mapping_model.js"></script>
     <script src="tournament_mapping_model.js"></script>
+    <script src="../sports/master_mapping_action.js"></script>
     <script src="tournament_details.js"></script>
 </body>
 </html>

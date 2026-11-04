@@ -294,7 +294,7 @@
                 });
 
                 if (!hasSelections) {
-                    alert("Molimo izaberite barem jedno mapiranje za objavljivanje.");
+                    alert('Select at least one mapping to preview publishing.');
                     return;
                 }
 
@@ -305,7 +305,7 @@
 
             confirmPublishBtn.addEventListener('click', () => {
                 publishModal.style.display = 'none';
-                alert("Mapiranja su uspešno objavljena!");
+                alert('This is a publishing preview. No mappings have been published.');
                 
                 document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
             });

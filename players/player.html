@@ -122,8 +122,8 @@
                         <div class="filter-group">
                             <label>View</label>
                             <div class="workspace-tabs" aria-label="Player mapping perspective">
-                                <button type="button" class="workspace-tab active" data-view="internal">Players</button>
-                                <button type="button" class="workspace-tab" data-view="provider">Provider players</button>
+                                <button type="button" class="workspace-tab active" data-view="provider">Provider players</button>
+                                <button type="button" class="workspace-tab" data-view="internal">Players</button>
                             </div>
                         </div>
 
@@ -228,7 +228,7 @@
             const workspaceBody = document.getElementById('workspaceBody');
             const deleteModal = document.getElementById('deleteModal');
             const deleteModalText = document.getElementById('deleteModalText');
-            let activeView = 'internal';
+            let activeView = new URLSearchParams(location.search).get('view') === 'internal' ? 'internal' : 'provider';
             let playerToDelete = null;
 
             function openDeleteModal(player) {
@@ -362,6 +362,7 @@
             }
 
             function render() {
+                tabs.forEach(tab => tab.classList.toggle('active', tab.dataset.view === activeView));
                 const showProviderFilters = activeView === 'provider';
                 providerFilterGroup.style.display = showProviderFilters ? 'block' : 'none';
                 statusFilterGroup.style.display = showProviderFilters ? 'block' : 'none';

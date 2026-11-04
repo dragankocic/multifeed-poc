@@ -136,8 +136,8 @@
                         <div class="filter-group">
                             <label>View</label>
                             <div class="workspace-tabs" aria-label="Sport mapping perspective">
-                                <button type="button" class="workspace-tab active" data-view="internal">Sports</button>
-                                <button type="button" class="workspace-tab" data-view="provider">Provider sports</button>
+                                <button type="button" class="workspace-tab active" data-view="provider">Provider sports</button>
+                                <button type="button" class="workspace-tab" data-view="internal">Sports</button>
                             </div>
                         </div>
 
@@ -193,14 +193,7 @@
     <script src="sport_mapping_model.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const internalSports = [
-                { id: "1", name: "Soccer", abbr: "SOC", active: true },
-                { id: "2", name: "Basketball", abbr: "BKB", active: false },
-                { id: "3", name: "Tennis", abbr: "TEN", active: false },
-                { id: "4", name: "Ice Hockey", abbr: "IHO", active: false },
-                { id: "5", name: "Baseball", abbr: "BBS", active: false },
-                { id: "6", name: "Moto GP", abbr: "MGP", active: false }
-            ];
+            const internalSports = SportMappingDemo.sports.map(sport => ({...sport, active: sport.id === '1'}));
 
             const providerSports = SportMappingDemo.providerRows();
 
@@ -215,7 +208,7 @@
             const activateSportModal = document.getElementById('activateSportModal');
             const activateSportModalText = document.getElementById('activateSportModalText');
             let sportToActivate = null;
-            let activeView = new URLSearchParams(location.search).get('view') === 'provider' ? 'provider' : 'internal';
+            let activeView = new URLSearchParams(location.search).get('view') === 'internal' ? 'internal' : 'provider';
 
             const activeSportIds = new Set(JSON.parse(localStorage.getItem('multifeedActiveSports') || '[]').map(id => String(id).replace(/^S-0*(\d+)$/, '$1')));
             localStorage.setItem('multifeedActiveSports', JSON.stringify([...activeSportIds]));
@@ -350,8 +343,8 @@
 
             function render() {
                 tabs.forEach(tab => tab.classList.toggle('active', tab.dataset.view === activeView));
-                providerFilterGroup.style.display = activeView === 'provider' ? 'block' : 'none';
-                statusFilterGroup.style.display = activeView === 'provider' ? 'block' : 'none';
+                providerFilterGroup.style.display = activeView === 'provider' ? 'flex' : 'none';
+                statusFilterGroup.style.display = activeView === 'provider' ? 'flex' : 'none';
                 if (activeView === 'internal') {
                     renderInternalView();
                 } else {
@@ -378,6 +371,7 @@
                 if (event.target === activateSportModal) closeActivateSportModal();
             });
 
+            window.addEventListener('storage', event => { if(event.key === SportMappingDemo.KEY) render(); });
             render();
         });
     </script>

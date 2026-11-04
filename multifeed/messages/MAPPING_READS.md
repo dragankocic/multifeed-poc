@@ -1,0 +1,9 @@
+# Event mapping reads — HS-232
+
+Events and Provider events read sport and category mapping results from the same browser administration state as their mapping pages, through event_mapping_projection.js. Provider fixtures retain immutable source sport/category IDs and their provider-native labels; they do not embed sport/category mapping outcomes. Provider event details show the currently resolved master sport and category separately.
+
+Sport reads ignore soft-deleted associations. Category reads select non-deleted mappings and exclude deleted targets. Category writes, like sport writes, are effective immediately after confirmation. Legacy drafts are not automatically applied during browser-state migration. Refresh occurs on page load, relevant cross-tab storage changes and window focus. Failure to read projection state is displayed as Unavailable rather than Unmapped. The last known mappings are not silently replaced with static fixture outcomes.
+
+Tournament and competitor fixture mappings, event links, reference selection and correlation actions are unchanged. The canonical event sport remains supplied by the tournament context; a source sport mapping does not independently redefine that sport. The canonical category follows the reference source's resolved category and can be absent. These reads do not implement the conflict/correlation work from HS-225 or backend orchestration from HS-231.
+
+This is a local browser demonstration, not a backend projection subscription, PolicyProvider implementation, tenant-isolated runtime or consistency guarantee. Demo source identity values for providers/sports outside the administration seed are explicitly marked demo; missing records resolve as unmapped rather than falling back to provider display names. Backend implementation and freshness coordination are tracked in HS-232.

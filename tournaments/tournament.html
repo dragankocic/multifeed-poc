@@ -128,8 +128,8 @@
                         <div class="filter-group">
                             <label>View</label>
                             <div class="workspace-tabs" aria-label="Tournament mapping perspective">
-                                <button type="button" class="workspace-tab active" data-view="internal">Tournaments</button>
-                                <button type="button" class="workspace-tab" data-view="provider">Provider tournaments</button>
+                                <button type="button" class="workspace-tab active" data-view="provider">Provider tournaments</button>
+                                <button type="button" class="workspace-tab" data-view="internal">Tournaments</button>
                             </div>
                         </div>
 
@@ -208,7 +208,9 @@
     </div>
 
     <script src="../pagination.js"></script>
+    <script src="../categories/category_mapping_model.js"></script>
     <script src="tournament_mapping_model.js"></script>
+    <script src="tournament_source_creation.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const api=TournamentMappingDemo;
@@ -226,7 +228,7 @@
             const workspaceBody = document.getElementById('workspaceBody');
             const deleteModal = document.getElementById('deleteModal');
             const deleteModalText = document.getElementById('deleteModalText');
-            let activeView = new URLSearchParams(location.search).get('view') === 'provider' ? 'provider' : 'internal';
+            let activeView = new URLSearchParams(location.search).get('view') === 'internal' ? 'internal' : 'provider';
             let tournamentToDelete = null;
 
             function openDeleteModal(tournament) {
@@ -234,7 +236,7 @@
                 deleteModalText.textContent = `Are you sure you want to delete tournament "${tournament.name}" (${tournament.id})?`;
                 const inUse=api.providerRows().some(source=>source.internalId===tournament.id);
                 document.getElementById('confirmDeleteBtn').style.display=inUse?'none':'';
-                if(inUse)deleteModalText.textContent='This tournament has active mappings. Deactivate or replace them before deleting it.';
+                if(inUse)deleteModalText.textContent='This tournament has mappings. Delete or update them before deleting it.';
                 deleteModal.style.display = 'flex';
             }
 
@@ -304,6 +306,10 @@
                 });
             }
 
+            workspaceBody.addEventListener('click', event => {
+                const button=event.target.closest('[data-create-tournament]');
+                if(button)window.CreateTournamentFromProvider({provider:button.dataset.provider,sourceId:button.dataset.createTournament});
+            });
             function renderProviderView() {
                 workspaceHead.innerHTML = `
                     <tr>
@@ -349,16 +355,17 @@
                         <tr>
                             <td style="font-weight: 500;">${tournament.provider}</td>
                             <td>${escape(tournament.sport)}</td>
-                            <td>${escape(tournament.category)}</td>
+                            <td>${escape(tournament.category)}${!tournament.categoryMapping.mapped?'<div style="color:#a06b19;font-size:12px;margin-top:5px">Category not mapped</div>':''}</td>
                             <td style="color: #6c757d;">${tournament.provId}</td>
                             <td class="market-name" style="color: #007bff;">${escape(tournament.provName)}</td>
                             <td style="color: #6c757d;">${tournament.internalId}</td>
                             <td style="font-weight: 500;">${escape(tournament.internalName)}</td>
                             <td>${tournament.primaryFeed}</td>
-                            <td><span class="status-badge ${badgeClass}">${tournament.status}</span>${tournament.hasDraft ? ' <span class="status-badge status-unmapped">Draft available</span>' : ''}</td>
+                            <td><span class="status-badge ${badgeClass}">${tournament.status}</span></td>
                             <td style="text-align: right;">
                                 <span class="row-actions">
                                     ${viewButton}
+                                    ${tournament.status === 'Unmapped' ? `<button type="button" class="btn-action" data-create-tournament="${escape(tournament.provId)}" data-provider="${escape(tournament.provider)}">Create tournament</button>` : ''}
                                     <a href="${mapUrl}" class="btn-action" style="text-decoration: none; display: inline-block;">${mapLabel}</a>
                                 </span>
                             </td>
@@ -407,7 +414,8 @@
                 if (event.target === deleteModal) closeDeleteModal();
             });
 
-            window.addEventListener('storage',event=>{if(event.key===api.KEY)render();});
+            window.addEventListener('storage',event=>{if(event.key===api.KEY||event.key===CategoryMappingDemo.KEY)render();});
+            window.addEventListener('focus',render);
             render();
         });
     </script>

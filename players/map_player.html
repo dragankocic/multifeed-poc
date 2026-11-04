@@ -7,8 +7,9 @@
     <link rel="stylesheet" href="../style.css">
     <link rel="stylesheet" href="../sports/style.css">
     <script src="../auth.js"></script>
+    <link rel="stylesheet" href="../mapping_workspace.css">
 </head>
-<body>
+<body class="entity-mapping-page">
 
     <div id="sidebar-container" data-root=".." data-active="player-management" data-service="sportsbook"></div>
     <script src="../sidebar.js"></script>
@@ -22,7 +23,7 @@
         <main class="split-layout">
             <div class="form-side">
                 <div style="margin-bottom: 20px;">
-                    <a href="player.html" class="btn-secondary" style="text-decoration: none; display: inline-block;">&larr; Back to list</a>
+                    <a href="player.html?view=provider" class="btn-secondary" style="text-decoration: none; display: inline-block;">&larr; Back to Provider players</a>
                 </div>
                 <div class="info-section">
                     <h2>Connect to Player</h2>
@@ -32,6 +33,7 @@
                     <h3 class="section-title">Mapping Configuration</h3>
                     <div class="form-row" style="align-items: flex-end; gap: 18px;">
                         <div class="form-column" style="flex: 1;">
+                            <span class="mapping-form-panel-label">Provider player</span>
                             <div class="form-group">
                                 <label>Provider Sport</label>
                                 <input type="text" id="displaySport" readonly style="background-color: #f9f9f9; color: #555; font-weight: 500;">
@@ -51,6 +53,7 @@
                         </div>
                         <div style="padding: 0 4px 12px; font-weight: bold; color: #888;">&rarr;</div>
                         <div class="form-column" style="flex: 1;">
+                            <span class="mapping-form-panel-label">Player</span>
                             <div class="form-group">
                                 <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
                                     <label>Sport</label>

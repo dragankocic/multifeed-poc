@@ -10,24 +10,48 @@
     <script src="../auth.js"></script>
 
     <style>
-        .sport-overview { width: 100%; max-width: none; margin: 28px 0; padding: 0 28px; box-sizing: border-box; }
-        .sport-summary, .sport-mapping-panel { background: #fff; border: 1px solid #e2e8ee; border-radius: 12px; padding: 26px; box-shadow: 0 3px 12px rgba(27, 46, 64, .035); }
-        .sport-summary h2 { margin: 0 0 22px; font-size: 28px; color: #23384d; }
-        .sport-facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; border-top: 1px solid #edf0f3; padding-top: 20px; }
-        .sport-facts dt, .mapping-source-label { font-size: 12px; color: #758395; margin-bottom: 7px; }
-        .sport-facts dd { margin: 0; font-size: 15px; font-weight: 600; color: #34475a; }
-        .sport-mapping-panel { margin-top: 20px; }
-        .sport-mapping-panel h3 { font-size: 18px; color: #23384d; margin: 0 0 18px; }
-        .mapping-source-card { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px; background: #f8fafb; border: 1px solid #e7edf1; border-radius: 9px; padding: 22px; }
-        .mapping-source-card + .mapping-source-card { margin-top: 12px; }
-        .mapping-source-name { font-size: 19px; font-weight: 600; color: #23384d; margin-bottom: 8px; }
-        .mapping-source-meta { font-size: 14px; color: #677789; overflow-wrap: anywhere; }
-        .mapping-source-card .btn-primary, .mapping-empty .btn-primary { text-decoration: none; padding: 11px 18px; border-radius: 6px; font-size: 14px; white-space: nowrap; }
-        .mapping-empty { display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap; padding: 22px; border: 1px dashed #d5dfe7; border-radius: 9px; background: #f8fafb; }
-        .mapping-empty strong { color: #34475a; font-size: 15px; }
-        .mapping-empty p { color: #758395; font-size: 14px; margin-top: 7px; }
-        @media (max-width: 700px) { .sport-overview { padding: 0 16px; } .sport-facts { grid-template-columns: 1fr; gap: 18px; } .sport-summary, .sport-mapping-panel { padding: 20px; } }
+        .sport-overview { width:100%;max-width:none;margin:24px 0;padding:0 28px;box-sizing:border-box;color:#263b50; }
+        .sport-overview .form-side { width:100%;max-width:none; }
+        .sport-back { display:inline-flex;align-items:center;gap:8px;margin-bottom:20px;color:#536b80;text-decoration:none;font-size:14px;font-weight:600; }
+        .sport-back:hover { color:#087e92;text-decoration:underline; }
+        .sport-summary,.sport-mapping-panel { background:#fff;border:1px solid #e1e8ee;border-radius:12px;box-shadow:0 3px 12px rgba(27,46,64,.035); }
+        .sport-summary { display:block;padding:26px 28px; }
+        .sport-eyebrow { margin:0 0 8px;color:#748496;font-size:11px;letter-spacing:.09em;text-transform:uppercase;font-weight:700; }
+        .sport-summary h2 { margin:0;color:#23384d;font-size:30px;letter-spacing:-.5px; }
+        .sport-facts { display:flex;gap:24px 36px;flex-wrap:wrap;margin:24px 0 0;padding-top:20px;border-top:1px solid #edf1f4; }
+        .sport-facts>div { padding:0;border:0;min-width:70px; }
+        .sport-facts dt { font-size:12px;color:#738296;margin-bottom:8px; }
+        .sport-facts dd { margin:0;font-size:18px;font-weight:650;color:#30475c; }
+        .sport-mapping-panel { margin-top:24px;overflow:hidden; }
+        .sport-mapping-heading { display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:22px 26px; }
+        .sport-mapping-panel h3 { margin:0;font-size:18px;color:#263b50; }
+        .sport-mapping-heading .btn-primary { display:inline-flex;align-items:center;gap:8px;padding:11px 18px;border-radius:6px;font-size:14px;font-weight:600;white-space:nowrap; }
+        .sport-table-scroll { overflow-x:auto; }
+        .sport-provider-table { width:100%;border-collapse:collapse;text-align:left; }
+        .sport-provider-table th { padding:13px 26px;background:#f7f9fb;border-top:1px solid #e8edf2;border-bottom:1px solid #e8edf2;font-size:11px;font-weight:700;color:#748396;text-transform:uppercase;letter-spacing:.04em; }
+        .sport-provider-table td { padding:20px 26px;border-bottom:1px solid #edf1f4;font-size:14px; }
+        .sport-provider-table tbody tr:last-child td { border-bottom:0; }
+        .sport-provider-table tbody tr:hover { background:#fafcfd; }
+        .sport-provider-name { display:flex;align-items:center;gap:12px;font-weight:600;color:#30475c;white-space:nowrap; }
+        .sport-provider-icon { display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border:1px solid #d9e7ec;border-radius:9px;background:#eef7f8;color:#168294;font-weight:700; }
+        .sport-source-name { display:block;font-weight:600;color:#30475c;margin-bottom:6px; }
+        .sport-source-id { color:#788798;font-size:12px;overflow-wrap:anywhere; }
+        .sport-mapping-link { display:inline-flex;padding:9px 14px;border:1px solid #d0dce6;border-radius:6px;background:#fff;color:#365873;text-decoration:none;font-size:13px;font-weight:600;white-space:nowrap; }
+        .sport-mapping-link:hover { border-color:#17a2b8;background:#f0fafb;color:#087e92; }
+        .mapping-empty { margin:0 26px 26px;padding:32px;text-align:center;border:1px dashed #d5dfe7;border-radius:9px;background:#fafcfd; }
+        .mapping-empty strong { color:#34475a;font-size:15px; }
+        .mapping-empty p { color:#758395;font-size:14px;margin:8px 0 0; }
+        .sport-overview a:focus-visible,.sport-overview button:focus-visible,#addMappingModal button:focus-visible { outline:3px solid #4abbd0;outline-offset:3px; }
+        #addMappingModal .modal-content { box-sizing:border-box;max-height:85vh;overflow:auto;padding:28px;border-radius:12px; }
+        #addMappingModal h3 { margin:0 38px 24px 0;font-size:22px;color:#263b50; }
+        #addMappingModal .top-bar { background:#f7f9fb;border-color:#e6edf2; }
+        #addMappingModal .filters { width:100%;align-items:end; }
+        #addMappingModal .filter-group { flex:1; }
+        #addMappingModal input,#addMappingModal select { width:100%;box-sizing:border-box;min-height:42px; }
+        #closeAddMappingModalBtn { background:none;border:0;cursor:pointer;line-height:1;padding:4px;color:#748396; }
+        @media(max-width:700px) { .sport-overview { padding:0 16px; } .sport-summary { padding:22px;gap:24px; } .sport-facts { width:100%;gap:24px; } .sport-facts>div { border:0;padding:0; } .sport-mapping-heading { padding:20px; } .sport-provider-table th,.sport-provider-table td { padding:14px 18px; } .sport-provider-table { min-width:540px; } }
     </style>
+    <link rel="stylesheet" href="../entity_overview.css">
 </head>
 <body>
 
@@ -43,23 +67,23 @@
 
         <main class="sport-overview">
             <div class="form-side">
-                <div style="margin-bottom: 20px;">
-                    <a href="hermes_sports.html" class="btn-secondary" style="text-decoration: none; display: inline-block;">&larr; Back to Sports</a>
-                </div>
-
-                <section class="sport-summary">
-                    <h2 id="displaySportName"></h2>
-                    <dl class="sport-facts">
+                <a href="hermes_sports.html?view=internal" class="sport-back">&larr; All sports</a>
+                <section class="sport-summary overview-summary" aria-labelledby="displaySportName">
+                    <div><p class="sport-eyebrow overview-eyebrow">Sport</p><h2 id="displaySportName"></h2></div>
+                    <dl class="sport-facts overview-facts">
                         <div><dt>Sport ID</dt><dd id="displaySportId"></dd></div>
                         <div><dt>Abbreviation</dt><dd id="displaySportAbbr"></dd></div>
+                        <div><dt>Provider mappings</dt><dd id="sportMappingCount"></dd></div>
                     </dl>
                 </section>
                 <section class="sport-mapping-panel" id="mappedProviderSection">
-                    <h3>Provider sport mapping</h3>
+                    <div class="sport-mapping-heading">
+                        <h3>Provider sport mappings</h3>
+                        <button type="button" id="addMappingBtn" class="btn-primary"><span aria-hidden="true">+</span> Add mapping</button>
+                    </div>
                     <div id="providerSportsList"></div>
                     <div class="mapping-empty" id="mappingEmptyState" hidden>
                         <div><strong>No provider sport mapped</strong><p>Add a mapping to connect this sport to a provider sport.</p></div>
-                        <button type="button" id="addMappingBtn" class="btn-primary">Add mapping</button>
                     </div>
                 </section>
 
@@ -69,7 +93,7 @@
 
     <div id="addMappingModal" class="modal">
         <div class="modal-content" style="width: min(900px, 92vw);">
-            <span class="close-modal" id="closeAddMappingModalBtn">&times;</span>
+            <button type="button" class="close-modal" id="closeAddMappingModalBtn" aria-label="Close add mapping">&times;</button>
             <h3>Add provider sport mapping for <span id="mappingSportName" style="color: #17a2b8;"></span></h3>
             <div class="top-bar" style="box-shadow: none; margin-bottom: 15px;">
                 <div class="filters">
@@ -104,20 +128,22 @@
 
     <script src="../pagination.js"></script>
     <script src="sport_mapping_model.js"></script>
+    <script src="master_mapping_action.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             // Čitanje informacija o sportu iz URL-a
             const urlParams = new URLSearchParams(window.location.search);
             const sportId = (urlParams.get('id') || '-').replace(/^S-0*(\d+)$/, '$1');
-            const sportName = urlParams.get('name') || 'Unknown Sport';
-            const sportAbbr = urlParams.get('abbr') || '-';
+            const masterSport = SportMappingDemo.sports.find(sport => sport.id === sportId);
+            const sportName = masterSport?.name || urlParams.get('name') || 'Unknown Sport';
+            const sportAbbr = masterSport?.abbr || urlParams.get('abbr') || '-';
 
             // Prikaz podataka u zaglavlju
             document.getElementById('displaySportId').textContent = sportId;
             document.getElementById('displaySportName').textContent = sportName;
             document.getElementById('displaySportAbbr').textContent = sportAbbr;
 
-            const allProviderSports = SportMappingDemo.providerRows();
+            let allProviderSports = SportMappingDemo.providerRows();
 
             let mappedList = SportMappingDemo.providerRows().filter(source => source.internalId === sportId);
             const listContainer = document.getElementById('providerSportsList');
@@ -135,19 +161,17 @@
                 mappedList = SportMappingDemo.providerRows().filter(source => source.internalId === sportId);
                 document.getElementById('mappingEmptyState').style.display = mappedList.length ? 'none' : 'flex';
                 document.getElementById('mappingEmptyState').hidden = mappedList.length > 0;
-                listContainer.innerHTML = mappedList.map(prov => `
-                    <div class="mapping-source-card">
-                        <div>
-                            <div class="mapping-source-label">Mapped provider sport</div>
-                            <div class="mapping-source-name">${escapeHtml(prov.provName)}</div>
-                            <div class="mapping-source-meta">${escapeHtml(prov.provider)} &middot; ${escapeHtml(prov.provId)}</div>
-                        </div>
-                        <a href="map_sport.html?provider=${encodeURIComponent(prov.provider)}&provId=${encodeURIComponent(prov.provId)}" class="btn-primary">Manage mapping</a>
-                    </div>
-                `).join('');
+                document.getElementById('sportMappingCount').textContent = mappedList.length;
+                listContainer.innerHTML = mappedList.length ? `<div class="sport-table-scroll"><table class="sport-provider-table"><thead><tr><th>Provider</th><th>Provider sport</th><th style="text-align:right">Action</th></tr></thead><tbody>${mappedList.map(prov => `
+                    <tr>
+                        <td><div class="sport-provider-name"><span class="sport-provider-icon" aria-hidden="true">${escapeHtml(prov.provider.slice(0,1))}</span>${escapeHtml(prov.provider)}</div></td>
+                        <td><span class="sport-source-name">${escapeHtml(prov.provName)}</span><span class="sport-source-id">${escapeHtml(prov.provId)}</span></td>
+                        <td style="text-align:right"><a href="map_sport.html?provider=${encodeURIComponent(prov.provider)}&provId=${encodeURIComponent(prov.provId)}" class="sport-mapping-link" aria-label="Manage mapping for ${escapeHtml(prov.provider)} ${escapeHtml(prov.provName)}">Manage mapping</a></td>
+                    </tr>`).join('')}</tbody></table></div>` : '';
             }
 
             function renderAvailableProviderSports() {
+                allProviderSports = SportMappingDemo.unmappedRows();
                 const providerVal = providerFilter.value;
                 const searchVal = providerSportSearch.value.toLowerCase();
                 const mappedKeys = new Set(mappedList.map(mappingKey));
@@ -180,10 +204,11 @@
                     button.addEventListener('click', () => {
                         const selectedSport = allProviderSports.find(item => mappingKey(item) === button.dataset.key);
                         if (!selectedSport) return;
-                        window.location.href = 'map_sport.html?' + new URLSearchParams({provider:selectedSport.provider,provId:selectedSport.provId,provName:selectedSport.provName});
-                        addMappingModal.style.display = 'none';
-                        renderMappedSports();
-                        renderAvailableProviderSports();
+                        window.MasterMappingAction({api:SportMappingDemo,provider:selectedSport.provider,sourceId:selectedSport.provId,targetId:sportId,entityName:'sport',onSaved:()=>{
+                            addMappingModal.style.display = 'none';
+                            renderMappedSports();
+                            renderAvailableProviderSports();
+                        }});
                     });
                 });
             }
@@ -200,6 +225,7 @@
             });
             providerFilter.addEventListener('change', renderAvailableProviderSports);
             providerSportSearch.addEventListener('input', renderAvailableProviderSports);
+            window.addEventListener('storage', event => { if(event.key === SportMappingDemo.KEY) { renderMappedSports(); if(addMappingModal.style.display === 'flex') renderAvailableProviderSports(); } });
             renderMappedSports();
             window.addEventListener('click', event => {
                 if (event.target === addMappingModal) addMappingModal.style.display = 'none';

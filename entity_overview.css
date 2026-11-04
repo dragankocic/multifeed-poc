@@ -1,0 +1,42 @@
+/* Shared master overview presentation; list and mapping behavior remain entity-owned. */
+.entity-overview-page main { width:100%;max-width:none;box-sizing:border-box;padding:24px 28px; }
+.entity-overview-page main>.form-side { width:100%;max-width:none; }
+.overview-back { display:inline-flex;align-items:center;gap:8px;margin-bottom:20px;color:#536b80;text-decoration:none;font-size:14px;font-weight:600; }
+.overview-back:hover { color:#087e92;text-decoration:underline; }
+.overview-summary { background:#fff!important;border:1px solid #e1e8ee!important;border-radius:12px!important;padding:26px 28px!important;box-shadow:0 3px 12px rgba(27,46,64,.035);margin:0 0 24px!important; }
+.overview-summary-layout { display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap; }
+.overview-eyebrow { margin:0 0 8px!important;font-size:11px!important;letter-spacing:.09em;text-transform:uppercase;font-weight:700;color:#748496!important; }
+.overview-summary h2 { margin:0!important;color:#23384d!important;font-size:30px!important;letter-spacing:-.5px; }
+.overview-summary h2 span { color:inherit!important; }
+.overview-facts { display:flex;flex-wrap:wrap;gap:24px 36px;margin:24px 0 0;padding-top:20px;border-top:1px solid #edf1f4; }
+.overview-facts dt { font-size:12px;color:#738296;margin-bottom:8px; }
+.overview-facts dd { margin:0;font-size:16px;font-weight:650;color:#30475c;overflow-wrap:anywhere; }
+.overview-actions { display:flex;gap:10px;align-items:center;flex-wrap:wrap; }
+.overview-actions a { text-decoration:none; }
+.overview-actions .btn-primary,.entity-overview-page #addMappingBtn { display:inline-flex;align-items:center;justify-content:center;padding:11px 18px;border-radius:6px;font-size:14px;font-weight:600;white-space:nowrap; }
+.overview-actions .btn-secondary { padding:10px 16px;border:1px solid #e5cccc;border-radius:6px;background:#fff;color:#a84242;font:inherit;font-size:14px;cursor:pointer; }
+.entity-overview-page main .mapping-card,.entity-overview-page main .markets-section,#detailView .markets-section { border:1px solid #e1e8ee!important;border-radius:12px!important;box-shadow:0 3px 12px rgba(27,46,64,.035);overflow-x:auto; }
+.entity-overview-page .mapping-card-header { padding:22px 26px;border-bottom:0; }
+.entity-overview-page .mapping-card-header h3,.entity-overview-page .section-header h3 { font-size:18px;color:#263b50; }
+.entity-overview-page main table th,#detailView table th { padding:13px 24px;background:#f7f9fb;border-bottom:1px solid #e8edf2;font-size:11px;color:#748396;text-transform:uppercase;letter-spacing:.04em; }
+.entity-overview-page main table td,#detailView table td { padding:18px 24px;border-bottom:1px solid #edf1f4;font-size:14px;vertical-align:middle; }
+.entity-overview-page main table tbody tr:last-child td,#detailView table tbody tr:last-child td { border-bottom:0; }
+.entity-overview-page main table tbody tr:hover,#detailView table tbody tr:hover { background:#fafcfd; }
+.overview-provider { display:flex;gap:12px;align-items:center;font-weight:600;color:#30475c;white-space:nowrap; }
+.overview-provider-icon { display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;width:34px;height:34px;border:1px solid #d9e7ec;border-radius:9px;background:#eef7f8;color:#168294;font-weight:700; }
+.overview-source-name { display:block;font-weight:600;color:#30475c;margin-bottom:6px; }
+.overview-source-id { color:#788798;font-size:12px;overflow-wrap:anywhere; }
+.entity-overview-page main .category-action,.entity-overview-page main .tournament-action { display:inline-flex;padding:9px 14px;border:1px solid #d0dce6;border-radius:6px;background:#fff;color:#365873;text-decoration:none;font-size:13px;font-weight:600;white-space:nowrap; }
+.entity-overview-page main a:focus-visible,.entity-overview-page button:focus-visible,#detailView button:focus-visible { outline:3px solid #4abbd0;outline-offset:3px; }
+.entity-overview-page .modal-content { box-sizing:border-box;max-height:85vh;overflow:auto;border-radius:12px; }
+.entity-overview-page .modal .btn-secondary { display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:10px 18px;border:1px solid #cbd5df;border-radius:6px;background:white;color:#34475a;font:inherit;font-size:14px;font-weight:600;cursor:pointer; }
+.entity-overview-page .modal .filters { align-items:end; }
+.entity-overview-page .modal input,.entity-overview-page .modal select { box-sizing:border-box;min-height:42px; }
+#detailView .detail-header { padding:26px 28px;margin-bottom:0;background:white;border:1px solid #e1e8ee;border-radius:12px 12px 0 0; }
+#detailView>.markets-section { margin-top:0;border-top:0!important;border-radius:0 0 12px 12px!important; }
+#detailView .detail-grid { gap:24px; }
+#detailView .mapping-section-header { padding:22px 24px; }
+#detailView .section-heading { font-size:18px;color:#263b50; }
+#detailView .nav-button { border:1px solid #d0dce6;border-radius:6px;background:white;color:#365873; }
+#detailView .member-item { border:1px solid #e4ebf0;border-radius:8px;background:#fafcfd; }
+@media(max-width:700px) { .entity-overview-page main { padding:20px 16px; } .overview-summary { padding:22px!important; } .overview-summary h2 { font-size:26px!important; } .overview-facts { gap:20px; } .entity-overview-page main table th,.entity-overview-page main table td,#detailView table th,#detailView table td { padding:14px 16px; } .entity-overview-page #mappedProviderSection table { min-width:520px; } #detailView .detail-header { padding:20px; } }

@@ -20,7 +20,7 @@
     }
 
     function setupTablePagination(tbody) {
-        if (!tbody || tbody.dataset.paginationReady === 'true') return;
+        if (!tbody || tbody.dataset.paginationReady === 'true' || tbody.dataset.pagination === 'off') return;
         tbody.dataset.paginationReady = 'true';
 
         const table = tbody.closest('table');
@@ -31,6 +31,7 @@
         const pageSize = Number(tbody.dataset.pageSize) || DEFAULT_PAGE_SIZE;
         const controls = createControls();
         const info = controls.querySelector('.table-pagination-info');
+        info.setAttribute('aria-live', 'polite');
         const prevBtn = controls.querySelector('.table-pagination-prev');
         const nextBtn = controls.querySelector('.table-pagination-next');
 
