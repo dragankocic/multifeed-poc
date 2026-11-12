@@ -1,222 +1,58 @@
 document.addEventListener('DOMContentLoaded', () => {
-
-    // Helper funkcija za generisanje Dropdown-a za Specifier
-    function createSpecifierRow(containerId, selectedValue = '') {
-        const container = document.getElementById(containerId);
-        
-        const row = document.createElement('div');
-        row.style.display = 'flex';
-        row.style.gap = '10px';
-        row.style.marginBottom = '10px';
-        row.style.alignItems = 'center';
-
-        row.innerHTML = `
-            <select class="specifier-select" style="flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px;">
-                <option value="" disabled selected>Select specifier...</option>
-                <option value="total">total</option>
-                <option value="goalnr">goalnr</option>
-                <option value="hcp">hcp</option>
-                <option value="player">player</option>
-                <option value="period">period</option>
-                <option value="from">from</option>
-                <option value="to">to</option>
-            </select>
-            <button type="button" class="btn-remove" title="Remove" style="padding: 10px 15px; font-weight: bold; cursor: pointer; border: 1px solid #ccc; border-radius: 4px; background: #fff; color: #d9534f; transition: 0.2s;">X</button>
-        `;
-
-        row.querySelector('.btn-remove').addEventListener('click', () => {
-            row.remove();
-        });
-
-        container.appendChild(row);
-        if (selectedValue) row.querySelector('select').value = selectedValue;
+    const store = MarketStorage.create(localStorage, ExeFeedMarkets);
+    const query = new URLSearchParams(location.search);
+    const error = document.createElement('p'); error.setAttribute('role','alert'); error.style.color='#b42318';
+    document.getElementById('saveMarketBtn').before(error);
+    let original;
+    function selected(name) { return document.querySelector(`input[name="${name}"]:checked`)?.value; }
+    function choices(extended) {
+        const defaults = extended ? ['score','period','total_for_the_rest','hcp_for_the_rest'] : ['total','goalnr','hcp','player','period','from','to','score'];
+        const saved = JSON.parse(localStorage.getItem(extended ? 'poc_ext_specifiers' : 'poc_specifiers') || '[]');
+        const other = store.load().markets.flatMap(m => extended ? m.extendedSpecifiers : m.specifiers);
+        return [...new Set([...defaults, ...saved.map(s => s.name), ...other])].filter(Boolean);
     }
-
-    // Helper funkcija za generisanje Dropdown-a za Extended Specifier
-    function createExtendedSpecifierRow(containerId, selectedValue = '') {
-        const container = document.getElementById(containerId);
-        
-        const row = document.createElement('div');
-        row.style.display = 'flex';
-        row.style.gap = '10px';
-        row.style.marginBottom = '10px';
-        row.style.alignItems = 'center';
-
-        row.innerHTML = `
-            <select class="extended-specifier-select" style="flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px;">
-                <option value="" disabled selected>Select extended specifier...</option>
-                <option value="score">score</option>
-                <option value="period">period</option>
-                <option value="total_for_the_rest">total_for_the_rest</option>
-                <option value="hcp_for_the_rest">hcp_for_the_rest</option>
-            </select>
-            <button type="button" class="btn-remove" title="Remove" style="padding: 10px 15px; font-weight: bold; cursor: pointer; border: 1px solid #ccc; border-radius: 4px; background: #fff; color: #d9534f; transition: 0.2s;">X</button>
-        `;
-
-        row.querySelector('.btn-remove').addEventListener('click', () => {
-            row.remove();
-        });
-
-        container.appendChild(row);
-        if (selectedValue) row.querySelector('select').value = selectedValue;
+    function addSpecifier(extended, value='') {
+        const row=document.createElement('div');row.className='specifier-row';
+        const select=document.createElement('select'); select.className=extended?'extended-specifier-select':'specifier-select';
+        select.add(new Option('Select specifier...',''));
+        const options=choices(extended);if(value&&!options.includes(value))options.push(value);
+        options.forEach(name=>select.add(new Option(name,name)));select.value=value;
+        const remove=document.createElement('button');remove.type='button';remove.className='btn-remove';remove.textContent='X';remove.setAttribute('aria-label','Remove specifier');remove.onclick=()=>row.remove();
+        row.append(select,remove);document.getElementById(extended?'extendedSpecifiersContainer':'specifiersContainer').append(row);
     }
-
-    // Helper funkcija specifično za Outcomes
-    function createOutcomeRow(containerId, name = '', description = '') {
-        const container = document.getElementById(containerId);
-        
-        const row = document.createElement('div');
-        row.style.display = 'flex';
-        row.style.gap = '10px';
-        row.style.marginBottom = '10px';
-        row.style.alignItems = 'center';
-
-        row.innerHTML = `
-            <div class="form-group" style="flex: 1; margin-bottom: 0;">
-                <input type="text" class="outcome-name-input" placeholder="Outcome Name (e.g. {\$competitor1})" value="${name}" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px;">
-            </div>
-            <div class="form-group" style="flex: 1; margin-bottom: 0;">
-                <input type="text" class="outcome-description-input" placeholder="Outcome Description (e.g. Home team wins)" value="${description}" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px;">
-            </div>
-            <button type="button" class="btn-remove" title="Remove" style="padding: 10px 15px; font-weight: bold; cursor: pointer; border: 1px solid #ccc; border-radius: 4px; background: #fff; color: #d9534f; transition: 0.2s;">X</button>
-        `;
-
-        row.querySelector('.btn-remove').addEventListener('click', () => {
-            row.remove();
-        });
-
-        container.appendChild(row);
+    function addOutcome(name='',description='') {
+        const row=document.createElement('div');row.className='outcome-row';row.style.cssText='display:flex;gap:12px;margin-bottom:12px;align-items:center';
+        const n=document.createElement('input');n.className='outcome-name-input';n.placeholder='Outcome name (e.g. {$competitor1})';n.setAttribute('aria-label','Outcome name');n.value=name;
+        const d=document.createElement('input');d.className='outcome-description-input';d.placeholder='Outcome description';d.setAttribute('aria-label','Outcome description');d.value=description;
+        for(const input of [n,d])input.style.cssText='flex:1;min-width:0;padding:10px;border:1px solid #ccc;border-radius:4px';
+        const remove=document.createElement('button');remove.type='button';remove.className='btn-remove';remove.textContent='X';remove.setAttribute('aria-label','Remove outcome');remove.onclick=()=>row.remove();
+        row.append(n,d,remove);document.getElementById('outcomesListContainer').append(row);
     }
-
-    // --- 1. Specifiers ---
-    const addSpecifierBtn = document.getElementById('addSpecifierBtn');
-    if(addSpecifierBtn) {
-        addSpecifierBtn.addEventListener('click', () => {
-            createSpecifierRow('specifiersContainer');
-        });
-    }
-
-    // --- 2. Extended Specifiers ---
-    const addExtendedSpecifierBtn = document.getElementById('addExtendedSpecifierBtn');
-    if(addExtendedSpecifierBtn) {
-        addExtendedSpecifierBtn.addEventListener('click', () => {
-            createExtendedSpecifierRow('extendedSpecifiersContainer');
-        });
-    }
-
-    // --- 3. Outcomes Type logika ---
-    const outcomesTypeRadios = document.querySelectorAll('input[name="outcomesType"]');
-    const regularOutcomesWrapper = document.getElementById('regularOutcomesWrapper');
-    
-    outcomesTypeRadios.forEach(radio => {
-        radio.addEventListener('change', function() {
-            if(this.value === 'Regular') {
-                regularOutcomesWrapper.style.display = 'block';
-            } else {
-                regularOutcomesWrapper.style.display = 'none';
-                document.getElementById('outcomesListContainer').innerHTML = '';
-            }
-        });
-    });
-
-    // --- 4. Regular Outcomes dodavanje ---
-    const addOutcomeBtn = document.getElementById('addOutcomeBtn');
-    if(addOutcomeBtn) {
-        addOutcomeBtn.addEventListener('click', () => {
-            createOutcomeRow('outcomesListContainer');
-        });
-    }
-
-    const urlParams = new URLSearchParams(window.location.search);
-    const isEdit = urlParams.get('edit') === 'true';
-    const editId = urlParams.get('id') || '';
-    const editMarket = urlParams.get('market');
-    const editSport = urlParams.get('sport');
-    const editType = urlParams.get('type');
-    const defaultsByMarket = {
-        "1X2": {
-            description: "Home, Draw, Away match winner",
-            specifiers: ["period"],
-            extendedSpecifiers: ["score"],
-            outcomes: [
-                ["{$competitor1}", "Home competitor wins"],
-                ["draw", "Match ends in a draw"],
-                ["{$competitor2}", "Away competitor wins"]
-            ]
-        },
-        "Asian Handicap": {
-            description: "Handicap betting for the match",
-            specifiers: ["hcp"],
-            extendedSpecifiers: ["score"],
-            outcomes: [
-                ["{$competitor1}", "Home competitor with handicap"],
-                ["{$competitor2}", "Away competitor with handicap"]
-            ]
-        },
-        "Total Goals": {
-            description: "Over/Under total goals",
-            specifiers: ["total"],
-            extendedSpecifiers: ["score", "period"],
-            outcomes: [
-                ["over", "Total goals over the line"],
-                ["under", "Total goals under the line"]
-            ]
-        },
-        "Anytime goalscorer": {
-            description: "Player to score at any time",
-            specifiers: ["player"],
-            extendedSpecifiers: ["period"],
-            outcomes: [
-                ["{$player}", "Selected player scores at any time"]
-            ]
-        },
-        "Total Corners": {
-            description: "Over/Under total corners in the match",
-            specifiers: ["total"],
-            extendedSpecifiers: ["period"],
-            outcomes: [
-                ["over", "Total corners over the line"],
-                ["under", "Total corners under the line"]
-            ]
+    function toggleOutcomes() { document.getElementById('regularOutcomesWrapper').style.display=selected('outcomesType')==='Regular'?'block':'none'; }
+    try {
+        original=query.get('id')?store.load().markets.find(m=>m.id===query.get('id')):null;
+        if(query.get('id')&&!original)throw Error('This saved market was not found. Return to the market list.');
+        document.getElementById('addSpecifierBtn').onclick=()=>addSpecifier(false);
+        document.getElementById('addExtendedSpecifierBtn').onclick=()=>addSpecifier(true);
+        document.getElementById('addOutcomeBtn').onclick=()=>addOutcome();
+        document.querySelectorAll('input[name="outcomesType"]').forEach(r=>r.addEventListener('change',toggleOutcomes));
+        if(original){
+            document.getElementById('pageMainTitle').textContent='Edit Market';document.getElementById('pageSubTitle').textContent='Update market definition';document.getElementById('saveMarketBtn').textContent='Update Market';
+            document.getElementById('marketName').value=original.name;document.getElementById('description').value=original.desc;document.getElementById('sport').value=original.sport.toLowerCase();
+            document.querySelector(`input[name="marketType"][value="${original.type}"]`).checked=true;
+            document.querySelector(`input[name="outcomesType"][value="${original.outcomesType}"]`).checked=true;
+            original.specifiers.forEach(s=>addSpecifier(false,s));original.extendedSpecifiers.forEach(s=>addSpecifier(true,s));original.outcomes.forEach(o=>addOutcome(o.name,o.desc));
+        }else{
+            document.querySelector('input[name="marketType"][value="Regular"]').checked=true;document.querySelector('input[name="outcomesType"][value="Regular"]').checked=true;
         }
-    };
-
-    if (isEdit) {
-        document.title = 'Edit Market';
-        document.getElementById('pageMainTitle').textContent = 'Edit Market';
-        document.getElementById('pageSubTitle').textContent = 'Update market definition';
-        document.getElementById('saveMarketBtn').textContent = 'Update Market';
-
-        const marketDefaults = defaultsByMarket[editMarket] || { description: '', specifiers: [], extendedSpecifiers: [], outcomes: [] };
-        if (editMarket) document.getElementById('marketName').value = editMarket;
-        if (marketDefaults.description) document.getElementById('description').value = marketDefaults.description;
-        if (editSport) document.getElementById('sport').value = editSport.toLowerCase();
-        if (editType) {
-            const typeRadio = document.querySelector(`input[name="marketType"][value="${editType}"]`);
-            if (typeRadio) typeRadio.checked = true;
-        }
-        marketDefaults.specifiers.forEach(specifier => createSpecifierRow('specifiersContainer', specifier));
-        marketDefaults.extendedSpecifiers.forEach(specifier => createExtendedSpecifierRow('extendedSpecifiersContainer', specifier));
-        if (marketDefaults.outcomes.length) {
-            const regularOutcomeRadio = document.querySelector('input[name="outcomesType"][value="Regular"]');
-            regularOutcomeRadio.checked = true;
-            regularOutcomesWrapper.style.display = 'block';
-            marketDefaults.outcomes.forEach(([name, description]) => createOutcomeRow('outcomesListContainer', name, description));
-        }
-    }
-
-    // --- 5. Save market ---
-    const saveMarketBtn = document.getElementById('saveMarketBtn');
-    if(saveMarketBtn) {
-        saveMarketBtn.addEventListener('click', () => {
-            const marketName = document.getElementById('marketName').value;
-            if(marketName) {
-                const actionText = isEdit ? 'updated' : 'added';
-                const idText = isEdit && editId ? ` (${editId})` : '';
-                alert('This market form is a visual demo. Changes have not been saved.');
-            } else {
-                alert("Please enter a market name.");
-            }
-        });
-    }
+        toggleOutcomes();
+        document.getElementById('saveMarketBtn').onclick=()=>{try{
+            const sportSelect=document.getElementById('sport');
+            const outcomesType=selected('outcomesType');
+            const market=store.saveMarket({...original,name:document.getElementById('marketName').value,desc:document.getElementById('description').value,sport:sportSelect.value?sportSelect.selectedOptions[0].text:'',type:selected('marketType'),outcomesType,
+                specifiers:[...document.querySelectorAll('.specifier-select')].map(n=>n.value),extendedSpecifiers:[...document.querySelectorAll('.extended-specifier-select')].map(n=>n.value),
+                outcomes:outcomesType==='Regular'?[...document.querySelectorAll('.outcome-row')].map(r=>({name:r.querySelector('.outcome-name-input').value.trim(),desc:r.querySelector('.outcome-description-input').value.trim()})):[]});
+            location.href='../view_hermes_market.html?id='+encodeURIComponent(market.id);
+        }catch(e){error.textContent=e.message;}};
+    } catch(e) { error.textContent=e.message;document.getElementById('saveMarketBtn').disabled=true; }
 });

@@ -59,60 +59,8 @@
     </div>
 
     <script src="pagination.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const marketId = urlParams.get('id') || '-';
-            const marketName = urlParams.get('market') || 'Unknown Market';
-            const sportName = urlParams.get('sport') || 'Unknown Sport';
-            const providerName = urlParams.get('provider') || 'Unknown Provider';
-
-            document.getElementById('displayMarketId').textContent = marketId;
-            document.getElementById('displayMarketName').textContent = marketName;
-            document.getElementById('displayProvider').textContent = providerName;
-            document.getElementById('displaySport').textContent = sportName;
-
-            const addMappingBtn = document.getElementById('addMappingBtn');
-            addMappingBtn.href = `mapping/mapping.html?market=${encodeURIComponent(marketName)}&sport=${encodeURIComponent(sportName)}&provider=${encodeURIComponent(providerName)}`;
-
-            const mockMappings = {
-                "1X2": ["1X2", "Asian Handicap"],
-                "TOTAL_GOALS": ["Total Goals", "Total Goals flat"],
-                "ANY_GOAL_SCORER": ["Anytime goalscorer"]
-            };
-
-            const mappedList = mockMappings[marketName] || [];
-            const listContainer = document.getElementById('mappedMarketsList');
-
-            if (mappedList.length === 0) {
-                listContainer.innerHTML = '<tr><td colspan="2" style="text-align: center; color: #888; font-style: italic;">No mappings found for this market.</td></tr>';
-            } else {
-                mappedList.forEach(hermesMarket => {
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td style="font-weight: 500; color: #2c3e50;">${hermesMarket}</td>
-                        <td style="text-align: right;">
-                            <a href="view_hermes_market.html?market=${encodeURIComponent(hermesMarket)}&sport=${encodeURIComponent(sportName)}" class="btn-action" style="background-color: #007bff; text-decoration: none; display: inline-block; margin-right: 8px;">View</a>
-                            <a href="mapping/mapping.html?market=${encodeURIComponent(marketName)}&sport=${encodeURIComponent(sportName)}&provider=${encodeURIComponent(providerName)}&edit=${encodeURIComponent(hermesMarket)}" class="btn-action" style="background-color: #17a2b8; text-decoration: none; display: inline-block; margin-right: 8px;">Edit Mapping</a>
-                            <button class="btn-remove-mapping" style="background-color: #dc3545; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 600;">Remove</button>
-                        </td>
-                    `;
-                    listContainer.appendChild(tr);
-                });
-
-                document.querySelectorAll('.btn-remove-mapping').forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        if (confirm('Are you sure you want to remove this mapping?')) {
-                            const row = this.closest('tr');
-                            row.remove();
-                            if (listContainer.children.length === 0) {
-                                listContainer.innerHTML = '<tr><td colspan="2" style="text-align: center; color: #888; font-style: italic;">No mappings found for this market.</td></tr>';
-                            }
-                        }
-                    });
-                });
-            }
-        });
-    </script>
+    <script src="./exefeed_markets.js"></script>
+    <script src="./market_storage.js"></script>
+    <script src="market_details.js"></script>
 </body>
 </html>

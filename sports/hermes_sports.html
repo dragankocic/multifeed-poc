@@ -177,18 +177,6 @@
         </main>
     </div>
 
-    <div id="activateSportModal" class="modal">
-        <div class="modal-content" style="width: min(520px, 92vw);">
-            <span class="close-modal" id="closeActivateSportModalBtn">&times;</span>
-            <h3>Activate Sport</h3>
-            <p id="activateSportModalText" style="font-size: 15px; line-height: 1.55; color: #555; margin-bottom: 20px;"></p>
-            <div class="activation-modal-actions" style="display: flex; justify-content: flex-end; gap: 10px;">
-                <button type="button" id="cancelActivateSportBtn" class="btn-secondary">Cancel</button>
-                <button type="button" id="confirmActivateSportBtn" class="btn-primary">Activate</button>
-            </div>
-        </div>
-    </div>
-
     <script src="../pagination.js"></script>
     <script src="sport_mapping_model.js"></script>
     <script>
@@ -205,9 +193,6 @@
             const searchInput = document.getElementById('searchInput');
             const workspaceHead = document.getElementById('workspaceHead');
             const workspaceBody = document.getElementById('workspaceBody');
-            const activateSportModal = document.getElementById('activateSportModal');
-            const activateSportModalText = document.getElementById('activateSportModalText');
-            let sportToActivate = null;
             let activeView = new URLSearchParams(location.search).get('view') === 'internal' ? 'internal' : 'provider';
 
             const activeSportIds = new Set(JSON.parse(localStorage.getItem('multifeedActiveSports') || '[]').map(id => String(id).replace(/^S-0*(\d+)$/, '$1')));
@@ -215,26 +200,6 @@
             internalSports.forEach(sport => {
                 sport.active = sport.active || activeSportIds.has(sport.id);
             });
-
-            function closeActivateSportModal() {
-                sportToActivate = null;
-                activateSportModal.style.display = 'none';
-            }
-
-            function openActivateSportModal(sport) {
-                sportToActivate = sport;
-                activateSportModalText.textContent = `Activate ${sport.name}? Its categories, tournaments, competitors, and players will become available for feed processing.`;
-                activateSportModal.style.display = 'flex';
-            }
-
-            function activateSport() {
-                if (!sportToActivate) return;
-                sportToActivate.active = true;
-                activeSportIds.add(sportToActivate.id);
-                localStorage.setItem('multifeedActiveSports', JSON.stringify([...activeSportIds]));
-                closeActivateSportModal();
-                renderInternalView();
-            }
 
             function renderInternalView() {
                 workspaceHead.innerHTML = `
@@ -270,19 +235,12 @@
                             <span class="row-actions">
                                 <a href="view_hermes_sport.html?id=${encodeURIComponent(sport.id)}&name=${encodeURIComponent(sport.name)}&abbr=${encodeURIComponent(sport.abbr)}" class="btn-action" style="background-color: #007bff; text-decoration: none; display: inline-block;">View</a>
                                 <a href="create_sport.html?edit=true&id=${encodeURIComponent(sport.id)}&name=${encodeURIComponent(sport.name)}&abbr=${encodeURIComponent(sport.abbr)}" class="btn-action" style="background-color: #17a2b8; text-decoration: none; display: inline-block;">Edit</a>
-                                ${sport.active ? '' : `<button type="button" class="btn-action activate-sport-btn" data-id="${sport.id}" style="background-color: #28a745; border: none;">Activate</button>`}
                             </span>
                             </td>
                         </tr>
                     `;
                 }).join('');
 
-                document.querySelectorAll('.activate-sport-btn').forEach(button => {
-                    button.addEventListener('click', () => {
-                        const sport = internalSports.find(item => item.id === button.dataset.id);
-                        if (sport) openActivateSportModal(sport);
-                    });
-                });
             }
 
             function renderProviderView() {
@@ -364,13 +322,6 @@
             providerSelect.addEventListener('change', render);
             statusSelect.addEventListener('change', render);
             searchInput.addEventListener('input', render);
-            document.getElementById('closeActivateSportModalBtn').addEventListener('click', closeActivateSportModal);
-            document.getElementById('cancelActivateSportBtn').addEventListener('click', closeActivateSportModal);
-            document.getElementById('confirmActivateSportBtn').addEventListener('click', activateSport);
-            window.addEventListener('click', event => {
-                if (event.target === activateSportModal) closeActivateSportModal();
-            });
-
             window.addEventListener('storage', event => { if(event.key === SportMappingDemo.KEY) render(); });
             render();
         });

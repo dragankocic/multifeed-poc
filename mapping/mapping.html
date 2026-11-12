@@ -40,7 +40,7 @@
                     <div class="form-row" style="align-items: flex-end;">
                         <div class="form-group" style="flex: 1; margin-bottom: 0;">
                             <label for="providerMarketSelect">Market Name</label>
-                            <input type="text" id="providerMarketSelect" readonly placeholder="Provider market is filled from the selected row" style="background-color: #f9f9f9; color: #333; font-weight: 600;">
+                            <select id="providerMarketSelect"><option value="">Select provider market...</option></select>
                         </div>
                         <div style="flex: 0 0 auto;">
                             <button type="button" id="viewMarketBtn" class="btn-secondary" disabled style="opacity: 0.5; cursor: not-allowed; padding: 10px 15px;">View Market</button>
@@ -69,6 +69,8 @@
         </div>
     </div>
 
+    <script src="../exefeed_markets.js"></script>
+    <script src="../market_storage.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

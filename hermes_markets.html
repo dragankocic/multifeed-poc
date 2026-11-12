@@ -211,30 +211,15 @@
         </main>
     </div>
 
+    <script src="./exefeed_markets.js"></script>
+    <script src="./market_storage.js"></script>
     <script src="pagination.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const internalMarkets = [
-                { id: "HRM-001", name: "1X2", sport: "Soccer", desc: "Home, Draw, Away match winner", type: "Regular" },
-                { id: "HRM-002", name: "Asian Handicap", sport: "Soccer", desc: "Handicap betting for the match", type: "Regular" },
-                { id: "HRM-003", name: "Total Goals", sport: "Soccer", desc: "Over/Under total goals", type: "Statistics" },
-                { id: "HRM-004", name: "Anytime goalscorer", sport: "Soccer", desc: "Player to score at any time", type: "Player Props" },
-                { id: "HRM-005", name: "Total Corners", sport: "Soccer", desc: "Over/Under total corners in the match", type: "Statistics" },
-                { id: "HRM-006", name: "Moneyline", sport: "Basketball", desc: "Match winner without draw", type: "Regular" },
-                { id: "HRM-007", name: "Set Winner", sport: "Tennis", desc: "Winner of selected set", type: "Regular" }
-            ];
-
-            const providerMarkets = [
-                { marketId: "-", providerMarketName: "1X2", provider: "ExeFeed", sport: "Soccer", status: "Mapped", internalId: "HRM-001", internalName: "1X2" },
-                { marketId: "-", providerMarketName: "TOTAL_GOALS", provider: "ExeFeed", sport: "Soccer", status: "Partially mapped", internalId: "HRM-003", internalName: "Total Goals" },
-                { marketId: "101", providerMarketName: "TOTAL_CORNERS", provider: "ExeFeed", sport: "Soccer", status: "Mapped", internalId: "HRM-005", internalName: "Total Corners" },
-                { marketId: "102", providerMarketName: "ANYTIME_GOALSCORER", provider: "ExeFeed", sport: "Soccer", status: "Unmapped", internalId: "-", internalName: "-" },
-                { marketId: "sr:market:1", providerMarketName: "3way", provider: "SportRadar", sport: "Soccer", status: "Mapped", internalId: "HRM-001", internalName: "1X2" },
-                { marketId: "sr:market:18", providerMarketName: "total", provider: "SportRadar", sport: "Soccer", status: "Partially mapped", internalId: "HRM-003", internalName: "Total Goals" },
-                { marketId: "sr:market:219", providerMarketName: "player_to_score", provider: "SportRadar", sport: "Soccer", status: "Unmapped", internalId: "-", internalName: "-" },
-                { marketId: "sg-mkt-moneyline", providerMarketName: "Moneyline", provider: "SportGenius", sport: "Basketball", status: "Mapped", internalId: "HRM-006", internalName: "Moneyline" },
-                { marketId: "sg-mkt-set-winner", providerMarketName: "Set Winner", provider: "SportGenius", sport: "Tennis", status: "Mapped", internalId: "HRM-007", internalName: "Set Winner" }
-            ];
+            const marketStore = MarketStorage.create(localStorage, ExeFeedMarkets);
+            const escape = MarketStorage.escape;
+            let internalMarkets = [];
+            let providerMarkets = [];
 
             const tabs = document.querySelectorAll('.workspace-tab');
             const providerFilterGroup = document.getElementById('providerFilterGroup');
@@ -256,7 +241,7 @@
             }
 
             function mapUrl(market) {
-                return `mapping/mapping.html?provider=${encodeURIComponent(market.provider)}&sport=${encodeURIComponent(market.sport)}&market=${encodeURIComponent(market.providerMarketName)}&marketId=${encodeURIComponent(market.marketId)}&internalId=${encodeURIComponent(market.internalId)}`;
+                return `mapping/mapping.html?provider=${encodeURIComponent(market.provider)}&sport=${encodeURIComponent(market.sport)}&market=${encodeURIComponent(market.providerMarketName)}&marketId=${encodeURIComponent(market.marketId)}`;
             }
 
             function renderInternalView() {
@@ -291,11 +276,11 @@
 
                 workspaceBody.innerHTML = rows.map(market => `
                     <tr>
-                        <td style="font-weight: 500; color: #6c757d;">${market.id}</td>
-                        <td class="market-name">${market.name}</td>
-                        <td>${market.sport}</td>
-                        <td style="color: #555;">${market.desc}</td>
-                        <td><span style="background: #e9ecef; padding: 4px 10px; border-radius: 4px; font-size: 12px; border: 1px solid #ccc;">${market.type}</span></td>
+                        <td style="font-weight: 500; color: #6c757d;">${escape(market.businessId || 'Unassigned')}</td>
+                        <td class="market-name">${escape(market.name)}</td>
+                        <td>${escape(market.sport)}</td>
+                        <td style="color: #555;">${escape(market.desc)}</td>
+                        <td><span style="background: #e9ecef; padding: 4px 10px; border-radius: 4px; font-size: 12px; border: 1px solid #ccc;">${escape(market.type)}</span></td>
                         <td style="text-align: right;">
                             <span class="row-actions">
                                 <a href="view_hermes_market.html?id=${encodeURIComponent(market.id)}&market=${encodeURIComponent(market.name)}&sport=${encodeURIComponent(market.sport)}&type=${encodeURIComponent(market.type)}" class="btn-action" style="background-color: #007bff; text-decoration: none; display: inline-block;">View</a>
@@ -341,17 +326,15 @@
                 }
 
                 workspaceBody.innerHTML = rows.map(market => {
-                    const viewButton = market.status !== 'Unmapped'
-                        ? `<a href="view_hermes_market.html?id=${encodeURIComponent(market.internalId)}&market=${encodeURIComponent(market.internalName)}&sport=${encodeURIComponent(market.sport)}" class="btn-action" style="background-color: #007bff; text-decoration: none; display: inline-block;">View</a>`
-                        : `<a href="view_market.html?provider=${encodeURIComponent(market.provider)}&market=${encodeURIComponent(market.providerMarketName)}&sport=${encodeURIComponent(market.sport)}" class="btn-action" style="background-color: #007bff; text-decoration: none; display: inline-block;">View</a>`;
+                    const viewButton = `<a href="view_market.html?marketId=${encodeURIComponent(market.marketId)}&sport=${encodeURIComponent(market.sport)}&provider=${encodeURIComponent(market.provider)}" class="btn-action" style="background-color: #007bff; text-decoration: none; display: inline-block;">View</a>`;
 
                     return `
                         <tr>
-                            <td style="font-weight: 500; color: #6c757d;">${market.marketId}</td>
-                            <td class="market-name">${market.providerMarketName}</td>
-                            <td style="font-weight: 500;">${market.provider}</td>
-                            <td>${market.sport}</td>
-                            <td><span class="status-badge ${statusBadgeClass(market.status)}">${market.status}</span></td>
+                            <td style="font-weight: 500; color: #6c757d;">${escape(market.marketId)}</td>
+                            <td class="market-name">${escape(market.providerMarketName)}</td>
+                            <td style="font-weight: 500;">${escape(market.provider)}</td>
+                            <td>${escape(market.sport)}</td>
+                            <td><span class="status-badge ${statusBadgeClass(market.status)}">${escape(market.status)}</span></td>
                             <td style="text-align: right;">
                                 <span class="row-actions">
                                     ${viewButton}
@@ -364,6 +347,13 @@
             }
 
             function render() {
+                try {
+                    internalMarkets = marketStore.load().markets;
+                    providerMarkets = marketStore.providerRows();
+                } catch (error) {
+                    workspaceBody.innerHTML = '<tr><td colspan="6" role="alert">' + escape(error.message) + '</td></tr>';
+                    return;
+                }
                 tabs.forEach(tab => tab.classList.toggle('active', tab.dataset.view === activeView));
                 const showProvider = activeView === 'provider';
                 providerFilterGroup.style.display = showProvider ? 'block' : 'none';
@@ -391,6 +381,7 @@
             typeSelect.addEventListener('change', render);
             statusSelect.addEventListener('change', render);
             searchInput.addEventListener('input', render);
+            window.addEventListener('storage', render);
             render();
         });
     </script>
