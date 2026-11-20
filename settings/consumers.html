@@ -78,6 +78,26 @@
             margin-top: 18px;
         }
 
+        #deleteConsumerDialog {
+            position: fixed;
+            box-sizing: border-box;
+            border: 0;
+        }
+
+        #deleteConsumerDialog::backdrop {
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        .delete-consumer-btn,
+        #confirmDeleteConsumerBtn {
+            background-color: #dc3545;
+        }
+
+        .delete-consumer-btn:hover,
+        #confirmDeleteConsumerBtn:hover {
+            background-color: #b02a37;
+        }
+
         @media (max-width: 760px) {
             .page-title-row {
                 align-items: flex-start;
@@ -163,6 +183,16 @@
         </div>
     </div>
 
+    <dialog id="deleteConsumerDialog" class="modal-content" aria-labelledby="deleteConsumerTitle" aria-describedby="deleteConsumerText">
+        <h3 id="deleteConsumerTitle">Delete Consumer</h3>
+        <p id="deleteConsumerText"></p>
+        <p id="deleteConsumerError" class="form-feedback" role="alert" hidden></p>
+        <form method="dialog" class="modal-actions">
+            <button type="submit" class="btn-secondary" autofocus>Cancel</button>
+            <button type="button" id="confirmDeleteConsumerBtn" class="btn-primary">Delete consumer</button>
+        </form>
+    </dialog>
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const consumerModal = document.getElementById('consumerModal');
@@ -170,15 +200,30 @@
             const consumerNameInput = document.getElementById('consumerNameInput');
             const saveConsumerBtn = document.getElementById('saveConsumerBtn');
             const consumersTableBody = document.getElementById('consumersTableBody');
+            const deleteConsumerDialog = document.getElementById('deleteConsumerDialog');
+            const deleteConsumerText = document.getElementById('deleteConsumerText');
+            const deleteConsumerError = document.getElementById('deleteConsumerError');
+            let consumerToDelete = null;
             let feedCheckboxes = [...document.querySelectorAll('#feedSelectionGrid input[type="checkbox"]')];
             let consumers = [
                 { id: 'consumer-1', name: 'Consumer 1', type: 'Kafka', feeds: ['SportRadar - Feed 1', 'ExeFeed - Feed 1'] },
                 { id: 'consumer-2', name: 'Consumer 2', type: 'Kafka', feeds: ['SportRadar - Feed 2'] }
             ];
             const escape = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-            const storageKey='multifeed:consumers:v1';
-            try { const saved=localStorage.getItem(storageKey);if(saved){const parsed=JSON.parse(saved);if(!Array.isArray(parsed)||parsed.some(item=>typeof item.name!=='string'||!Array.isArray(item.feeds)))throw Error();consumers=parsed;} }
-            catch { saveConsumerBtn.disabled=true; }
+            const storageKey = 'multifeed:consumers:v1';
+
+            function readStoredConsumers() {
+                const saved = localStorage.getItem(storageKey);
+                if (saved === null) return consumers;
+                const parsed = JSON.parse(saved);
+                if (!Array.isArray(parsed) || parsed.some(item => !item || typeof item.name !== 'string' || !Array.isArray(item.feeds))) {
+                    throw new Error('Saved consumer settings could not be read. Reload after restoring the saved data.');
+                }
+                return parsed;
+            }
+
+            try { consumers = readStoredConsumers(); }
+            catch { saveConsumerBtn.disabled = true; }
             function refreshFeedChoices(){
                 const saved=localStorage.getItem('multifeed:provider-settings:v1');
                 if(!saved)return;
@@ -200,16 +245,52 @@
                             </div>
                         </td>
                         <td>${consumer.feeds.length}</td>
-                        <td style="text-align: right;"><button type="button" class="btn-action edit-consumer-btn" data-id="${consumer.id}">Edit</button></td>
+                        <td style="text-align: right;">
+                            <button type="button" class="btn-action edit-consumer-btn" data-id="${escape(consumer.id)}">Edit</button>
+                            <button type="button" class="btn-action delete-consumer-btn" data-id="${escape(consumer.id)}" aria-label="Delete ${escape(consumer.name)}">Delete</button>
+                        </td>
                     </tr>
                 `).join('');
-                document.querySelectorAll('.edit-consumer-btn').forEach(button => {
-                    button.addEventListener('click', () => {
-                        const consumer = consumers.find(item => item.id === button.dataset.id);
-                        if (consumer) openConsumerModal('edit', consumer);
-                    });
-                });
             }
+
+            consumersTableBody.addEventListener('click', event => {
+                const button = event.target.closest('.edit-consumer-btn, .delete-consumer-btn');
+                if (!button) return;
+                const consumer = consumers.find(item => item.id === button.dataset.id);
+                if (!consumer) return;
+                if (button.classList.contains('edit-consumer-btn')) {
+                    openConsumerModal('edit', consumer);
+                    return;
+                }
+
+                consumerToDelete = consumer;
+                deleteConsumerText.textContent = `Are you sure you want to delete “${consumer.name}”?`;
+                deleteConsumerError.hidden = true;
+                deleteConsumerDialog.showModal();
+            });
+
+            document.getElementById('confirmDeleteConsumerBtn').addEventListener('click', () => {
+                if (!consumerToDelete) return;
+                try {
+                    const fresh = readStoredConsumers();
+                    const current = fresh.find(consumer => consumer.id === consumerToDelete.id);
+                    if (JSON.stringify(current) !== JSON.stringify(consumerToDelete)) {
+                        throw new Error('This consumer changed. Reload and review it before deleting.');
+                    }
+                    const next = fresh.filter(consumer => consumer.id !== consumerToDelete.id);
+                    localStorage.setItem(storageKey, JSON.stringify(next));
+                    consumers = next;
+                } catch (error) {
+                    deleteConsumerError.textContent = error.message;
+                    deleteConsumerError.hidden = false;
+                    return;
+                }
+
+                deleteConsumerDialog.close();
+                renderConsumers();
+                const remainingDeleteButton = consumersTableBody.querySelector('.delete-consumer-btn');
+                (remainingDeleteButton || document.getElementById('openCreateConsumerBtn')).focus();
+            });
 
             function selectedFeeds() {
                 return feedCheckboxes
@@ -243,7 +324,7 @@
                 const error=document.getElementById('consumerSaveError');
                 try {
                     if(!name)throw Error('Enter a consumer name.');
-                    const fresh=JSON.parse(localStorage.getItem(storageKey)||'null')||consumers;
+                    const fresh=readStoredConsumers();
                     if(fresh.some(consumer=>consumer.id!==editingConsumerId&&consumer.name.toLowerCase()===name.toLowerCase()))throw Error('A consumer with this name already exists.');
                     const feeds=selectedFeeds();
                     if(!feeds.length)throw Error('Select at least one feed.');

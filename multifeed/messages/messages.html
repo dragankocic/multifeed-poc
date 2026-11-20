@@ -353,16 +353,9 @@
                     </div>
                     <div class="top-bar event-toolbar">
                         <div class="filters">
-                            <div class="filter-group" id="eventProviderFilterGroup">
-                                <label for="providerSelect">Feed Provider</label>
-                                <select id="providerSelect">
-                                    <option value="ExeFeed" selected>ExeFeed</option>
-                                    <option value="SportRadar">SportRadar</option>
-                                    <option value="Bet Genius">Bet Genius</option>
-                                    <option value="IMG Arena">IMG Arena</option>
-                                    <option value="Bet Construct">Bet Construct</option>
-                                    <option value="LSports">LSports</option>
-                                </select>
+                            <div class="filter-group" id="eventFeedFilterGroup">
+                                <label for="feedSelect">Feed</label>
+                                <select id="feedSelect"></select>
                             </div>
 
                             <div class="filter-group">
@@ -668,6 +661,18 @@
     <script src="event_mapping_projection.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            const feedLabels = new Map([
+                ['ExeFeed', 'ExeFeed Prematch'],
+                ['exefeed-live', 'ExeFeed Live'],
+                ['SportRadar', 'SportRadar Prematch'],
+                ['sportradar-live', 'SportRadar Live'],
+                ['Bet Genius', 'Bet Genius Odds'],
+                ['bet-genius-live', 'Bet Genius Live'],
+                ['IMG Arena', 'IMG Arena PreOdds'],
+                ['Bet Construct', 'Bet Construct Prematch'],
+                ['LSports', 'LSports Prematch']
+            ]);
+
             const providerEvents = [
                 { id: "EV-001", internalId: "event:56418719", providerId: "sr:match:61300621", provider: "SportRadar", sourceSportId: "sr:sport:1", sourceCategoryId: "sr:category:1", sport: "Soccer", category: "England", competition: "Premier League", season: "2025/26", stage: "-", startTime: "17.03.2026. 16:00", venue: "Old Trafford", status: "Not started", desc: "Manchester United vs Liverpool", updatedAt: "04:46:32 PM", group: "G-001", tournamentMapping: "Mapped" },
                 { id: "EV-011", internalId: "event:56418719", providerId: "6569588", provider: "ExeFeed", sourceSportId: "F", sourceCategoryId: "1126", sport: "Soccer", category: "England", competition: "Premier League", season: "2025/26", stage: "-", startTime: "17.03.2026. 16:00", venue: "Old Trafford", status: "Not started", desc: "Manchester United - Liverpool", updatedAt: "04:45:10 PM", group: "G-001", tournamentMapping: "Mapped" },
@@ -797,7 +802,7 @@
             const eventTabs = document.querySelectorAll('.event-tab');
             const tableHead = document.getElementById('eventsTableHead');
             const tableBody = document.getElementById('eventsTableBody');
-            const providerSelect = document.getElementById('providerSelect');
+            const feedSelect = document.getElementById('feedSelect');
             const sportSelect = document.getElementById('sportSelect');
             const statusSelect = document.getElementById('statusSelect');
             const linkStatusSelect = document.getElementById('linkStatusSelect');
@@ -1383,7 +1388,7 @@
             }
 
             function filteredProviderRows() {
-                const providerVal = providerSelect.value;
+                const feedId = feedSelect.value;
                 const sportVal = sportSelect.value;
                 const linkStatusVal = linkStatusSelect.value;
                 const tournamentVal = tournamentInput.value.trim().toLowerCase();
@@ -1393,7 +1398,7 @@
 
                 return providerEvents.filter(event => {
                     const eventStartTime = parseEventStartTime(event.startTime);
-                    const providerMatch = event.provider === providerVal;
+                    const feedMatch = eventFeed(event) === feedId;
                     const sportMatch = sportVal === 'all' || event.sport === sportVal;
                     const linkStatusMatch = linkStatusVal === 'all' ||
                         (linkStatusVal === 'linked' && providerEventLinkStatus(event) === 'Linked') ||
@@ -1406,7 +1411,7 @@
                         event.providerId.toLowerCase().includes(searchVal) ||
                         event.desc.toLowerCase().includes(searchVal) ||
                         event.competition.toLowerCase().includes(searchVal);
-                    return providerMatch && sportMatch && linkStatusMatch && tournamentMatch && startFromMatch && startToMatch && searchMatch;
+                    return feedMatch && sportMatch && linkStatusMatch && tournamentMatch && startFromMatch && startToMatch && searchMatch;
                 }).sort((a, b) => a.startTime.localeCompare(b.startTime));
             }
 
@@ -1418,7 +1423,7 @@
             }
 
             function renderTable() {
-                document.getElementById('eventProviderFilterGroup').style.display = activeEventsView === 'provider' ? 'block' : 'none';
+                document.getElementById('eventFeedFilterGroup').style.display = activeEventsView === 'provider' ? 'block' : 'none';
                 if (activeEventsView === 'provider') {
                     renderProviderEventsTable();
                     return;
@@ -1463,7 +1468,7 @@
             function renderProviderEventsTable() {
                 tableHead.innerHTML = `
                     <tr>
-                        <th>Feed Provider</th>
+                        <th>Feed</th>
                         <th>Source ID</th>
                         <th>${linkSourceProviderEventId ? 'Event ID' : 'Provider event ID'}</th>
                         <th>Start Time</th>
@@ -1486,7 +1491,7 @@
                     const linkClass = linkStatus === 'Linked' ? 'status-mapped' : 'status-unmapped';
                     return `
                         <tr>
-                            <td>${event.provider}</td>
+                            <td>${feedLabels.get(eventFeed(event))}</td>
                             <td style="font-weight: 600; color: #6c757d;">${event.providerId}</td>
                             <td style="font-weight: 600; color: #007bff;">${linkStatus === 'Linked' ? event.internalId : '<span style="color: #98a2b3;">-</span>'}</td>
                             <td>${event.startTime}</td>
@@ -1738,7 +1743,7 @@
                 messageDetailsModal.style.display = 'flex';
             }
 
-            [providerSelect, sportSelect, statusSelect].forEach(field => field.addEventListener('change', renderTable));
+            [feedSelect, sportSelect, statusSelect].forEach(field => field.addEventListener('change', renderTable));
             linkStatusSelect.addEventListener('change', renderTable);
             tournamentInput.addEventListener('input', renderTable);
             searchInput.addEventListener('input', renderTable);
@@ -1842,6 +1847,7 @@
                 if ([SportMappingDemo.KEY, CategoryMappingDemo.KEY, null].includes(event.key)) refreshMappingProjectionViews();
             });
             window.addEventListener('focus', refreshMappingProjectionViews);
+            feedSelect.replaceChildren(...Array.from(feedLabels, ([id, label]) => new Option(label, id)));
             populateTournamentOptions();
             renderTable();
         });
