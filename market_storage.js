@@ -1,6 +1,79 @@
 (function (root) {
     'use strict';
     const KEY = 'multifeed:market-authoring:v1';
+    const demoMarkets = [
+        {
+            id: "demo-1x2", businessId: "HRM-001", revision: 1,
+            name: "1X2", sport: "Soccer", type: "Regular",
+            desc: "Home, Draw, Away match winner",
+            specifiers: ["period"], extendedSpecifiers: ["score"], outcomesType: "Regular",
+            outcomes: [
+                { name: "{$competitor1}", desc: "Home competitor wins" },
+                { name: "draw", desc: "Match ends in a draw" },
+                { name: "{$competitor2}", desc: "Away competitor wins" }
+            ]
+        },
+        {
+            id: "demo-asian-handicap", businessId: "HRM-002", revision: 1,
+            name: "Asian Handicap", sport: "Soccer", type: "Regular",
+            desc: "Handicap betting for the match",
+            specifiers: ["hcp"], extendedSpecifiers: ["score"], outcomesType: "Regular",
+            outcomes: [
+                { name: "{$competitor1}", desc: "Home competitor with handicap" },
+                { name: "{$competitor2}", desc: "Away competitor with handicap" }
+            ]
+        },
+        {
+            id: "demo-total-goals", businessId: "HRM-003", revision: 1,
+            name: "Total Goals", sport: "Soccer", type: "Statistics",
+            desc: "Over/Under total goals",
+            specifiers: ["total"], extendedSpecifiers: ["score", "period"], outcomesType: "Regular",
+            outcomes: [
+                { name: "over", desc: "Total goals over the line" },
+                { name: "under", desc: "Total goals under the line" }
+            ]
+        },
+        {
+            id: "demo-anytime-goalscorer", businessId: "HRM-004", revision: 1,
+            name: "Anytime goalscorer", sport: "Soccer", type: "Player Props",
+            desc: "Player to score at any time",
+            specifiers: ["player"], extendedSpecifiers: ["period"], outcomesType: "Regular",
+            outcomes: [
+                { name: "{$player}", desc: "Selected player scores at any time" }
+            ]
+        },
+        {
+            id: "demo-total-corners", businessId: "HRM-005", revision: 1,
+            name: "Total Corners", sport: "Soccer", type: "Statistics",
+            desc: "Over/Under total corners in the match",
+            specifiers: ["total"], extendedSpecifiers: ["period"], outcomesType: "Regular",
+            outcomes: [
+                { name: "over", desc: "Total corners over the line" },
+                { name: "under", desc: "Total corners under the line" }
+            ]
+        },
+        {
+            id: "demo-moneyline", businessId: "HRM-006", revision: 1,
+            name: "Moneyline", sport: "Basketball", type: "Regular",
+            desc: "Match winner without draw",
+            specifiers: [], extendedSpecifiers: [], outcomesType: "Regular",
+            outcomes: [
+                { name: "{$competitor1}", desc: "Home competitor wins" },
+                { name: "{$competitor2}", desc: "Away competitor wins" }
+            ]
+        },
+        {
+            id: "demo-set-winner", businessId: "HRM-007", revision: 1,
+            name: "Set Winner", sport: "Tennis", type: "Regular",
+            desc: "Winner of selected set",
+            specifiers: ["set"], extendedSpecifiers: [], outcomesType: "Regular",
+            outcomes: [
+                { name: "{$competitor1}", desc: "First competitor wins the set" },
+                { name: "{$competitor2}", desc: "Second competitor wins the set" }
+            ]
+        }
+    ];
+
     const copy = value => JSON.parse(JSON.stringify(value));
     const id = () => 'local-' + (root.crypto?.randomUUID?.() || Date.now() + '-' + Math.random().toString(16).slice(2));
     function create(storage, providers) {
@@ -8,6 +81,11 @@
             const saved = storage.getItem(KEY);
             const state = saved === null ? {schema: 1, markets: [], mappings: []} : JSON.parse(saved);
             if (state.schema !== 1 || !Array.isArray(state.markets) || !Array.isArray(state.mappings)) throw Error('Saved markets could not be read. No data has been replaced.');
+            const missingExamples = demoMarkets.filter(example => !state.markets.some(market =>
+                market.id === example.id ||
+                (market.sport === example.sport && market.name.toLowerCase() === example.name.toLowerCase())
+            ));
+            state.markets.push(...copy(missingExamples));
             return state;
         }
         function validateMapping(state, mapping) {
