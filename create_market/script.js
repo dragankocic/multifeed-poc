@@ -5,18 +5,20 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('saveMarketBtn').before(error);
     let original;
     function selected(name) { return document.querySelector(`input[name="${name}"]:checked`)?.value; }
-    function choices(extended) {
-        const defaults = extended ? ['score','period','total_for_the_rest','hcp_for_the_rest'] : ['total','goalnr','hcp','player','period','from','to','score'];
-        const saved = JSON.parse(localStorage.getItem(extended ? 'poc_ext_specifiers' : 'poc_specifiers') || '[]');
-        const other = store.load().markets.flatMap(m => extended ? m.extendedSpecifiers : m.specifiers);
-        return [...new Set([...defaults, ...saved.map(s => s.name), ...other])].filter(Boolean);
+    function handleAddSpecifier(extended) {
+        try {
+            addSpecifier(extended);
+            error.textContent = '';
+        } catch (e) {
+            error.textContent = e.message;
+        }
     }
     function addSpecifier(extended, value='') {
         const row=document.createElement('div');row.className='specifier-row';
         const select=document.createElement('select'); select.className=extended?'extended-specifier-select':'specifier-select';
         select.add(new Option('Select specifier...',''));
-        const options=choices(extended);if(value&&!options.includes(value))options.push(value);
-        options.forEach(name=>select.add(new Option(name,name)));select.value=value;
+        store.listSpecifiers().forEach(name => select.add(new Option(name, name)));
+        select.value=value;
         const remove=document.createElement('button');remove.type='button';remove.className='btn-remove';remove.textContent='X';remove.setAttribute('aria-label','Remove specifier');remove.onclick=()=>row.remove();
         row.append(select,remove);document.getElementById(extended?'extendedSpecifiersContainer':'specifiersContainer').append(row);
     }
@@ -32,11 +34,14 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
         original=query.get('id')?store.load().markets.find(m=>m.id===query.get('id')):null;
         if(query.get('id')&&!original)throw Error('This saved market was not found. Return to the market list.');
-        document.getElementById('addSpecifierBtn').onclick=()=>addSpecifier(false);
-        document.getElementById('addExtendedSpecifierBtn').onclick=()=>addSpecifier(true);
+        document.getElementById('addSpecifierBtn').onclick=()=>handleAddSpecifier(false);
+        document.getElementById('addExtendedSpecifierBtn').onclick=()=>handleAddSpecifier(true);
         document.getElementById('addOutcomeBtn').onclick=()=>addOutcome();
         document.querySelectorAll('input[name="outcomesType"]').forEach(r=>r.addEventListener('change',toggleOutcomes));
         if(original){
+            document.querySelectorAll('.manage-specifiers').forEach(link => {
+                link.search = new URLSearchParams({id: original.id}).toString();
+            });
             document.getElementById('pageMainTitle').textContent='Edit Market';document.getElementById('pageSubTitle').textContent='Update market definition';document.getElementById('saveMarketBtn').textContent='Update Market';
             document.getElementById('marketName').value=original.name;document.getElementById('description').value=original.desc;document.getElementById('sport').value=original.sport.toLowerCase();
             document.querySelector(`input[name="marketType"][value="${original.type}"]`).checked=true;

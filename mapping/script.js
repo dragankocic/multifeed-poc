@@ -25,30 +25,43 @@ document.addEventListener('DOMContentLoaded', () => {
         function render(){
             details.replaceChildren();controls={spec:[],ext:[],outcomes:[]};
             const target=targets.find(t=>t.id===targetSelect.value);type.value=target?.type||'';if(!target)return;
+            const specifierTypes = new Map(store.listSpecifierDefinitions().map(({name, dataType}) => [name, dataType]));
             const previous=saved?.targetId===target.id?saved:null;
             if(target.specifiers.length)details.append(node('h4','Specifiers Mapping'));
             for(const name of target.specifiers){
                 const row=node('div',undefined,'form-row');const fixedRow=previous?.fixedSpecifiers.find(s=>s.hermesSpecifier===name),mappedRow=previous?.specifiers.find(s=>s.hermesSpecifier===name);
                 const mode=select([['provider','Mapped from Provider'],['fixed','Fixed Value']],fixedRow?'fixed':'provider');
-                const attribute=select(cardSource.specifiers.map(s=>[s,s]),mappedRow?.providerSpecifier||'');const value=node('input');value.type='text';value.value=fixedRow?.value||'';value.placeholder='e.g. 2.5';
+                const attribute=select(cardSource.specifiers.map(s=>[s,s]),mappedRow?.providerSpecifier||'');const value=node('input');value.type='text';value.value=fixedRow?.value??'';
+                const dataType = specifierTypes.get(name);
+                value.placeholder = 'e.g. ' + MarketStorage.specifierTypeExamples[dataType];
                 const attrField=field('Provider market specifier',attribute),fixedField=field('Fixed Specifier Value',value);
                 const toggle=()=>{attrField.style.display=mode.value==='provider'?'':'none';fixedField.style.display=mode.value==='fixed'?'':'none';};mode.onchange=toggle;
-                row.append(field('Hermes specifier: '+name,mode),attrField,fixedField);details.append(row);toggle();controls.spec.push({name,mode,attribute,value});
+                row.append(field(`Hermes specifier: ${name} (${dataType})`,mode),attrField,fixedField);details.append(row);toggle();controls.spec.push({name,mode,attribute,value});
             }
             if(target.extendedSpecifiers.length)details.append(node('h4','Extended specifiers mapping'));
-            for(const name of target.extendedSpecifiers){const previousRow=previous?.extendedSpecifiers.find(s=>s.hermesExtendedSpecifier===name);const input=select([...new Set([...cardSource.specifiers,...cardSource.extendedSpecifiers])].map(s=>[s,s]),previousRow?.providerValue||'');details.append(field(name+' — provider attribute',input));controls.ext.push({name,input});}
+            for(const name of target.extendedSpecifiers){const previousRow=previous?.extendedSpecifiers.find(s=>s.hermesExtendedSpecifier===name);const input=select([...new Set([...cardSource.specifiers,...cardSource.extendedSpecifiers])].map(s=>[s,s]),previousRow?.providerValue||'');details.append(field(`${name} (${specifierTypes.get(name)}) — provider attribute`,input));controls.ext.push({name,input});}
             details.append(node('h4','Outcome mapping'));
             if(target.outcomesType!=='Regular'){details.append(node('p','The documented ExeFeed markets use explicit selections. Choose a Hermes market with Regular outcomes.'));return;}
             for(const outcome of cardSource.outcomes){const previousRow=previous?.outcomes.find(o=>o.providerOutcome===outcome.code);const input=select(target.outcomes.map(o=>[o.name,o.name]),previousRow?.hermesOutcome||'');input.className='hermes-outcome-select';details.append(field(outcome.code+' — '+outcome.name,input));controls.outcomes.push({code:outcome.code,input});}
         }
         function definition(){return {id:saved?.id,revision:saved?.revision,provider:cardSource.provider,sourceId:cardSource.code,sport:cardSource.sport,targetId:targetSelect.value,
             specifiers:controls.spec.filter(c=>c.mode.value==='provider').map(c=>({providerSpecifier:c.attribute.value,hermesSpecifier:c.name})),
-            fixedSpecifiers:controls.spec.filter(c=>c.mode.value==='fixed').map(c=>({value:c.value.value.trim(),hermesSpecifier:c.name})),
+            fixedSpecifiers:controls.spec.filter(c=>c.mode.value==='fixed').map(c=>({value:c.value.value,hermesSpecifier:c.name})),
             extendedSpecifiers:controls.ext.map(c=>({providerValue:c.input.value,hermesExtendedSpecifier:c.name})),
             outcomes:controls.outcomes.map(c=>({providerOutcome:c.code,hermesOutcome:c.input.value}))};}
         targetSelect.onchange=()=>{status.textContent='';render();};render();
         const actions=node('div',undefined,'form-row');actions.style.cssText='justify-content:flex-end;margin-top:24px;gap:10px';
-        actions.append(button('View mapping',()=>showJson('Mapping Definition',definition())),button('Reset',()=>{targetSelect.value=saved?.targetId||'';render();status.textContent='';}),button('Cancel',()=>section.remove()),button('Save mapping',()=>{try{saved=store.saveMapping(definition());status.style.color='#167447';status.textContent='Mapping saved in this browser.';}catch(e){status.style.color='#b42318';status.textContent=e.message;}},'btn-primary'));
+        actions.append(button('View mapping',()=>showJson('Mapping Definition',definition())),button('Reset',()=>{targetSelect.value=saved?.targetId||'';render();status.textContent='';}),button('Cancel',()=>section.remove()),button('Save mapping',()=>{
+            try {
+                saved=store.saveMapping(definition());
+                for (const {hermesSpecifier, value} of saved.fixedSpecifiers) {
+                    controls.spec.find(control => control.name === hermesSpecifier).value.value = value;
+                }
+                status.style.color='#167447';status.textContent='Mapping saved in this browser.';
+            } catch(e) {
+                status.style.color='#b42318';status.textContent=e.message;
+            }
+        },'btn-primary'));
         section.append(actions);container.append(section);
     }
     function load(){

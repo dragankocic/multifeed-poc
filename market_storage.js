@@ -1,6 +1,35 @@
 (function (root) {
     'use strict';
     const KEY = 'multifeed:market-authoring:v1';
+    const defaultSpecifierTypes = {
+        total: 'DECIMAL', goalnr: 'INTEGER', hcp: 'DECIMAL', player: 'STRING', period: 'STRING',
+        from: 'STRING', to: 'STRING', score: 'SCORE', total_for_the_rest: 'DECIMAL',
+        hcp_for_the_rest: 'DECIMAL', set: 'INTEGER'
+    };
+    const stripLeadingZeros = digits => digits.replace(/^0+(?=\d)/, '');
+    function canonicalNumber(value) {
+        const negative = value.startsWith('-');
+        const [digits, fraction = ''] = (negative ? value.slice(1) : value).split('.');
+        const integer = stripLeadingZeros(digits);
+        const decimals = fraction.replace(/0+$/, '');
+        const magnitude = decimals ? integer + '.' + decimals : integer;
+        return negative && magnitude !== '0' ? '-' + magnitude : magnitude;
+    }
+    const specifierDataTypes = {
+        INTEGER: {pattern: /^-?\d+$/, example: '1', canonicalize: canonicalNumber},
+        DECIMAL: {pattern: /^-?\d+(\.\d+)?$/, example: '2.5', canonicalize: canonicalNumber},
+        STRING: {pattern: /^.+$/, example: 'home', canonicalize: value => value},
+        SCORE: {pattern: /^\d+:\d+$/, example: '1:0', canonicalize: value => value.split(':').map(stripLeadingZeros).join(':')}
+    };
+    function canonicalSpecifierValue(name, dataType, input) {
+        const {pattern, example, canonicalize} = specifierDataTypes[dataType];
+        const value = String(input ?? '');
+        if (!pattern.test(value)) throw Error(`Enter a valid ${dataType} value for ${name} (e.g. ${example}).`);
+        return canonicalize(value);
+    }
+    const legacySpecifierKeys = ['poc_specifiers', 'poc_ext_specifiers'];
+    const isSpecifierName = name => /^[A-Za-z][A-Za-z0-9_]*$/.test(name);
+    const marketSpecifierNames = market => [...market.specifiers, ...market.extendedSpecifiers];
     const demoMarkets = [
         {
             id: "demo-1x2", businessId: "HRM-001", revision: 1,
@@ -88,6 +117,97 @@
             state.markets.push(...copy(missingExamples));
             return state;
         }
+        function specifierNames(state) {
+            const savedNames = state.specifierNames ?? [
+                ...Object.keys(defaultSpecifierTypes).filter(name => name !== 'set'),
+                ...legacySpecifierKeys.flatMap(key =>
+                    (JSON.parse(storage.getItem(key)) ?? []).map(specifier => specifier.name)
+                )
+            ];
+            return [...new Set([...savedNames, ...state.markets.flatMap(marketSpecifierNames)])];
+        }
+        function listSpecifiers() {
+            return specifierNames(load());
+        }
+        function specifierType(state, name) {
+            if (Object.hasOwn(state.specifierTypes ?? {}, name)) return state.specifierTypes[name];
+            return Object.hasOwn(defaultSpecifierTypes, name) ? defaultSpecifierTypes[name] : 'STRING';
+        }
+        function listSpecifierDefinitions() {
+            const state = load();
+            return specifierNames(state).map(name => ({name, dataType: specifierType(state, name)}));
+        }
+        function saveSpecifier(input, previousName = null, dataType) {
+            const name = input.trim();
+            if (!isSpecifierName(name)) throw Error('Use a specifier name that starts with a letter and contains only letters, numbers or underscores.');
+            const state = load();
+            const names = specifierNames(state);
+            if (previousName !== null && !names.includes(previousName)) throw Error('This specifier no longer exists.');
+            const previousType = previousName === null ? null : specifierType(state, previousName);
+            const nextType = dataType ?? previousType ?? 'STRING';
+            if (typeof nextType !== 'string' || !Object.hasOwn(specifierDataTypes, nextType)) {
+                throw Error('Select a valid specifier data type.');
+            }
+            const renamed = previousName !== null && name !== previousName;
+            const typeChanged = previousType !== nextType;
+            if (name === previousName && !typeChanged) return;
+            if (name !== previousName && names.includes(name)) throw Error('A specifier with this name already exists.');
+            state.specifierNames = previousName === null
+                ? [...names, name]
+                : names.map(current => current === previousName ? name : current);
+
+            state.specifierTypes = {...state.specifierTypes, [name]: nextType};
+            if (renamed) {
+                delete state.specifierTypes[previousName];
+                const replaceName = current => current === previousName ? name : current;
+                const replaceOutcomeName = current => current.replaceAll('{' + previousName + '}', '{' + name + '}')
+                    .replaceAll('{$' + previousName + '}', '{$' + name + '}');
+                for (const market of state.markets.filter(market => marketSpecifierNames(market).includes(previousName))) {
+                    market.specifiers = market.specifiers.map(replaceName);
+                    market.extendedSpecifiers = market.extendedSpecifiers.map(replaceName);
+                    market.outcomes = market.outcomes.map(outcome => ({...outcome, name: replaceOutcomeName(outcome.name)}));
+                    if (new Set(market.outcomes.map(outcome => outcome.name)).size !== market.outcomes.length) {
+                        throw Error('Renaming this specifier would create duplicate outcomes in ' + market.name + '.');
+                    }
+                    market.revision++;
+                    for (const mapping of state.mappings.filter(mapping => mapping.targetId === market.id)) {
+                        for (const row of [...mapping.specifiers, ...mapping.fixedSpecifiers]) {
+                            row.hermesSpecifier = replaceName(row.hermesSpecifier);
+                        }
+                        for (const row of mapping.extendedSpecifiers) {
+                            row.hermesExtendedSpecifier = replaceName(row.hermesExtendedSpecifier);
+                        }
+                        for (const row of mapping.outcomes) {
+                            row.hermesOutcome = replaceOutcomeName(row.hermesOutcome);
+                        }
+                        validateMapping(state, mapping);
+                        mapping.revision++;
+                    }
+                }
+            }
+            if (previousName !== null && typeChanged) {
+                for (const mapping of state.mappings) {
+                    const fixed = mapping.fixedSpecifiers.find(row => row.hermesSpecifier === name);
+                    if (!fixed) continue;
+                    try {
+                        fixed.value = canonicalSpecifierValue(name, nextType, fixed.value);
+                    } catch (error) {
+                        throw Error(`${error.message} Update the fixed value in the ${mapping.sourceId} mapping before changing the data type.`);
+                    }
+                    if (!renamed) mapping.revision++;
+                }
+            }
+            storage.setItem(KEY, JSON.stringify(state));
+        }
+        function removeSpecifier(name) {
+            const state = load();
+            if (state.markets.some(market => marketSpecifierNames(market).includes(name))) {
+                throw Error('Remove this specifier from all markets before deleting it.');
+            }
+            state.specifierNames = specifierNames(state).filter(current => current !== name);
+            if (state.specifierTypes) delete state.specifierTypes[name];
+            storage.setItem(KEY, JSON.stringify(state));
+        }
         function validateMapping(state, mapping) {
             const source = providers.find(p => p.provider === mapping.provider && p.sport === mapping.sport && p.code === mapping.sourceId);
             const target = state.markets.find(m => m.id === mapping.targetId);
@@ -98,7 +218,6 @@
                 if (!target.specifiers.includes(row.hermesSpecifier) || assigned.has(row.hermesSpecifier)) throw Error('Assign each Hermes specifier once.');
                 assigned.add(row.hermesSpecifier);
                 if ('providerSpecifier' in row && !source.specifiers.includes(row.providerSpecifier)) throw Error('Choose a documented provider attribute.');
-                if ('value' in row && !String(row.value).trim()) throw Error('Enter a fixed specifier value.');
             }
             if (assigned.size !== target.specifiers.length) throw Error('Map every required Hermes specifier or give it a fixed value.');
             const extended = new Set();
@@ -125,11 +244,12 @@
             if (!market.name || !market.desc || !market.sport) throw Error('Enter a market name, description and sport.');
             if (!['Regular','Statistics','Player Props','Outright'].includes(market.type)) throw Error('Select a market type.');
             if (!['Regular','Competitors','Players'].includes(market.outcomesType)) throw Error('Select an outcomes type.');
-            const all = [...market.specifiers, ...market.extendedSpecifiers];
-            if (new Set(all).size !== all.length || all.some(s => !/^[A-Za-z][A-Za-z0-9_]*$/.test(s))) throw Error('Use unique specifier names containing letters, numbers or underscores.');
+            const all = marketSpecifierNames(market);
+            if (new Set(all).size !== all.length || all.some(s => !isSpecifierName(s))) throw Error('Use unique specifier names containing letters, numbers or underscores.');
             if (market.outcomesType === 'Regular' && (!market.outcomes.length || market.outcomes.some(o => !o.name.trim()) || new Set(market.outcomes.map(o => o.name)).size !== market.outcomes.length)) throw Error('Enter at least one outcome and give each outcome a unique name.');
             if (state.markets.some(m => m.id !== market.id && m.sport === market.sport && m.name.toLowerCase() === market.name.toLowerCase())) throw Error('A market with this name already exists for this sport.');
             market.id = old?.id || id(); market.businessId = old?.businessId ?? null; market.revision = (old?.revision || 0) + 1;
+            state.specifierNames = [...new Set([...specifierNames(state), ...all])];
             state.markets = state.markets.filter(m => m.id !== market.id).concat(market);
             state.mappings.filter(m => m.targetId === market.id).forEach(m => validateMapping(state, m));
             storage.setItem(KEY, JSON.stringify(state)); return market;
@@ -139,6 +259,10 @@
             if (input.id && !old) throw Error('This mapping no longer exists.');
             if (old && old.revision !== input.revision) throw Error('This mapping changed in another tab. Reload before saving.');
             const mapping = copy(input); validateMapping(state, mapping);
+            for (const row of mapping.fixedSpecifiers) {
+                const name = row.hermesSpecifier;
+                row.value = canonicalSpecifierValue(name, specifierType(state, name), row.value);
+            }
             if (state.mappings.some(m => m.id !== mapping.id && m.provider === mapping.provider && m.sourceId === mapping.sourceId && m.sport === mapping.sport && m.targetId === mapping.targetId)) throw Error('This source is already mapped to that Hermes market. Edit the saved mapping.');
             mapping.id = old?.id || id(); mapping.revision = (old?.revision || 0) + 1;
             state.mappings = state.mappings.filter(m => m.id !== mapping.id).concat(mapping);
@@ -157,9 +281,10 @@
                 return {...p, marketId: p.code, providerMarketName: p.name, status: mappings.length ? 'Mapped' : 'Unmapped', internalId: targets.map(t => t.id).join(', ') || '-', internalName: targets.map(t => t.name).join(', ') || '-'};
             });
         }
-        return {load, saveMarket, saveMapping, removeMapping, providerRows, validateMapping};
+        return {load, saveMarket, saveMapping, removeMapping, providerRows, validateMapping, listSpecifiers, listSpecifierDefinitions, saveSpecifier, removeSpecifier};
     }
     const escape = value => String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
-    root.MarketStorage = {create, KEY, escape};
+    const specifierTypeExamples = Object.fromEntries(Object.entries(specifierDataTypes).map(([type, {example}]) => [type, example]));
+    root.MarketStorage = {create, KEY, escape, specifierTypeExamples};
     if (typeof module !== 'undefined') module.exports = root.MarketStorage;
 })(typeof window === 'undefined' ? globalThis : window);

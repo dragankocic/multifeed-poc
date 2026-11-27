@@ -68,3 +68,114 @@ test('incomplete and conflicting mappings do not persist',()=>{const {store}=set
 test('editing, stale saves and removal preserve mapping integrity',()=>{const {store}=setup(),target=market(store);const saved=store.saveMapping(mapping(target));const updated=store.saveMapping({...saved,specifiers:[],fixedSpecifiers:[{value:'2.5',hermesSpecifier:'total'}]});assert.throws(()=>store.saveMapping(saved),/another tab/);assert.throws(()=>store.saveMarket({...target,specifiers:[]}),/once/);store.removeMapping(updated.id,updated.revision);assert.equal(store.load().mappings.length,0);assert.equal(store.providerRows().find(p=>p.code==='TOTAL_GOALS').status,'Unmapped');});
 test('cross-sport mappings and duplicate source-target mappings are rejected',()=>{const {store}=setup(),target=market(store);store.saveMapping(mapping(target));assert.throws(()=>store.saveMapping(mapping(target)),/already mapped/);const basketball=market(store,'Other total','Basketball');assert.throws(()=>store.saveMapping(mapping(basketball)),/same sport/);});
 test('unreadable or full storage is reported instead of replaced or silently ignored',()=>{const values=new Map([[KEY,'broken']]);const broken=create({getItem:k=>values.get(k),setItem:()=>assert.fail('Must not replace corrupted data')},sources);assert.throws(()=>broken.load());const full=create({getItem:()=>null,setItem:()=>{throw Error('Storage full');}},sources);assert.throws(()=>market(full),/Storage full/);});
+
+test('the shared catalogue imports both legacy lists and persists additions and deletions', () => {
+    const {store, storage, values} = setup();
+    values.set('poc_specifiers', JSON.stringify([{id: 1, name: 'legacy_regular'}]));
+    values.set('poc_ext_specifiers', JSON.stringify([
+        {id: 1, name: 'legacy_extended'}, {id: 2, name: 'legacy_regular'}
+    ]));
+
+    assert.ok(store.listSpecifiers().includes('legacy_extended'));
+    assert.equal(store.listSpecifiers().filter(name => name === 'legacy_regular').length, 1);
+    assert.throws(() => store.saveSpecifier('legacy_regular'), /already exists/);
+    store.saveSpecifier('new_specifier');
+    store.removeSpecifier('legacy_regular');
+    store.removeSpecifier('goalnr');
+
+    const reopened = create(storage, sources);
+    const names = reopened.listSpecifiers();
+    assert.ok(names.includes('legacy_extended'));
+    assert.ok(names.includes('new_specifier'));
+    assert.ok(names.includes('set'));
+    assert.ok(!names.includes('legacy_regular'));
+    assert.ok(!names.includes('goalnr'));
+});
+
+test('renaming updates both market roles and their mappings together', () => {
+    const {store, storage} = setup();
+    const regular = market(store);
+    const extended = store.saveMarket({
+        ...regular, id: undefined, name: 'Extended total', specifiers: [], extendedSpecifiers: ['total']
+    });
+    store.saveMapping(mapping(regular));
+    store.saveMapping({
+        ...mapping(regular, 'TOTAL_GOALS_1ST_HALF'),
+        specifiers: [], fixedSpecifiers: [{hermesSpecifier: 'total', value: '2.5'}]
+    });
+    store.saveMapping({
+        ...mapping(extended), specifiers: [],
+        extendedSpecifiers: [{hermesExtendedSpecifier: 'total', providerValue: 'B'}]
+    });
+    assert.throws(() => store.removeSpecifier('total'), /Remove this specifier from all markets/);
+    assert.throws(() => store.saveSpecifier('period', 'total'), /already exists/);
+    store.saveSpecifier('goal_line', 'total');
+
+    const reopened = create(storage, sources);
+    const {markets, mappings} = reopened.load();
+    assert.ok(!reopened.listSpecifiers().includes('total'));
+    assert.deepEqual(markets.find(m => m.id === regular.id).specifiers, ['goal_line']);
+    assert.deepEqual(markets.find(m => m.id === extended.id).extendedSpecifiers, ['goal_line']);
+    assert.equal(mappings[0].specifiers[0].hermesSpecifier, 'goal_line');
+    assert.equal(mappings[1].fixedSpecifiers[0].hermesSpecifier, 'goal_line');
+    assert.equal(mappings[2].extendedSpecifiers[0].hermesExtendedSpecifier, 'goal_line');
+    assert.equal(mappings[2].extendedSpecifiers[0].providerValue, 'B');
+    assert.equal(mappings[2].outcomes[0].hermesOutcome, 'over {goal_line}');
+    for (const saved of mappings) {
+        assert.equal(saved.revision, 2);
+        reopened.validateMapping({markets}, saved);
+    }
+    assert.throws(() => reopened.saveMarket(regular), /another tab/);
+});
+
+test('specifier data types apply their regex and canonicalize fixed mapping values without rounding', () => {
+    const {store, storage} = setup();
+    const examples = [
+        ['INTEGER', '0009007199254740993', '9007199254740993', '1.0'],
+        ['DECIMAL', '-0002.5000', '-2.5', '2e1'],
+        ['DECIMAL', '-00.000', '0', '.5'],
+        ['SCORE', '01:02', '1:2', '-1:2'],
+        ['STRING', ' Home ', ' Home ', '']
+    ];
+    for (const [index, [dataType, input, canonical, invalid]] of examples.entries()) {
+        const name = 'typed_' + index;
+        store.saveSpecifier(name, null, dataType);
+        const target = store.saveMarket({
+            ...market(store, 'Example ' + index), specifiers: [name]
+        });
+        const fixed = value => ({...mapping(target), specifiers: [], fixedSpecifiers: [{hermesSpecifier: name, value}]});
+        assert.throws(() => store.saveMapping(fixed(invalid)), new RegExp(`valid ${dataType} value for ${name}`));
+        assert.equal(store.saveMapping(fixed(input)).fixedSpecifiers[0].value, canonical);
+    }
+    const reopened = create(storage, sources);
+    assert.deepEqual(reopened.load().mappings.map(saved => saved.fixedSpecifiers[0].value), examples.map(example => example[2]));
+    assert.throws(() => store.saveSpecifier('invalid_type', null, 'BOOLEAN'), /valid specifier data type/);
+});
+
+test('legacy specifiers get types and a type change validates existing fixed values before saving', () => {
+    const {store, storage, values} = setup();
+    values.set('poc_specifiers', JSON.stringify([{name: 'custom'}]));
+    const types = Object.fromEntries(store.listSpecifierDefinitions().map(({name, dataType}) => [name, dataType]));
+    assert.equal(types.total, 'DECIMAL');
+    assert.equal(types.set, 'INTEGER');
+    assert.equal(types.score, 'SCORE');
+    assert.equal(types.custom, 'STRING');
+
+    const target = store.saveMarket({...market(store), specifiers: ['custom']});
+    const saved = store.saveMapping({
+        ...mapping(target), specifiers: [], fixedSpecifiers: [{hermesSpecifier: 'custom', value: '003'}]
+    });
+    const before = values.get(KEY);
+    assert.throws(() => store.saveSpecifier('renamed', 'custom', 'SCORE'), /Update the fixed value in the TOTAL_GOALS mapping/);
+    assert.equal(values.get(KEY), before);
+
+    store.saveSpecifier('renamed', 'custom', 'INTEGER');
+    const reopened = create(storage, sources);
+    assert.deepEqual(reopened.listSpecifierDefinitions().find(specifier => specifier.name === 'renamed'), {
+        name: 'renamed', dataType: 'INTEGER'
+    });
+    const [updated] = reopened.load().mappings;
+    assert.deepEqual(updated.fixedSpecifiers, [{hermesSpecifier: 'renamed', value: '3'}]);
+    assert.equal(updated.revision, saved.revision + 1);
+    assert.throws(() => reopened.saveMapping(saved), /another tab/);
+});

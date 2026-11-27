@@ -38,7 +38,6 @@ document.addEventListener("DOMContentLoaded", () => {
         'hermes_markets.html',
         'create_market/create_market.html',
         'create_market/specifiers.html',
-        'create_market/extended_specifiers.html',
         'view_hermes_market.html',
         'mapping/mapping.html',
         'view_market.html'
